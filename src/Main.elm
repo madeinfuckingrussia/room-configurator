@@ -67,33 +67,28 @@ viewMenu model =
 
             else
                 "animate__slideOutLeft"
-    in
-    let
-        animationClassBtn =
+
+        iconClass =
             if model.isOpenMenu then
-                "animate__animated animate__flip"
+                "fa-xmark animate__rotateInDownLeft"
 
             else
-                "animate__animated animate__flip"
+                "fa-bars animate__rotateInDownRight"
     in
     div []
         [ button
             [ Attr.class "button is-light m-2"
             , onClick ToggleMenu
             ]
-            [ span [ Attr.class ("icon " ++ animationClassBtn) ] [ i [ Attr.class "fa-solid fa-bars" ] [] ] ]
-        , aside
-            [ Attr.class ("menu p-4 animate__animated " ++ animationClass)
+            [ span [ Attr.class "icon" ]
+                [ i [ Attr.class ("fa-solid animate__animated " ++ iconClass) ] [] ]
             ]
+        , aside
+            [ Attr.class ("menu p-4 animate__animated " ++ animationClass) ]
             [ p [ Attr.class "menu-label" ] [ text "Label 1" ]
             , ul [ Attr.class "menu-list" ]
                 [ li [] [ a [] [ text "Link 1" ] ]
                 , li [] [ a [] [ text "Link 2" ] ]
-                ]
-            , p [ Attr.class "menu-label" ] [ text "Label 2" ]
-            , ul [ Attr.class "menu-list" ]
-                [ li [] [ a [ Attr.class "is-active" ] [ text "Link 3" ] ]
-                , li [] [ a [] [ text "Link 4" ] ]
                 ]
             ]
         ]

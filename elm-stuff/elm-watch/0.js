@@ -5268,8 +5268,8 @@ var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$viewMenu = function (model) {
+	var iconClass = model.isOpenMenu ? 'fa-xmark animate__rotateInDownLeft' : 'fa-bars animate__rotateInDownRight';
 	var animationClass = model.isOpenMenu ? 'animate__slideInLeft' : 'animate__slideOutLeft';
-	var animationClassBtn = model.isOpenMenu ? 'animate__animated animate__flip' : 'animate__animated animate__flip';
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -5288,7 +5288,7 @@ var $author$project$Main$viewMenu = function (model) {
 						$elm$html$Html$span,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('icon ' + animationClassBtn)
+								$elm$html$Html$Attributes$class('icon')
 							]),
 						_List_fromArray(
 							[
@@ -5296,7 +5296,7 @@ var $author$project$Main$viewMenu = function (model) {
 								$elm$html$Html$i,
 								_List_fromArray(
 									[
-										$elm$html$Html$Attributes$class('fa-solid fa-bars')
+										$elm$html$Html$Attributes$class('fa-solid animate__animated ' + iconClass)
 									]),
 								_List_Nil)
 							]))
@@ -5351,54 +5351,6 @@ var $author$project$Main$viewMenu = function (model) {
 										_List_fromArray(
 											[
 												$elm$html$Html$text('Link 2')
-											]))
-									]))
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('menu-label')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Label 2')
-							])),
-						A2(
-						$elm$html$Html$ul,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('menu-list')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('is-active')
-											]),
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Link 3')
-											]))
-									])),
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Link 4')
 											]))
 									]))
 							]))
