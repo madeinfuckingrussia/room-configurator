@@ -1,0 +1,10 @@
+{
+    "targets": {
+        "Raumplaner": {
+            "inputs": [
+                "src/Main.elm"
+            ],
+            "output": "main.js"
+        }
+    }
+}

@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "elm": "^0.19.1-6",
+    "elm-live": "^4.0.2",
+    "elm-watch": "^1.2.6"
+  },
+  "devDependencies": {
+    "elm-format": "^0.8.8"
+  }
+}
