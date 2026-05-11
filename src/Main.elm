@@ -1,8 +1,8 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, a, aside, button, div, i, li, nav, p, span, text, ul)
-import Html.Attributes as Attr
+import Html exposing (Html, a, aside, button, div, i, input, li, nav, p, span, text, ul)
+import Html.Attributes as Attr exposing (class)
 import Html.Events exposing (onClick)
 import Svg exposing (Svg, rect, svg)
 import Svg.Attributes as SvgAttr
@@ -107,10 +107,16 @@ viewBottomBar : Html Msg
 viewBottomBar =
     nav [ Attr.class "navbar is-fixed-bottom is-dark" ]
         [ div [ Attr.class "container is-flex is-justify-content-center" ]
-            [ div [ Attr.class "navbar-brand" ]
-                [ a [ Attr.class "navbar-item" ] [ text "Tisch" ]
-                , a [ Attr.class "navbar-item" ] [ text "Stuhl" ]
-                , a [ Attr.class "navbar-item" ] [ text "Teppich" ]
+            [ div [ Attr.class "navbar-brand is-flex is-align-items-center" ]
+                [ i [ Attr.class "fa-solid fa-ruler-combined fa-lg mr-3" ] []
+                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ] [ text "3x3" ]
+                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ] [ text "3x4" ]
+                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ] [ text "5x6" ]
+                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3" ] [ text "6x6" ]
+                , text "Custom size"
+                , viewSquareInput
+                , text "x"
+                , viewSquareInput
                 ]
             ]
         ]
@@ -134,6 +140,21 @@ renderCanvas model =
             ]
             []
         ]
+
+
+viewSquareInput =
+    input
+        [ Attr.class "mx-3"
+        , Attr.style "width" "40px"
+        , Attr.style "height" "25px"
+        , Attr.style "text-align" "center"
+        , Attr.style "border" "2px solid #555"
+        , Attr.style "border-radius" "8px"
+        , Attr.style "background" "none"
+        , Attr.style "color" "white"
+        , Attr.style "outline" "none"
+        ]
+        []
 
 
 

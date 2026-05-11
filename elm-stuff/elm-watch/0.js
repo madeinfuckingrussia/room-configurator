@@ -5241,9 +5241,26 @@ var $author$project$Main$renderCanvas = function (model) {
 			]));
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $author$project$Main$viewSquareInput = A2(
+	$elm$html$Html$input,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('mx-3'),
+			A2($elm$html$Html$Attributes$style, 'width', '40px'),
+			A2($elm$html$Html$Attributes$style, 'height', '25px'),
+			A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+			A2($elm$html$Html$Attributes$style, 'border', '2px solid #555'),
+			A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+			A2($elm$html$Html$Attributes$style, 'background', 'none'),
+			A2($elm$html$Html$Attributes$style, 'color', 'white'),
+			A2($elm$html$Html$Attributes$style, 'outline', 'none')
+		]),
+	_List_Nil);
 var $author$project$Main$viewBottomBar = A2(
 	$elm$html$Html$nav,
 	_List_fromArray(
@@ -5264,46 +5281,66 @@ var $author$project$Main$viewBottomBar = A2(
 					$elm$html$Html$div,
 					_List_fromArray(
 						[
-							$elm$html$Html$Attributes$class('navbar-brand')
+							$elm$html$Html$Attributes$class('navbar-brand is-flex is-align-items-center')
 						]),
 					_List_fromArray(
 						[
 							A2(
+							$elm$html$Html$i,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('fa-solid fa-ruler-combined fa-lg mr-3')
+								]),
+							_List_Nil),
+							A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('navbar-item')
+									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Tisch')
+									$elm$html$Html$text('3x3')
 								])),
 							A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('navbar-item')
+									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Stuhl')
+									$elm$html$Html$text('3x4')
 								])),
 							A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('navbar-item')
+									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('Teppich')
-								]))
+									$elm$html$Html$text('5x6')
+								])),
+							A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless mr-3')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('6x6')
+								])),
+							$elm$html$Html$text('Custom size'),
+							$author$project$Main$viewSquareInput,
+							$elm$html$Html$text('x'),
+							$author$project$Main$viewSquareInput
 						]))
 				]))
 		]));
 var $author$project$Main$ToggleMenu = {$: 'ToggleMenu'};
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
