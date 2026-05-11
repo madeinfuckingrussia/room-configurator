@@ -5240,8 +5240,68 @@ var $author$project$Main$renderCanvas = function (model) {
 				_List_Nil)
 			]));
 };
-var $author$project$Main$ToggleMenu = {$: 'ToggleMenu'};
 var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$viewBottomBar = A2(
+	$elm$html$Html$nav,
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$class('navbar is-fixed-bottom is-dark')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('container is-flex is-justify-content-center')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('navbar-brand')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('navbar-item')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Tisch')
+								])),
+							A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('navbar-item')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Stuhl')
+								])),
+							A2(
+							$elm$html$Html$a,
+							_List_fromArray(
+								[
+									$elm$html$Html$Attributes$class('navbar-item')
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Teppich')
+								]))
+						]))
+				]))
+		]));
+var $author$project$Main$ToggleMenu = {$: 'ToggleMenu'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$li = _VirtualDom_node('li');
@@ -5264,8 +5324,6 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$viewMenu = function (model) {
 	var iconClass = model.isOpenMenu ? 'fa-xmark animate__rotateInDownLeft' : 'fa-bars animate__rotateInDownRight';
@@ -5317,7 +5375,7 @@ var $author$project$Main$viewMenu = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Label 1')
+								$elm$html$Html$text('Furniture')
 							])),
 						A2(
 						$elm$html$Html$ul,
@@ -5337,7 +5395,7 @@ var $author$project$Main$viewMenu = function (model) {
 										_List_Nil,
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Link 1')
+												$elm$html$Html$text('Table')
 											]))
 									])),
 								A2(
@@ -5350,7 +5408,20 @@ var $author$project$Main$viewMenu = function (model) {
 										_List_Nil,
 										_List_fromArray(
 											[
-												$elm$html$Html$text('Link 2')
+												$elm$html$Html$text('Chair')
+											]))
+									])),
+								A2(
+								$elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$a,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Carpet')
 											]))
 									]))
 							]))
@@ -5362,7 +5433,7 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('hero is-fullheight')
+				$elm$html$Html$Attributes$class('hero is-fullheight is-clipped')
 			]),
 		_List_fromArray(
 			[
@@ -5370,33 +5441,49 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('columns is-gapless is-marginless')
+						$elm$html$Html$Attributes$class('hero-body p-0 is-align-items-stretch')
 					]),
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$aside,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$class('column is-2'),
-								A2($elm$html$Html$Attributes$style, 'min-height', '100vh')
-							]),
-						_List_fromArray(
-							[
-								$author$project$Main$viewMenu(model)
-							])),
-						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('column is-flex is-justify-content-center is-align-items-center'),
-								A2($elm$html$Html$Attributes$style, 'min-height', '100vh')
+								$elm$html$Html$Attributes$class('columns is-gapless is-marginless'),
+								A2($elm$html$Html$Attributes$style, 'width', '100%')
 							]),
 						_List_fromArray(
 							[
-								$author$project$Main$renderCanvas(model)
+								A2(
+								$elm$html$Html$aside,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('column is-2')
+									]),
+								_List_fromArray(
+									[
+										$author$project$Main$viewMenu(model)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('column is-flex is-justify-content-center is-align-items-center')
+									]),
+								_List_fromArray(
+									[
+										$author$project$Main$renderCanvas(model)
+									]))
 							]))
-					]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('hero-foot')
+					]),
+				_List_fromArray(
+					[$author$project$Main$viewBottomBar]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, a, aside, button, div, i, li, p, span, text, ul)
+import Html exposing (Html, a, aside, button, div, i, li, nav, p, span, text, ul)
 import Html.Attributes as Attr
 import Html.Events exposing (onClick)
 import Svg exposing (Svg, rect, svg)
@@ -48,13 +48,21 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ Attr.class "hero is-fullheight" ]
-        [ div [ Attr.class "columns is-gapless is-marginless" ]
-            [ aside [ Attr.class "column is-2", Attr.style "min-height" "100vh" ]
-                [ viewMenu model ]
-            , div [ Attr.class "column is-flex is-justify-content-center is-align-items-center", Attr.style "min-height" "100vh" ]
-                [ renderCanvas model ]
+    div [ Attr.class "hero is-fullheight is-clipped" ]
+        [ div [ Attr.class "hero-body p-0 is-align-items-stretch" ]
+            [ div [ Attr.class "columns is-gapless is-marginless", Attr.style "width" "100%" ]
+                [ aside
+                    [ Attr.class "column is-2"
+                    ]
+                    [ viewMenu model ]
+                , div
+                    [ Attr.class "column is-flex is-justify-content-center is-align-items-center"
+                    ]
+                    [ renderCanvas model ]
+                ]
             ]
+        , div [ Attr.class "hero-foot" ]
+            [ viewBottomBar ]
         ]
 
 
@@ -85,10 +93,24 @@ viewMenu model =
             ]
         , aside
             [ Attr.class ("menu p-4 animate__animated " ++ animationClass) ]
-            [ p [ Attr.class "menu-label" ] [ text "Label 1" ]
+            [ p [ Attr.class "menu-label" ] [ text "Furniture" ]
             , ul [ Attr.class "menu-list" ]
-                [ li [] [ a [] [ text "Link 1" ] ]
-                , li [] [ a [] [ text "Link 2" ] ]
+                [ li [] [ a [] [ text "Table" ] ]
+                , li [] [ a [] [ text "Chair" ] ]
+                , li [] [ a [] [ text "Carpet" ] ]
+                ]
+            ]
+        ]
+
+
+viewBottomBar : Html Msg
+viewBottomBar =
+    nav [ Attr.class "navbar is-fixed-bottom is-dark" ]
+        [ div [ Attr.class "container is-flex is-justify-content-center" ]
+            [ div [ Attr.class "navbar-brand" ]
+                [ a [ Attr.class "navbar-item" ] [ text "Tisch" ]
+                , a [ Attr.class "navbar-item" ] [ text "Stuhl" ]
+                , a [ Attr.class "navbar-item" ] [ text "Teppich" ]
                 ]
             ]
         ]
