@@ -49,17 +49,11 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div [ Attr.class "hero is-fullheight is-clipped" ]
-        [ div [ Attr.class "hero-body p-0 is-align-items-stretch" ]
-            [ div [ Attr.class "columns is-gapless is-marginless", Attr.style "width" "100%" ]
-                [ aside
-                    [ Attr.class "column is-2"
-                    ]
-                    [ viewMenu model ]
-                , div
-                    [ Attr.class "column is-flex is-justify-content-center is-align-items-center"
-                    ]
-                    [ renderCanvas model ]
-                ]
+        [ div [ Attr.class "hero-body p-0 is-relative" ]
+            [ div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "left" "0" ]
+                [ viewMenu model ]
+            , div [ Attr.class "is-flex is-justify-content-center is-align-items-center", Attr.style "width" "100%", Attr.style "height" "100%" ]
+                [ renderCanvas model ]
             ]
         , div [ Attr.class "hero-foot" ]
             [ viewBottomBar ]

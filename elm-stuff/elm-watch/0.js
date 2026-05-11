@@ -5192,7 +5192,6 @@ var $author$project$Main$update = F2(
 				{isOpenMenu: !model.isOpenMenu}),
 			$elm$core$Platform$Cmd$none);
 	});
-var $elm$html$Html$aside = _VirtualDom_node('aside');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5340,6 +5339,7 @@ var $author$project$Main$viewBottomBar = A2(
 				]))
 		]));
 var $author$project$Main$ToggleMenu = {$: 'ToggleMenu'};
+var $elm$html$Html$aside = _VirtualDom_node('aside');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5581,7 +5581,7 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('hero-body p-0 is-align-items-stretch')
+						$elm$html$Html$Attributes$class('hero-body p-0 is-relative')
 					]),
 				_List_fromArray(
 					[
@@ -5589,31 +5589,26 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('columns is-gapless is-marginless'),
-								A2($elm$html$Html$Attributes$style, 'width', '100%')
+								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+								A2($elm$html$Html$Attributes$style, 'z-index', '10'),
+								A2($elm$html$Html$Attributes$style, 'top', '0'),
+								A2($elm$html$Html$Attributes$style, 'left', '0')
 							]),
 						_List_fromArray(
 							[
-								A2(
-								$elm$html$Html$aside,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('column is-2')
-									]),
-								_List_fromArray(
-									[
-										$author$project$Main$viewMenu(model)
-									])),
-								A2(
-								$elm$html$Html$div,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('column is-flex is-justify-content-center is-align-items-center')
-									]),
-								_List_fromArray(
-									[
-										$author$project$Main$renderCanvas(model)
-									]))
+								$author$project$Main$viewMenu(model)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('is-flex is-justify-content-center is-align-items-center'),
+								A2($elm$html$Html$Attributes$style, 'width', '100%'),
+								A2($elm$html$Html$Attributes$style, 'height', '100%')
+							]),
+						_List_fromArray(
+							[
+								$author$project$Main$renderCanvas(model)
 							]))
 					])),
 				A2(
