@@ -5332,7 +5332,7 @@ var $author$project$Main$viewBottomBar = A2(
 								[
 									$elm$html$Html$text('6x6')
 								])),
-							$elm$html$Html$text('Custom size'),
+							$elm$html$Html$text('Custom size (m)'),
 							$author$project$Main$viewSquareInput,
 							$elm$html$Html$text('x'),
 							$author$project$Main$viewSquareInput
@@ -5447,6 +5447,38 @@ var $author$project$Main$viewMenu = function (model) {
 											[
 												$elm$html$Html$text('Chair')
 											]))
+									]))
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('menu-label')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Utilities')
+							])),
+						A2(
+						$elm$html$Html$ul,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('menu-list')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$a,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Desktop')
+											]))
 									])),
 								A2(
 								$elm$html$Html$li,
@@ -5458,7 +5490,78 @@ var $author$project$Main$viewMenu = function (model) {
 										_List_Nil,
 										_List_fromArray(
 											[
+												$elm$html$Html$text('TV')
+											]))
+									])),
+								A2(
+								$elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$a,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Heating')
+											]))
+									])),
+								A2(
+								$elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$a,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Lamp')
+											]))
+									]))
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('menu-label')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Decor')
+							])),
+						A2(
+						$elm$html$Html$ul,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('menu-list')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$a,
+										_List_Nil,
+										_List_fromArray(
+											[
 												$elm$html$Html$text('Carpet')
+											]))
+									])),
+								A2(
+								$elm$html$Html$li,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$a,
+										_List_Nil,
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Plant')
 											]))
 									]))
 							]))

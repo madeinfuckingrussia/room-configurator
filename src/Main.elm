@@ -97,7 +97,18 @@ viewMenu model =
             , ul [ Attr.class "menu-list" ]
                 [ li [] [ a [] [ text "Table" ] ]
                 , li [] [ a [] [ text "Chair" ] ]
-                , li [] [ a [] [ text "Carpet" ] ]
+                ]
+            , p [ Attr.class "menu-label" ] [ text "Utilities" ]
+            , ul [ Attr.class "menu-list" ]
+                [ li [] [ a [] [ text "Desktop" ] ]
+                , li [] [ a [] [ text "TV" ] ]
+                , li [] [ a [] [ text "Heating" ] ]
+                , li [] [ a [] [ text "Lamp" ] ]
+                ]
+            , p [ Attr.class "menu-label" ] [ text "Decor" ]
+            , ul [ Attr.class "menu-list" ]
+                [ li [] [ a [] [ text "Carpet" ] ]
+                , li [] [ a [] [ text "Plant" ] ]
                 ]
             ]
         ]
@@ -113,7 +124,7 @@ viewBottomBar =
                 , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ] [ text "3x4" ]
                 , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ] [ text "5x6" ]
                 , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3" ] [ text "6x6" ]
-                , text "Custom size"
+                , text "Custom size (m)"
                 , viewSquareInput
                 , text "x"
                 , viewSquareInput
