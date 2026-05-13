@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html, a, aside, button, div, i, input, li, nav, p, span, text, ul)
-import Html.Attributes as Attr exposing (class)
+import Html.Attributes as Attr exposing (class, width)
 import Html.Events exposing (onClick)
 import Svg exposing (Svg, rect, svg)
 import Svg.Attributes as SvgAttr
@@ -12,9 +12,16 @@ import Svg.Attributes as SvgAttr
 -- 1. MODEL
 
 
+type alias CanvasSize =
+    { width : Float
+    , height : Float
+    }
+
+
 type alias Model =
     { items : List String
     , isOpenMenu : Bool
+    , canvasSize : CanvasSize
     }
 
 
@@ -22,6 +29,7 @@ init : () -> ( Model, Cmd Msg )
 init _ =
     ( { items = [ "Tisch", "Stuhl", "Schrank" ]
       , isOpenMenu = True
+      , canvasSize = { width = 400, height = 300 }
       }
     , Cmd.none
     )
@@ -33,6 +41,7 @@ init _ =
 
 type Msg
     = ToggleMenu
+    | ResizeCanvas Float Float
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -40,6 +49,16 @@ update msg model =
     case msg of
         ToggleMenu ->
             ( { model | isOpenMenu = not model.isOpenMenu }, Cmd.none )
+
+        ResizeCanvas w h ->
+            let
+                old =
+                    model.canvasSize
+
+                newCanvas =
+                    { old | width = w * 100, height = h * 100 }
+            in
+            ( { model | canvasSize = newCanvas }, Cmd.none )
 
 
 
@@ -114,10 +133,10 @@ viewBottomBar =
         [ div [ Attr.class "container is-flex is-justify-content-center" ]
             [ div [ Attr.class "navbar-brand is-flex is-align-items-center" ]
                 [ i [ Attr.class "fa-solid fa-ruler-combined fa-lg mr-3" ] []
-                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ] [ text "3x3" ]
-                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ] [ text "3x4" ]
-                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ] [ text "5x6" ]
-                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3" ] [ text "6x6" ]
+                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 3 3) ] [ text "3x3" ]
+                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 4 3) ] [ text "4x3" ]
+                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 6 5) ] [ text "6x5" ]
+                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3", onClick (ResizeCanvas 6 6) ] [ text "6x6" ]
                 , text "Custom size (m)"
                 , viewSquareInput
                 , text "x"
@@ -130,8 +149,8 @@ viewBottomBar =
 renderCanvas : Model -> Html Msg
 renderCanvas model =
     svg
-        [ SvgAttr.width "600"
-        , SvgAttr.height "400"
+        [ SvgAttr.width (String.fromFloat model.canvasSize.width)
+        , SvgAttr.height (String.fromFloat model.canvasSize.height)
         , SvgAttr.viewBox "0 0 600 400"
         , Attr.style "border" "2px solid black"
         , Attr.style "display" "block"

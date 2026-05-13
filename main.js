@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1778540599292"
+    "1778709047351"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8647,6 +8647,7 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
+			canvasSize: {height: 300, width: 400},
 			isOpenMenu: true,
 			items: _List_fromArray(
 				['Tisch', 'Stuhl', 'Schrank'])
@@ -8661,11 +8662,25 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		return _Utils_Tuple2(
-			_Utils_update(
-				model,
-				{isOpenMenu: !model.isOpenMenu}),
-			$elm$core$Platform$Cmd$none);
+		if (msg.$ === 'ToggleMenu') {
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{isOpenMenu: !model.isOpenMenu}),
+				$elm$core$Platform$Cmd$none);
+		} else {
+			var w = msg.a;
+			var h = msg.b;
+			var old = model.canvasSize;
+			var newCanvas = _Utils_update(
+				old,
+				{height: h * 100, width: w * 100});
+			return _Utils_Tuple2(
+				_Utils_update(
+					model,
+					{canvasSize: newCanvas}),
+				$elm$core$Platform$Cmd$none);
+		}
 	});
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -8678,6 +8693,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
@@ -8693,8 +8709,10 @@ var $author$project$Main$renderCanvas = function (model) {
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$width('600'),
-				$elm$svg$Svg$Attributes$height('400'),
+				$elm$svg$Svg$Attributes$width(
+				$elm$core$String$fromFloat(model.canvasSize.width)),
+				$elm$svg$Svg$Attributes$height(
+				$elm$core$String$fromFloat(model.canvasSize.height)),
 				$elm$svg$Svg$Attributes$viewBox('0 0 600 400'),
 				A2($elm$html$Html$Attributes$style, 'border', '2px solid black'),
 				A2($elm$html$Html$Attributes$style, 'display', 'block')
@@ -8714,9 +8732,30 @@ var $author$project$Main$renderCanvas = function (model) {
 				_List_Nil)
 			]));
 };
+var $author$project$Main$ResizeCanvas = F2(
+	function (a, b) {
+		return {$: 'ResizeCanvas', a: a, b: b};
+	});
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$input = _VirtualDom_node('input');
@@ -8770,7 +8809,9 @@ var $author$project$Main$viewBottomBar = A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
+									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
+									$elm$html$Html$Events$onClick(
+									A2($author$project$Main$ResizeCanvas, 3, 3))
 								]),
 							_List_fromArray(
 								[
@@ -8780,27 +8821,33 @@ var $author$project$Main$viewBottomBar = A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
+									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
+									$elm$html$Html$Events$onClick(
+									A2($author$project$Main$ResizeCanvas, 4, 3))
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('3x4')
+									$elm$html$Html$text('4x3')
 								])),
 							A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
+									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
+									$elm$html$Html$Events$onClick(
+									A2($author$project$Main$ResizeCanvas, 6, 5))
 								]),
 							_List_fromArray(
 								[
-									$elm$html$Html$text('5x6')
+									$elm$html$Html$text('6x5')
 								])),
 							A2(
 							$elm$html$Html$a,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless mr-3')
+									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless mr-3'),
+									$elm$html$Html$Events$onClick(
+									A2($author$project$Main$ResizeCanvas, 6, 6))
 								]),
 							_List_fromArray(
 								[
@@ -8817,23 +8864,6 @@ var $author$project$Main$ToggleMenu = {$: 'ToggleMenu'};
 var $elm$html$Html$aside = _VirtualDom_node('aside');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$li = _VirtualDom_node('li');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
