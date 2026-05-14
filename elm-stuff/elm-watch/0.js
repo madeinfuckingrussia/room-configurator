@@ -5215,14 +5215,14 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{customInputW: value}),
+						{customInputW: value, isOpenToaster: false}),
 					$elm$core$Platform$Cmd$none);
 			case 'SetCustomInputH':
 				var value = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{customInputH: value}),
+						{customInputH: value, isOpenToaster: false}),
 					$elm$core$Platform$Cmd$none);
 			case 'OpenToaster':
 				var message = msg.a;

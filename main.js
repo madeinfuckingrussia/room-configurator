@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1778793370846"
+    "1778794524500"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8690,14 +8690,14 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{customInputW: value}),
+						{customInputW: value, isOpenToaster: false}),
 					$elm$core$Platform$Cmd$none);
 			case 'SetCustomInputH':
 				var value = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{customInputH: value}),
+						{customInputH: value, isOpenToaster: false}),
 					$elm$core$Platform$Cmd$none);
 			case 'OpenToaster':
 				var message = msg.a;

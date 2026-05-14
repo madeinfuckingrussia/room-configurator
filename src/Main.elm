@@ -73,10 +73,10 @@ update msg model =
             ( { model | canvasSize = newCanvas, isOpenToaster = False }, Cmd.none )
 
         SetCustomInputW value ->
-            ( { model | customInputW = value }, Cmd.none )
+            ( { model | customInputW = value, isOpenToaster = False }, Cmd.none )
 
         SetCustomInputH value ->
-            ( { model | customInputH = value }, Cmd.none )
+            ( { model | customInputH = value, isOpenToaster = False }, Cmd.none )
 
         OpenToaster message ->
             ( { model | isOpenToaster = True, toasterMsg = message }, Cmd.none )
