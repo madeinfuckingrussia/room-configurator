@@ -1,9 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Html, a, aside, button, div, i, input, li, nav, p, span, text, ul)
+import Html exposing (Attribute, Html, a, aside, button, div, form, i, input, li, nav, p, span, text, ul)
 import Html.Attributes as Attr exposing (class, width)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onSubmit)
 import Svg exposing (Svg, rect, svg)
 import Svg.Attributes as SvgAttr
 
@@ -22,6 +22,10 @@ type alias Model =
     { items : List String
     , isOpenMenu : Bool
     , canvasSize : CanvasSize
+    , customInputW : String
+    , customInputH : String
+    , isOpenToaster : Bool
+    , toasterMsg : String
     }
 
 
@@ -30,6 +34,10 @@ init _ =
     ( { items = [ "Tisch", "Stuhl", "Schrank" ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
+      , customInputW = ""
+      , customInputH = ""
+      , isOpenToaster = False
+      , toasterMsg = ""
       }
     , Cmd.none
     )
@@ -42,6 +50,10 @@ init _ =
 type Msg
     = ToggleMenu
     | ResizeCanvas Float Float
+    | SetCustomInputW String
+    | SetCustomInputH String
+    | OpenToaster String
+    | HideToaster
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -58,7 +70,36 @@ update msg model =
                 newCanvas =
                     { old | width = w * 100, height = h * 100 }
             in
-            ( { model | canvasSize = newCanvas }, Cmd.none )
+            ( { model | canvasSize = newCanvas, isOpenToaster = False }, Cmd.none )
+
+        SetCustomInputW value ->
+            ( { model | customInputW = value }, Cmd.none )
+
+        SetCustomInputH value ->
+            ( { model | customInputH = value }, Cmd.none )
+
+        OpenToaster message ->
+            ( { model | isOpenToaster = True, toasterMsg = message }, Cmd.none )
+
+        HideToaster ->
+            ( { model | isOpenToaster = False }, Cmd.none )
+
+
+submitCustomSize : String -> String -> Msg
+submitCustomSize w h =
+    case ( String.toFloat w, String.toFloat h ) of
+        ( Just width, Just height ) ->
+            if width > 12 then
+                OpenToaster "Width must be 12m or less"
+
+            else if height > 6.5 then
+                OpenToaster "Height must be 6.5m or less"
+
+            else
+                ResizeCanvas width height
+
+        _ ->
+            OpenToaster "Inputs should be of type number"
 
 
 
@@ -67,15 +108,22 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    div [ Attr.class "hero is-fullheight is-clipped" ]
-        [ div [ Attr.class "hero-body p-0 is-relative" ]
+    div
+        [ Attr.class "hero is-fullheight is-clipped"
+        ]
+        [ if model.isOpenToaster then
+            viewToast model.toasterMsg
+
+          else
+            text ""
+        , div [ Attr.class "hero-body p-0 is-relative" ]
             [ div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "left" "0" ]
                 [ viewMenu model ]
             , div [ Attr.class "is-flex is-justify-content-center is-align-items-center", Attr.style "width" "100%", Attr.style "height" "100%" ]
                 [ renderCanvas model ]
             ]
         , div [ Attr.class "hero-foot" ]
-            [ viewBottomBar ]
+            [ viewBottomBar model ]
         ]
 
 
@@ -127,20 +175,34 @@ viewMenu model =
         ]
 
 
-viewBottomBar : Html Msg
-viewBottomBar =
+viewBottomBar : Model -> Html Msg
+viewBottomBar model =
     nav [ Attr.class "navbar is-fixed-bottom is-dark" ]
         [ div [ Attr.class "container is-flex is-justify-content-center" ]
             [ div [ Attr.class "navbar-brand is-flex is-align-items-center" ]
                 [ i [ Attr.class "fa-solid fa-ruler-combined fa-lg mr-3" ] []
-                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 3 3) ] [ text "3x3" ]
-                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 4 3) ] [ text "4x3" ]
-                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 6 5) ] [ text "6x5" ]
-                , a [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3", onClick (ResizeCanvas 6 6) ] [ text "6x6" ]
+                , a (sizeBtnAttrs model 3 3 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 3 3) ]) [ text "3x3" ]
+                , a (sizeBtnAttrs model 4 3 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 4 3) ]) [ text "4x3" ]
+                , a (sizeBtnAttrs model 6 5 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 6 5) ]) [ text "6x5" ]
+                , a (sizeBtnAttrs model 6 6 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3", onClick (ResizeCanvas 6 6) ]) [ text "6x6" ]
                 , text "Custom size (m)"
-                , viewSquareInput
-                , text "x"
-                , viewSquareInput
+                , form
+                    [ Attr.class "is-flex is-align-items-center"
+                    , onSubmit (submitCustomSize model.customInputW model.customInputH)
+                    ]
+                    [ viewSquareInput model.customInputW SetCustomInputW
+                    , text "x"
+                    , viewSquareInput model.customInputH SetCustomInputH
+                    , button
+                        [ Attr.class "button is-small is-dark p-0 ml-2"
+                        , Attr.style "width" "1.8rem"
+                        , Attr.style "height" "1.8rem"
+                        , Attr.type_ "submit"
+                        ]
+                        [ span [ Attr.class "icon is-small m-0" ]
+                            [ i [ Attr.class "fas fa-check" ] [] ]
+                        ]
+                    ]
                 ]
             ]
         ]
@@ -155,20 +217,15 @@ renderCanvas model =
         , Attr.style "border" "2px solid black"
         , Attr.style "display" "block"
         ]
-        [ rect
-            [ SvgAttr.x "50"
-            , SvgAttr.y "50"
-            , SvgAttr.width "100"
-            , SvgAttr.height "60"
-            , SvgAttr.fill "cornflowerblue"
-            ]
-            []
-        ]
+        []
 
 
-viewSquareInput =
+viewSquareInput : String -> (String -> Msg) -> Html Msg
+viewSquareInput currentVal toMsg =
     input
-        [ Attr.class "mx-3"
+        [ Attr.value currentVal
+        , Html.Events.onInput toMsg
+        , Attr.class "mx-3"
         , Attr.style "width" "40px"
         , Attr.style "height" "25px"
         , Attr.style "text-align" "center"
@@ -177,8 +234,53 @@ viewSquareInput =
         , Attr.style "background" "none"
         , Attr.style "color" "white"
         , Attr.style "outline" "none"
+        , Attr.required True
         ]
         []
+
+
+viewToast : String -> Html Msg
+viewToast message =
+    div
+        [ Attr.class "notification is-danger animate__animated animate__fadeInRight"
+        , Attr.style "position" "fixed"
+        , Attr.style "top" "20px"
+        , Attr.style "right" "20px"
+        , Attr.style "z-index" "1000"
+        , Attr.style "box-shadow" "0 4px 12px rgba(0,0,0,0.1)"
+        , Attr.style "padding-right" "3.5rem"
+        , Attr.style "min-width" "200px"
+        , Attr.style "display" "flex"
+        , Attr.style "align-items" "center"
+        ]
+        [ button
+            [ Attr.class "delete"
+            , onClick HideToaster
+            , Attr.style "position" "absolute"
+            , Attr.style "right" "0.5rem"
+            , Attr.style "top" "0.5rem"
+            ]
+            []
+        , span [] [ text message ]
+        ]
+
+
+sizeBtnAttrs : Model -> Float -> Float -> List (Attribute Msg)
+sizeBtnAttrs model w h =
+    let
+        isActive =
+            model.canvasSize.width == w * 100 && model.canvasSize.height == h * 100
+
+        activeClass =
+            if isActive then
+                "has-background-warning has-text-black"
+
+            else
+                ""
+    in
+    [ Attr.class ("navbar-item has-text-weight-bold box m-0 is-shadowless " ++ activeClass)
+    , onClick (ResizeCanvas w h)
+    ]
 
 
 

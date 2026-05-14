@@ -5173,9 +5173,13 @@ var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
 			canvasSize: {height: 300, width: 400},
+			customInputH: '',
+			customInputW: '',
 			isOpenMenu: true,
+			isOpenToaster: false,
 			items: _List_fromArray(
-				['Tisch', 'Stuhl', 'Schrank'])
+				['Tisch', 'Stuhl', 'Schrank']),
+			toasterMsg: ''
 		},
 		$elm$core$Platform$Cmd$none);
 };
@@ -5187,24 +5191,52 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'ToggleMenu') {
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{isOpenMenu: !model.isOpenMenu}),
-				$elm$core$Platform$Cmd$none);
-		} else {
-			var w = msg.a;
-			var h = msg.b;
-			var old = model.canvasSize;
-			var newCanvas = _Utils_update(
-				old,
-				{height: h * 100, width: w * 100});
-			return _Utils_Tuple2(
-				_Utils_update(
-					model,
-					{canvasSize: newCanvas}),
-				$elm$core$Platform$Cmd$none);
+		switch (msg.$) {
+			case 'ToggleMenu':
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{isOpenMenu: !model.isOpenMenu}),
+					$elm$core$Platform$Cmd$none);
+			case 'ResizeCanvas':
+				var w = msg.a;
+				var h = msg.b;
+				var old = model.canvasSize;
+				var newCanvas = _Utils_update(
+					old,
+					{height: h * 100, width: w * 100});
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{canvasSize: newCanvas, isOpenToaster: false}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetCustomInputW':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customInputW: value}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetCustomInputH':
+				var value = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customInputH: value}),
+					$elm$core$Platform$Cmd$none);
+			case 'OpenToaster':
+				var message = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{isOpenToaster: true, toasterMsg: message}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{isOpenToaster: false}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -5217,18 +5249,14 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Main$renderCanvas = function (model) {
 	return A2(
 		$elm$svg$Svg$svg,
@@ -5242,26 +5270,23 @@ var $author$project$Main$renderCanvas = function (model) {
 				A2($elm$html$Html$Attributes$style, 'border', '2px solid black'),
 				A2($elm$html$Html$Attributes$style, 'display', 'block')
 			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$rect,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$x('50'),
-						$elm$svg$Svg$Attributes$y('50'),
-						$elm$svg$Svg$Attributes$width('100'),
-						$elm$svg$Svg$Attributes$height('60'),
-						$elm$svg$Svg$Attributes$fill('cornflowerblue')
-					]),
-				_List_Nil)
-			]));
+		_List_Nil);
 };
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$ResizeCanvas = F2(
 	function (a, b) {
 		return {$: 'ResizeCanvas', a: a, b: b};
 	});
+var $author$project$Main$SetCustomInputH = function (a) {
+	return {$: 'SetCustomInputH', a: a};
+};
+var $author$project$Main$SetCustomInputW = function (a) {
+	return {$: 'SetCustomInputW', a: a};
+};
 var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
@@ -5281,116 +5306,262 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
+	return _Utils_Tuple2(msg, true);
+};
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var $elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var $elm$html$Html$Events$onSubmit = function (msg) {
+	return A2(
+		$elm$html$Html$Events$preventDefaultOn,
+		'submit',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysPreventDefault,
+			$elm$json$Json$Decode$succeed(msg)));
+};
+var $author$project$Main$sizeBtnAttrs = F3(
+	function (model, w, h) {
+		var isActive = _Utils_eq(model.canvasSize.width, w * 100) && _Utils_eq(model.canvasSize.height, h * 100);
+		var activeClass = isActive ? 'has-background-warning has-text-black' : '';
+		return _List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless ' + activeClass),
+				$elm$html$Html$Events$onClick(
+				A2($author$project$Main$ResizeCanvas, w, h))
+			]);
+	});
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $author$project$Main$OpenToaster = function (a) {
+	return {$: 'OpenToaster', a: a};
+};
+var $elm$core$String$toFloat = _String_toFloat;
+var $author$project$Main$submitCustomSize = F2(
+	function (w, h) {
+		var _v0 = _Utils_Tuple2(
+			$elm$core$String$toFloat(w),
+			$elm$core$String$toFloat(h));
+		if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
+			var width = _v0.a.a;
+			var height = _v0.b.a;
+			return (width > 12) ? $author$project$Main$OpenToaster('Width must be 12m or less') : ((height > 6.5) ? $author$project$Main$OpenToaster('Height must be 6.5m or less') : A2($author$project$Main$ResizeCanvas, width, height));
+		} else {
+			return $author$project$Main$OpenToaster('Inputs should be of type number');
+		}
+	});
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $author$project$Main$viewSquareInput = A2(
-	$elm$html$Html$input,
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
 	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$class('mx-3'),
-			A2($elm$html$Html$Attributes$style, 'width', '40px'),
-			A2($elm$html$Html$Attributes$style, 'height', '25px'),
-			A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
-			A2($elm$html$Html$Attributes$style, 'border', '2px solid #555'),
-			A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-			A2($elm$html$Html$Attributes$style, 'background', 'none'),
-			A2($elm$html$Html$Attributes$style, 'color', 'white'),
-			A2($elm$html$Html$Attributes$style, 'outline', 'none')
-		]),
-	_List_Nil);
-var $author$project$Main$viewBottomBar = A2(
-	$elm$html$Html$nav,
-	_List_fromArray(
-		[
-			$elm$html$Html$Attributes$class('navbar is-fixed-bottom is-dark')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$html$Html$div,
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $author$project$Main$viewSquareInput = F2(
+	function (currentVal, toMsg) {
+		return A2(
+			$elm$html$Html$input,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$class('container is-flex is-justify-content-center')
+					$elm$html$Html$Attributes$value(currentVal),
+					$elm$html$Html$Events$onInput(toMsg),
+					$elm$html$Html$Attributes$class('mx-3'),
+					A2($elm$html$Html$Attributes$style, 'width', '40px'),
+					A2($elm$html$Html$Attributes$style, 'height', '25px'),
+					A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+					A2($elm$html$Html$Attributes$style, 'border', '2px solid #555'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+					A2($elm$html$Html$Attributes$style, 'background', 'none'),
+					A2($elm$html$Html$Attributes$style, 'color', 'white'),
+					A2($elm$html$Html$Attributes$style, 'outline', 'none'),
+					$elm$html$Html$Attributes$required(true)
 				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$div,
-					_List_fromArray(
-						[
-							$elm$html$Html$Attributes$class('navbar-brand is-flex is-align-items-center')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$html$Html$i,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('fa-solid fa-ruler-combined fa-lg mr-3')
-								]),
-							_List_Nil),
-							A2(
-							$elm$html$Html$a,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
-									$elm$html$Html$Events$onClick(
-									A2($author$project$Main$ResizeCanvas, 3, 3))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('3x3')
-								])),
-							A2(
-							$elm$html$Html$a,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
-									$elm$html$Html$Events$onClick(
-									A2($author$project$Main$ResizeCanvas, 4, 3))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('4x3')
-								])),
-							A2(
-							$elm$html$Html$a,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
-									$elm$html$Html$Events$onClick(
-									A2($author$project$Main$ResizeCanvas, 6, 5))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('6x5')
-								])),
-							A2(
-							$elm$html$Html$a,
-							_List_fromArray(
-								[
-									$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless mr-3'),
-									$elm$html$Html$Events$onClick(
-									A2($author$project$Main$ResizeCanvas, 6, 6))
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('6x6')
-								])),
-							$elm$html$Html$text('Custom size (m)'),
-							$author$project$Main$viewSquareInput,
-							$elm$html$Html$text('x'),
-							$author$project$Main$viewSquareInput
-						]))
-				]))
-		]));
+			_List_Nil);
+	});
+var $author$project$Main$viewBottomBar = function (model) {
+	return A2(
+		$elm$html$Html$nav,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('navbar is-fixed-bottom is-dark')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container is-flex is-justify-content-center')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('navbar-brand is-flex is-align-items-center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$i,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('fa-solid fa-ruler-combined fa-lg mr-3')
+									]),
+								_List_Nil),
+								A2(
+								$elm$html$Html$a,
+								_Utils_ap(
+									A3($author$project$Main$sizeBtnAttrs, model, 3, 3),
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
+											$elm$html$Html$Events$onClick(
+											A2($author$project$Main$ResizeCanvas, 3, 3))
+										])),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('3x3')
+									])),
+								A2(
+								$elm$html$Html$a,
+								_Utils_ap(
+									A3($author$project$Main$sizeBtnAttrs, model, 4, 3),
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
+											$elm$html$Html$Events$onClick(
+											A2($author$project$Main$ResizeCanvas, 4, 3))
+										])),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('4x3')
+									])),
+								A2(
+								$elm$html$Html$a,
+								_Utils_ap(
+									A3($author$project$Main$sizeBtnAttrs, model, 6, 5),
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
+											$elm$html$Html$Events$onClick(
+											A2($author$project$Main$ResizeCanvas, 6, 5))
+										])),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('6x5')
+									])),
+								A2(
+								$elm$html$Html$a,
+								_Utils_ap(
+									A3($author$project$Main$sizeBtnAttrs, model, 6, 6),
+									_List_fromArray(
+										[
+											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless mr-3'),
+											$elm$html$Html$Events$onClick(
+											A2($author$project$Main$ResizeCanvas, 6, 6))
+										])),
+								_List_fromArray(
+									[
+										$elm$html$Html$text('6x6')
+									])),
+								$elm$html$Html$text('Custom size (m)'),
+								A2(
+								$elm$html$Html$form,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('is-flex is-align-items-center'),
+										$elm$html$Html$Events$onSubmit(
+										A2($author$project$Main$submitCustomSize, model.customInputW, model.customInputH))
+									]),
+								_List_fromArray(
+									[
+										A2($author$project$Main$viewSquareInput, model.customInputW, $author$project$Main$SetCustomInputW),
+										$elm$html$Html$text('x'),
+										A2($author$project$Main$viewSquareInput, model.customInputH, $author$project$Main$SetCustomInputH),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('button is-small is-dark p-0 ml-2'),
+												A2($elm$html$Html$Attributes$style, 'width', '1.8rem'),
+												A2($elm$html$Html$Attributes$style, 'height', '1.8rem'),
+												$elm$html$Html$Attributes$type_('submit')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$span,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('icon is-small m-0')
+													]),
+												_List_fromArray(
+													[
+														A2(
+														$elm$html$Html$i,
+														_List_fromArray(
+															[
+																$elm$html$Html$Attributes$class('fas fa-check')
+															]),
+														_List_Nil)
+													]))
+											]))
+									]))
+							]))
+					]))
+			]));
+};
 var $author$project$Main$ToggleMenu = {$: 'ToggleMenu'};
 var $elm$html$Html$aside = _VirtualDom_node('aside');
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$p = _VirtualDom_node('p');
-var $elm$html$Html$span = _VirtualDom_node('span');
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$viewMenu = function (model) {
 	var iconClass = model.isOpenMenu ? 'fa-xmark animate__rotateInDownLeft' : 'fa-bars animate__rotateInDownRight';
@@ -5598,6 +5769,45 @@ var $author$project$Main$viewMenu = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$HideToaster = {$: 'HideToaster'};
+var $author$project$Main$viewToast = function (message) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('notification is-danger animate__animated animate__fadeInRight'),
+				A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
+				A2($elm$html$Html$Attributes$style, 'top', '20px'),
+				A2($elm$html$Html$Attributes$style, 'right', '20px'),
+				A2($elm$html$Html$Attributes$style, 'z-index', '1000'),
+				A2($elm$html$Html$Attributes$style, 'box-shadow', '0 4px 12px rgba(0,0,0,0.1)'),
+				A2($elm$html$Html$Attributes$style, 'padding-right', '3.5rem'),
+				A2($elm$html$Html$Attributes$style, 'min-width', '200px'),
+				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+				A2($elm$html$Html$Attributes$style, 'align-items', 'center')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$button,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('delete'),
+						$elm$html$Html$Events$onClick($author$project$Main$HideToaster),
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+						A2($elm$html$Html$Attributes$style, 'right', '0.5rem'),
+						A2($elm$html$Html$Attributes$style, 'top', '0.5rem')
+					]),
+				_List_Nil),
+				A2(
+				$elm$html$Html$span,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(message)
+					]))
+			]));
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -5607,6 +5817,7 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
+				model.isOpenToaster ? $author$project$Main$viewToast(model.toasterMsg) : $elm$html$Html$text(''),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -5648,7 +5859,9 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$Attributes$class('hero-foot')
 					]),
 				_List_fromArray(
-					[$author$project$Main$viewBottomBar]))
+					[
+						$author$project$Main$viewBottomBar(model)
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
