@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1778794524500"
+    "1778797092537"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8724,28 +8724,82 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
+var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
+var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
+var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
+	return A3(
+		_VirtualDom_attributeNS,
+		'http://www.w3.org/1999/xlink',
+		'xlink:href',
+		_VirtualDom_noJavaScriptUri(value));
+};
 var $author$project$Main$renderCanvas = function (model) {
+	var wStr = $elm$core$String$fromFloat(model.canvasSize.width);
+	var hStr = $elm$core$String$fromFloat(model.canvasSize.height);
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$width(
-				$elm$core$String$fromFloat(model.canvasSize.width)),
-				$elm$svg$Svg$Attributes$height(
-				$elm$core$String$fromFloat(model.canvasSize.height)),
-				$elm$svg$Svg$Attributes$viewBox('0 0 600 400'),
-				A2($elm$html$Html$Attributes$style, 'border', '2px solid black'),
+				$elm$svg$Svg$Attributes$width(wStr),
+				$elm$svg$Svg$Attributes$height(hStr),
+				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (wStr + (' ' + hStr))),
+				A2($elm$html$Html$Attributes$style, 'border', '2px solid #E0E0E0'),
 				A2($elm$html$Html$Attributes$style, 'display', 'block')
 			]),
-		_List_Nil);
+		_List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$defs,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$pattern,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$id('linoleumPattern'),
+								$elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
+								$elm$svg$Svg$Attributes$width('200'),
+								$elm$svg$Svg$Attributes$height('200')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$image,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$xlinkHref('src/img/laminateFloor.jpg'),
+										$elm$svg$Svg$Attributes$width('200'),
+										$elm$svg$Svg$Attributes$height('200'),
+										$elm$svg$Svg$Attributes$transform('rotate(90, 100, 100)')
+									]),
+								_List_Nil)
+							]))
+					])),
+				A2(
+				$elm$svg$Svg$rect,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$width(wStr),
+						$elm$svg$Svg$Attributes$height(hStr),
+						$elm$svg$Svg$Attributes$fill('url(#linoleumPattern)')
+					]),
+				_List_Nil)
+			]));
 };
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
@@ -9252,7 +9306,7 @@ var $author$project$Main$viewToast = function (message) {
 			[
 				$elm$html$Html$Attributes$class('notification is-danger animate__animated animate__fadeInRight'),
 				A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
-				A2($elm$html$Html$Attributes$style, 'top', '20px'),
+				A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
 				A2($elm$html$Html$Attributes$style, 'right', '20px'),
 				A2($elm$html$Html$Attributes$style, 'z-index', '1000'),
 				A2($elm$html$Html$Attributes$style, 'box-shadow', '0 4px 12px rgba(0,0,0,0.1)'),

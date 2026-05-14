@@ -2,9 +2,9 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Attribute, Html, a, aside, button, div, form, i, input, li, nav, p, span, text, ul)
-import Html.Attributes as Attr exposing (class, width)
+import Html.Attributes as Attr exposing (width)
 import Html.Events exposing (onClick, onSubmit)
-import Svg exposing (Svg, rect, svg)
+import Svg exposing (svg)
 import Svg.Attributes as SvgAttr
 
 
@@ -210,14 +210,43 @@ viewBottomBar model =
 
 renderCanvas : Model -> Html Msg
 renderCanvas model =
+    let
+        wStr =
+            String.fromFloat model.canvasSize.width
+
+        hStr =
+            String.fromFloat model.canvasSize.height
+    in
     svg
-        [ SvgAttr.width (String.fromFloat model.canvasSize.width)
-        , SvgAttr.height (String.fromFloat model.canvasSize.height)
-        , SvgAttr.viewBox "0 0 600 400"
-        , Attr.style "border" "2px solid black"
+        [ SvgAttr.width wStr
+        , SvgAttr.height hStr
+        , SvgAttr.viewBox ("0 0 " ++ wStr ++ " " ++ hStr)
+        , Attr.style "border" "2px solid #E0E0E0"
         , Attr.style "display" "block"
         ]
-        []
+        [ Svg.defs []
+            [ Svg.pattern
+                [ SvgAttr.id "linoleumPattern"
+                , SvgAttr.patternUnits "userSpaceOnUse"
+                , SvgAttr.width "200"
+                , SvgAttr.height "200"
+                ]
+                [ Svg.image
+                    [ SvgAttr.xlinkHref "src/img/laminateFloor.jpg"
+                    , SvgAttr.width "200"
+                    , SvgAttr.height "200"
+                    , SvgAttr.transform "rotate(90, 100, 100)"
+                    ]
+                    []
+                ]
+            ]
+        , Svg.rect
+            [ SvgAttr.width wStr
+            , SvgAttr.height hStr
+            , SvgAttr.fill "url(#linoleumPattern)"
+            ]
+            []
+        ]
 
 
 viewSquareInput : String -> (String -> Msg) -> Html Msg
@@ -244,7 +273,7 @@ viewToast message =
     div
         [ Attr.class "notification is-danger animate__animated animate__fadeInRight"
         , Attr.style "position" "fixed"
-        , Attr.style "top" "20px"
+        , Attr.style "bottom" "10px"
         , Attr.style "right" "20px"
         , Attr.style "z-index" "1000"
         , Attr.style "box-shadow" "0 4px 12px rgba(0,0,0,0.1)"
