@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1778797092537"
+    "1778966020580"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8650,6 +8650,7 @@ var $author$project$Main$init = function (_v0) {
 			canvasSize: {height: 300, width: 400},
 			customInputH: '',
 			customInputW: '',
+			floorType: 'src/img/laminateFloor.jpg',
 			isOpenMenu: true,
 			isOpenToaster: false,
 			items: _List_fromArray(
@@ -8706,11 +8707,18 @@ var $author$project$Main$update = F2(
 						model,
 						{isOpenToaster: true, toasterMsg: message}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'HideToaster':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{isOpenToaster: false}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var floor = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{floorType: floor}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -8771,7 +8779,7 @@ var $author$project$Main$renderCanvas = function (model) {
 						$elm$svg$Svg$pattern,
 						_List_fromArray(
 							[
-								$elm$svg$Svg$Attributes$id('linoleumPattern'),
+								$elm$svg$Svg$Attributes$id('floorPattern'),
 								$elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
 								$elm$svg$Svg$Attributes$width('200'),
 								$elm$svg$Svg$Attributes$height('200')
@@ -8782,7 +8790,7 @@ var $author$project$Main$renderCanvas = function (model) {
 								$elm$svg$Svg$image,
 								_List_fromArray(
 									[
-										$elm$svg$Svg$Attributes$xlinkHref('src/img/laminateFloor.jpg'),
+										$elm$svg$Svg$Attributes$xlinkHref(model.floorType),
 										$elm$svg$Svg$Attributes$width('200'),
 										$elm$svg$Svg$Attributes$height('200'),
 										$elm$svg$Svg$Attributes$transform('rotate(90, 100, 100)')
@@ -8796,7 +8804,7 @@ var $author$project$Main$renderCanvas = function (model) {
 					[
 						$elm$svg$Svg$Attributes$width(wStr),
 						$elm$svg$Svg$Attributes$height(hStr),
-						$elm$svg$Svg$Attributes$fill('url(#linoleumPattern)')
+						$elm$svg$Svg$Attributes$fill('url(#floorPattern)')
 					]),
 				_List_Nil)
 			]));
@@ -8881,7 +8889,7 @@ var $author$project$Main$submitCustomSize = F2(
 		if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
 			var width = _v0.a.a;
 			var height = _v0.b.a;
-			return (width > 12) ? $author$project$Main$OpenToaster('Width must be 12m or less') : ((height > 6.5) ? $author$project$Main$OpenToaster('Height must be 6.5m or less') : A2($author$project$Main$ResizeCanvas, width, height));
+			return (width > 11) ? $author$project$Main$OpenToaster('Width must be 11m or less') : ((height > 6.5) ? $author$project$Main$OpenToaster('Height must be 6.5m or less') : A2($author$project$Main$ResizeCanvas, width, height));
 		} else {
 			return $author$project$Main$OpenToaster('Inputs should be of type number');
 		}
@@ -9298,6 +9306,207 @@ var $author$project$Main$viewMenu = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$SetFloorType = function (a) {
+	return {$: 'SetFloorType', a: a};
+};
+var $author$project$Main$floorBtnAttrs = F2(
+	function (model, targetFloor) {
+		var isActive = _Utils_eq(model.floorType, targetFloor);
+		var activeClass = isActive ? 'has-background-warning has-text-weight-bold has-text-black' : '';
+		return _List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('is-flex is-align-items-center ' + activeClass),
+				$elm$html$Html$Events$onClick(
+				$author$project$Main$SetFloorType(targetFloor))
+			]);
+	});
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $author$project$Main$viewRoomSettings = function (model) {
+	return A2(
+		$elm$html$Html$aside,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('menu p-4')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('menu-label has-text-centered')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Floor')
+					])),
+				A2(
+				$elm$html$Html$ul,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('menu-list')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$li,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								A2($author$project$Main$floorBtnAttrs, model, 'src/img/graniteFloor.jpg'),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon mr-2')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$img,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$src('src/img/graniteFloor.jpg'),
+														A2($elm$html$Html$Attributes$style, 'border', '1px solid #dbdbdb')
+													]),
+												_List_Nil)
+											])),
+										$elm$html$Html$text('Granite')
+									]))
+							])),
+						A2(
+						$elm$html$Html$li,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								A2($author$project$Main$floorBtnAttrs, model, 'src/img/herringboneFloor.jpg'),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon mr-2')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$img,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$src('src/img/herringboneFloor.jpg'),
+														A2($elm$html$Html$Attributes$style, 'border', '1px solid #dbdbdb')
+													]),
+												_List_Nil)
+											])),
+										$elm$html$Html$text('Herringbone')
+									]))
+							])),
+						A2(
+						$elm$html$Html$li,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								A2($author$project$Main$floorBtnAttrs, model, 'src/img/laminateFloor.jpg'),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon mr-2')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$img,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$src('src/img/laminateFloor.jpg'),
+														A2($elm$html$Html$Attributes$style, 'border', '1px solid #dbdbdb')
+													]),
+												_List_Nil)
+											])),
+										$elm$html$Html$text('Laminate')
+									]))
+							])),
+						A2(
+						$elm$html$Html$li,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								A2($author$project$Main$floorBtnAttrs, model, 'src/img/patioFloor.jpg'),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon mr-2')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$img,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$src('src/img/patioFloor.jpg'),
+														A2($elm$html$Html$Attributes$style, 'border', '1px solid #dbdbdb')
+													]),
+												_List_Nil)
+											])),
+										$elm$html$Html$text('Patio')
+									]))
+							])),
+						A2(
+						$elm$html$Html$li,
+						_List_Nil,
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$a,
+								A2($author$project$Main$floorBtnAttrs, model, 'src/img/plankFloor.jpg'),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon mr-2')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$img,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$src('src/img/plankFloor.jpg'),
+														A2($elm$html$Html$Attributes$style, 'border', '1px solid #dbdbdb')
+													]),
+												_List_Nil)
+											])),
+										$elm$html$Html$text('Plank')
+									]))
+							]))
+					]))
+			]));
+};
 var $author$project$Main$HideToaster = {$: 'HideToaster'};
 var $author$project$Main$viewToast = function (message) {
 	return A2(
@@ -9379,6 +9588,19 @@ var $author$project$Main$view = function (model) {
 						_List_fromArray(
 							[
 								$author$project$Main$renderCanvas(model)
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+								A2($elm$html$Html$Attributes$style, 'z-index', '10'),
+								A2($elm$html$Html$Attributes$style, 'top', '0'),
+								A2($elm$html$Html$Attributes$style, 'right', '0')
+							]),
+						_List_fromArray(
+							[
+								$author$project$Main$viewRoomSettings(model)
 							]))
 					])),
 				A2(

@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Html exposing (Attribute, Html, a, aside, button, div, form, i, input, li, nav, p, span, text, ul)
+import Html exposing (Attribute, Html, a, aside, button, div, form, i, img, input, li, nav, p, span, text, ul)
 import Html.Attributes as Attr exposing (width)
 import Html.Events exposing (onClick, onSubmit)
 import Svg exposing (svg)
@@ -26,6 +26,7 @@ type alias Model =
     , customInputH : String
     , isOpenToaster : Bool
     , toasterMsg : String
+    , floorType : String
     }
 
 
@@ -38,6 +39,7 @@ init _ =
       , customInputH = ""
       , isOpenToaster = False
       , toasterMsg = ""
+      , floorType = "src/img/laminateFloor.jpg"
       }
     , Cmd.none
     )
@@ -54,6 +56,7 @@ type Msg
     | SetCustomInputH String
     | OpenToaster String
     | HideToaster
+    | SetFloorType String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -84,13 +87,16 @@ update msg model =
         HideToaster ->
             ( { model | isOpenToaster = False }, Cmd.none )
 
+        SetFloorType floor ->
+            ( { model | floorType = floor }, Cmd.none )
+
 
 submitCustomSize : String -> String -> Msg
 submitCustomSize w h =
     case ( String.toFloat w, String.toFloat h ) of
         ( Just width, Just height ) ->
-            if width > 12 then
-                OpenToaster "Width must be 12m or less"
+            if width > 11 then
+                OpenToaster "Width must be 11m or less"
 
             else if height > 6.5 then
                 OpenToaster "Height must be 6.5m or less"
@@ -121,6 +127,8 @@ view model =
                 [ viewMenu model ]
             , div [ Attr.class "is-flex is-justify-content-center is-align-items-center", Attr.style "width" "100%", Attr.style "height" "100%" ]
                 [ renderCanvas model ]
+            , div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "right" "0" ]
+                [ viewRoomSettings model ]
             ]
         , div [ Attr.class "hero-foot" ]
             [ viewBottomBar model ]
@@ -170,6 +178,51 @@ viewMenu model =
             , ul [ Attr.class "menu-list" ]
                 [ li [] [ a [] [ text "Carpet" ] ]
                 , li [] [ a [] [ text "Plant" ] ]
+                ]
+            ]
+        ]
+
+
+viewRoomSettings : Model -> Html Msg
+viewRoomSettings model =
+    aside
+        [ Attr.class "menu p-4" ]
+        [ p [ Attr.class "menu-label has-text-centered" ] [ text "Floor" ]
+        , ul [ Attr.class "menu-list" ]
+            [ li []
+                [ a (floorBtnAttrs model "src/img/graniteFloor.jpg")
+                    [ span [ Attr.class "icon mr-2" ]
+                        [ img [ Attr.src "src/img/graniteFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
+                    , text "Granite"
+                    ]
+                ]
+            , li []
+                [ a (floorBtnAttrs model "src/img/herringboneFloor.jpg")
+                    [ span [ Attr.class "icon mr-2" ]
+                        [ img [ Attr.src "src/img/herringboneFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
+                    , text "Herringbone"
+                    ]
+                ]
+            , li []
+                [ a (floorBtnAttrs model "src/img/laminateFloor.jpg")
+                    [ span [ Attr.class "icon mr-2" ]
+                        [ img [ Attr.src "src/img/laminateFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
+                    , text "Laminate"
+                    ]
+                ]
+            , li []
+                [ a (floorBtnAttrs model "src/img/patioFloor.jpg")
+                    [ span [ Attr.class "icon mr-2" ]
+                        [ img [ Attr.src "src/img/patioFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
+                    , text "Patio"
+                    ]
+                ]
+            , li []
+                [ a (floorBtnAttrs model "src/img/plankFloor.jpg")
+                    [ span [ Attr.class "icon mr-2" ]
+                        [ img [ Attr.src "src/img/plankFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
+                    , text "Plank"
+                    ]
                 ]
             ]
         ]
@@ -226,13 +279,13 @@ renderCanvas model =
         ]
         [ Svg.defs []
             [ Svg.pattern
-                [ SvgAttr.id "linoleumPattern"
+                [ SvgAttr.id "floorPattern"
                 , SvgAttr.patternUnits "userSpaceOnUse"
                 , SvgAttr.width "200"
                 , SvgAttr.height "200"
                 ]
                 [ Svg.image
-                    [ SvgAttr.xlinkHref "src/img/laminateFloor.jpg"
+                    [ SvgAttr.xlinkHref model.floorType
                     , SvgAttr.width "200"
                     , SvgAttr.height "200"
                     , SvgAttr.transform "rotate(90, 100, 100)"
@@ -243,7 +296,7 @@ renderCanvas model =
         , Svg.rect
             [ SvgAttr.width wStr
             , SvgAttr.height hStr
-            , SvgAttr.fill "url(#linoleumPattern)"
+            , SvgAttr.fill "url(#floorPattern)"
             ]
             []
         ]
@@ -310,6 +363,22 @@ sizeBtnAttrs model w h =
     [ Attr.class ("navbar-item has-text-weight-bold box m-0 is-shadowless " ++ activeClass)
     , onClick (ResizeCanvas w h)
     ]
+
+
+floorBtnAttrs : Model -> String -> List (Attribute Msg)
+floorBtnAttrs model targetFloor =
+    let
+        isActive =
+            model.floorType == targetFloor
+
+        activeClass =
+            if isActive then
+                "has-background-warning has-text-weight-bold has-text-black"
+
+            else
+                ""
+    in
+    [ Attr.class ("is-flex is-align-items-center " ++ activeClass), onClick (SetFloorType targetFloor) ]
 
 
 
