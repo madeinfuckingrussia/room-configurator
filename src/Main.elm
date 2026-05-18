@@ -18,8 +18,18 @@ type alias CanvasSize =
     }
 
 
+type alias RoomItem =
+    { name : String
+    , imgSrc : String
+    , width : Float
+    , height : Float
+    }
+
+
 type alias Model =
-    { items : List String
+    { itemsFurniture : List RoomItem
+    , itemsUtilities : List RoomItem
+    , itemsDecor : List RoomItem
     , isOpenMenu : Bool
     , canvasSize : CanvasSize
     , customInputW : String
@@ -32,7 +42,9 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { items = [ "Tisch", "Stuhl", "Schrank" ]
+    ( { itemsFurniture = [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 50, height = 120 }, { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50 }, { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 50, height = 90 } ]
+      , itemsUtilities = [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 50, height = 70 }, { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 20, height = 20 }, { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 80, height = 30 } ]
+      , itemsDecor = [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 40, height = 100 }, { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 20, height = 20 } ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
       , customInputW = ""
@@ -164,21 +176,13 @@ viewMenu model =
             [ Attr.class ("menu p-4 animate__animated " ++ animationClass) ]
             [ p [ Attr.class "menu-label" ] [ text "Furniture" ]
             , ul [ Attr.class "menu-list" ]
-                [ li [] [ a [] [ text "Table" ] ]
-                , li [] [ a [] [ text "Chair" ] ]
-                ]
+                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center" ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsFurniture)
             , p [ Attr.class "menu-label" ] [ text "Utilities" ]
             , ul [ Attr.class "menu-list" ]
-                [ li [] [ a [] [ text "Desktop" ] ]
-                , li [] [ a [] [ text "TV" ] ]
-                , li [] [ a [] [ text "Heating" ] ]
-                , li [] [ a [] [ text "Lamp" ] ]
-                ]
+                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center" ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsUtilities)
             , p [ Attr.class "menu-label" ] [ text "Decor" ]
             , ul [ Attr.class "menu-list" ]
-                [ li [] [ a [] [ text "Carpet" ] ]
-                , li [] [ a [] [ text "Plant" ] ]
-                ]
+                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center" ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsDecor)
             ]
         ]
 

@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1778966020580"
+    "1779142033862"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8653,8 +8653,23 @@ var $author$project$Main$init = function (_v0) {
 			floorType: 'src/img/laminateFloor.jpg',
 			isOpenMenu: true,
 			isOpenToaster: false,
-			items: _List_fromArray(
-				['Tisch', 'Stuhl', 'Schrank']),
+			itemsDecor: _List_fromArray(
+				[
+					{height: 100, imgSrc: 'src/img/carpetDecor.png', name: 'Carpet', width: 40},
+					{height: 20, imgSrc: 'src/img/plantDecor.png', name: 'Plant', width: 20}
+				]),
+			itemsFurniture: _List_fromArray(
+				[
+					{height: 120, imgSrc: 'src/img/bedFurniture.png', name: 'Bed', width: 50},
+					{height: 50, imgSrc: 'src/img/chairFurniture.png', name: 'Chair', width: 50},
+					{height: 90, imgSrc: 'src/img/tableFurniture.png', name: 'Table', width: 50}
+				]),
+			itemsUtilities: _List_fromArray(
+				[
+					{height: 70, imgSrc: 'src/img/desktopUtilities.png', name: 'Desktop', width: 50},
+					{height: 20, imgSrc: 'src/img/lampUtilities.png', name: 'Lamp', width: 20},
+					{height: 30, imgSrc: 'src/img/tvUtilities.png', name: 'TV', width: 80}
+				]),
 			toasterMsg: ''
 		},
 		$elm$core$Platform$Cmd$none);
@@ -9097,8 +9112,15 @@ var $author$project$Main$viewBottomBar = function (model) {
 };
 var $author$project$Main$ToggleMenu = {$: 'ToggleMenu'};
 var $elm$html$Html$aside = _VirtualDom_node('aside');
+var $elm$html$Html$img = _VirtualDom_node('img');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Main$viewMenu = function (model) {
 	var iconClass = model.isOpenMenu ? 'fa-xmark animate__rotateInDownLeft' : 'fa-bars animate__rotateInDownRight';
@@ -9158,35 +9180,51 @@ var $author$project$Main$viewMenu = function (model) {
 							[
 								$elm$html$Html$Attributes$class('menu-list')
 							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Table')
-											]))
-									])),
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Chair')
-											]))
-									]))
-							])),
+						A2(
+							$elm$core$List$map,
+							function (item) {
+								return A2(
+									$elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(item.name),
+													A2(
+													$elm$html$Html$span,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('is-flex is-align-items-center is-justify-content-center ml-3'),
+															A2($elm$html$Html$Attributes$style, 'width', '35px'),
+															A2($elm$html$Html$Attributes$style, 'height', '35px')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$img,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$src(item.imgSrc),
+																	A2($elm$html$Html$Attributes$style, 'border', '1.7px solid #363636'),
+																	A2($elm$html$Html$Attributes$style, 'border-radius', '4px'),
+																	A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 4px rgba(0,0,0,1)'),
+																	A2($elm$html$Html$Attributes$style, 'width', '100%'),
+																	A2($elm$html$Html$Attributes$style, 'height', '100%'),
+																	A2($elm$html$Html$Attributes$style, 'object-fit', 'contain')
+																]),
+															_List_Nil)
+														]))
+												]))
+										]));
+							},
+							model.itemsFurniture)),
 						A2(
 						$elm$html$Html$p,
 						_List_fromArray(
@@ -9203,61 +9241,51 @@ var $author$project$Main$viewMenu = function (model) {
 							[
 								$elm$html$Html$Attributes$class('menu-list')
 							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Desktop')
-											]))
-									])),
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('TV')
-											]))
-									])),
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Heating')
-											]))
-									])),
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Lamp')
-											]))
-									]))
-							])),
+						A2(
+							$elm$core$List$map,
+							function (item) {
+								return A2(
+									$elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(item.name),
+													A2(
+													$elm$html$Html$span,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('is-flex is-align-items-center is-justify-content-center ml-3'),
+															A2($elm$html$Html$Attributes$style, 'width', '35px'),
+															A2($elm$html$Html$Attributes$style, 'height', '35px')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$img,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$src(item.imgSrc),
+																	A2($elm$html$Html$Attributes$style, 'border', '1.7px solid #363636'),
+																	A2($elm$html$Html$Attributes$style, 'border-radius', '4px'),
+																	A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 4px rgba(0,0,0,1)'),
+																	A2($elm$html$Html$Attributes$style, 'width', '100%'),
+																	A2($elm$html$Html$Attributes$style, 'height', '100%'),
+																	A2($elm$html$Html$Attributes$style, 'object-fit', 'contain')
+																]),
+															_List_Nil)
+														]))
+												]))
+										]));
+							},
+							model.itemsUtilities)),
 						A2(
 						$elm$html$Html$p,
 						_List_fromArray(
@@ -9274,35 +9302,51 @@ var $author$project$Main$viewMenu = function (model) {
 							[
 								$elm$html$Html$Attributes$class('menu-list')
 							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Carpet')
-											]))
-									])),
-								A2(
-								$elm$html$Html$li,
-								_List_Nil,
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$a,
-										_List_Nil,
-										_List_fromArray(
-											[
-												$elm$html$Html$text('Plant')
-											]))
-									]))
-							]))
+						A2(
+							$elm$core$List$map,
+							function (item) {
+								return A2(
+									$elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center')
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(item.name),
+													A2(
+													$elm$html$Html$span,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('is-flex is-align-items-center is-justify-content-center ml-3'),
+															A2($elm$html$Html$Attributes$style, 'width', '35px'),
+															A2($elm$html$Html$Attributes$style, 'height', '35px')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$img,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$src(item.imgSrc),
+																	A2($elm$html$Html$Attributes$style, 'border', '1.7px solid #363636'),
+																	A2($elm$html$Html$Attributes$style, 'border-radius', '4px'),
+																	A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 4px rgba(0,0,0,1)'),
+																	A2($elm$html$Html$Attributes$style, 'width', '100%'),
+																	A2($elm$html$Html$Attributes$style, 'height', '100%'),
+																	A2($elm$html$Html$Attributes$style, 'object-fit', 'contain')
+																]),
+															_List_Nil)
+														]))
+												]))
+										]));
+							},
+							model.itemsDecor))
 					]))
 			]));
 };
@@ -9320,13 +9364,6 @@ var $author$project$Main$floorBtnAttrs = F2(
 				$author$project$Main$SetFloorType(targetFloor))
 			]);
 	});
-var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$src = function (url) {
-	return A2(
-		$elm$html$Html$Attributes$stringProperty,
-		'src',
-		_VirtualDom_noJavaScriptOrHtmlUri(url));
-};
 var $author$project$Main$viewRoomSettings = function (model) {
 	return A2(
 		$elm$html$Html$aside,
