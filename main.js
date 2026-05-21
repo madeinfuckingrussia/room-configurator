@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1779223728427"
+    "1779369151331"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8642,11 +8642,15 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Idle = {$: 'Idle'};
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{
+			canvasGrid: {active: false, items: $elm$core$Dict$empty},
 			canvasSize: {height: 300, width: 400},
 			customInputH: '',
 			customInputW: '',
@@ -8670,6 +8674,7 @@ var $author$project$Main$init = function (_v0) {
 					{height: 20, imgSrc: 'src/img/lampUtilities.png', name: 'Lamp', width: 20},
 					{height: 30, imgSrc: 'src/img/tvUtilities.png', name: 'TV', width: 80}
 				]),
+			placement: $author$project$Main$Idle,
 			toasterMsg: ''
 		},
 		$elm$core$Platform$Cmd$none);
@@ -8679,6 +8684,118 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (_v0) {
 	return $elm$core$Platform$Sub$none;
 };
+var $author$project$Main$HoldingItem = function (a) {
+	return {$: 'HoldingItem', a: a};
+};
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -8728,13 +8845,45 @@ var $author$project$Main$update = F2(
 						model,
 						{isOpenToaster: false}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'SetFloorType':
 				var floor = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{floorType: floor}),
 					$elm$core$Platform$Cmd$none);
+			case 'SelectItem':
+				var item = msg.a;
+				var oldGrid = model.canvasGrid;
+				var newGrid = _Utils_update(
+					oldGrid,
+					{active: true});
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							canvasGrid: newGrid,
+							placement: $author$project$Main$HoldingItem(item)
+						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var position = msg.a;
+				var _v1 = model.placement;
+				if (_v1.$ === 'Idle') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var item = _v1.a;
+					var oldGrid = model.canvasGrid;
+					var updatedItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
+					var newGrid = _Utils_update(
+						oldGrid,
+						{active: false, items: updatedItems});
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{canvasGrid: newGrid, placement: $author$project$Main$Idle}),
+						$elm$core$Platform$Cmd$none);
+				}
 		}
 	});
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -8747,6 +8896,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
@@ -8754,15 +8904,21 @@ var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 	return A3(
 		_VirtualDom_attributeNS,
@@ -8770,9 +8926,35 @@ var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 		'xlink:href',
 		_VirtualDom_noJavaScriptUri(value));
 };
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Main$renderCanvas = function (model) {
 	var wStr = $elm$core$String$fromFloat(model.canvasSize.width);
+	var renderedItems = A2(
+		$elm$core$List$map,
+		function (_v0) {
+			var _v1 = _v0.a;
+			var x = _v1.a;
+			var y = _v1.b;
+			var item = _v0.b;
+			return A2(
+				$elm$svg$Svg$image,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromInt(x * 10)),
+						$elm$svg$Svg$Attributes$y(
+						$elm$core$String$fromInt(y * 10)),
+						$elm$svg$Svg$Attributes$width(
+						$elm$core$String$fromFloat(item.width)),
+						$elm$svg$Svg$Attributes$height(
+						$elm$core$String$fromFloat(item.height))
+					]),
+				_List_Nil);
+		},
+		$elm$core$Dict$toList(model.canvasGrid.items));
 	var hStr = $elm$core$String$fromFloat(model.canvasSize.height);
+	var gridSize = '10';
 	return A2(
 		$elm$svg$Svg$svg,
 		_List_fromArray(
@@ -8783,48 +8965,80 @@ var $author$project$Main$renderCanvas = function (model) {
 				A2($elm$html$Html$Attributes$style, 'border', '2px solid #E0E0E0'),
 				A2($elm$html$Html$Attributes$style, 'display', 'block')
 			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$defs,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$svg$Svg$pattern,
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$id('floorPattern'),
-								$elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
-								$elm$svg$Svg$Attributes$width('200'),
-								$elm$svg$Svg$Attributes$height('200')
-							]),
-						_List_fromArray(
-							[
-								A2(
-								$elm$svg$Svg$image,
-								_List_fromArray(
-									[
-										$elm$svg$Svg$Attributes$xlinkHref(model.floorType),
-										$elm$svg$Svg$Attributes$width('200'),
-										$elm$svg$Svg$Attributes$height('200'),
-										$elm$svg$Svg$Attributes$transform('rotate(90, 100, 100)')
-									]),
-								_List_Nil)
-							]))
-					])),
-				A2(
-				$elm$svg$Svg$rect,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$width(wStr),
-						$elm$svg$Svg$Attributes$height(hStr),
-						$elm$svg$Svg$Attributes$fill('url(#floorPattern)')
-					]),
-				_List_Nil)
-			]));
+		_Utils_ap(
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$defs,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$pattern,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$id('floorPattern'),
+									$elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
+									$elm$svg$Svg$Attributes$width('200'),
+									$elm$svg$Svg$Attributes$height('200')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$svg$Svg$image,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$xlinkHref(model.floorType),
+											$elm$svg$Svg$Attributes$width('200'),
+											$elm$svg$Svg$Attributes$height('200'),
+											$elm$svg$Svg$Attributes$transform('rotate(90, 100, 100)')
+										]),
+									_List_Nil)
+								]))
+						])),
+					A2(
+					$elm$svg$Svg$pattern,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$id('gridPattern'),
+							$elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
+							$elm$svg$Svg$Attributes$width(gridSize),
+							$elm$svg$Svg$Attributes$height(gridSize)
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$path,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$d('M ' + (gridSize + (' 0 L 0 0 0 ' + gridSize))),
+									$elm$svg$Svg$Attributes$fill('none'),
+									$elm$svg$Svg$Attributes$stroke('rgba(0, 0, 0, 1)'),
+									$elm$svg$Svg$Attributes$strokeWidth('1')
+								]),
+							_List_Nil)
+						])),
+					A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$width(wStr),
+							$elm$svg$Svg$Attributes$height(hStr),
+							$elm$svg$Svg$Attributes$fill('url(#floorPattern)')
+						]),
+					_List_Nil),
+					model.canvasGrid.active ? A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$width(wStr),
+							$elm$svg$Svg$Attributes$height(hStr),
+							$elm$svg$Svg$Attributes$fill('url(#gridPattern)')
+						]),
+					_List_Nil) : $elm$svg$Svg$text('')
+				]),
+			renderedItems));
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$ResizeCanvas = F2(
 	function (a, b) {
@@ -9110,6 +9324,9 @@ var $author$project$Main$viewBottomBar = function (model) {
 					]))
 			]));
 };
+var $author$project$Main$SelectItem = function (a) {
+	return {$: 'SelectItem', a: a};
+};
 var $author$project$Main$ToggleMenu = {$: 'ToggleMenu'};
 var $elm$html$Html$aside = _VirtualDom_node('aside');
 var $elm$html$Html$img = _VirtualDom_node('img');
@@ -9192,7 +9409,9 @@ var $author$project$Main$viewMenu = function (model) {
 											$elm$html$Html$a,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center')
+													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
+													$elm$html$Html$Events$onClick(
+													$author$project$Main$SelectItem(item))
 												]),
 											_List_fromArray(
 												[

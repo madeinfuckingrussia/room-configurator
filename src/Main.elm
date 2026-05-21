@@ -1,9 +1,11 @@
 module Main exposing (main)
 
 import Browser
+import Dict exposing (Dict)
 import Html exposing (Attribute, Html, a, aside, button, div, form, i, img, input, li, nav, p, span, text, ul)
 import Html.Attributes as Attr exposing (width)
 import Html.Events exposing (onClick, onSubmit)
+import Platform.Cmd as Cmd
 import Svg exposing (svg)
 import Svg.Attributes as SvgAttr
 
@@ -26,17 +28,34 @@ type alias RoomItem =
     }
 
 
+type alias Position =
+    ( Int, Int )
+
+
+type alias Grid =
+    { active : Bool
+    , items : Dict Position RoomItem
+    }
+
+
+type PlacementState
+    = Idle
+    | HoldingItem RoomItem
+
+
 type alias Model =
     { itemsFurniture : List RoomItem
     , itemsUtilities : List RoomItem
     , itemsDecor : List RoomItem
     , isOpenMenu : Bool
     , canvasSize : CanvasSize
+    , canvasGrid : Grid
     , customInputW : String
     , customInputH : String
     , isOpenToaster : Bool
     , toasterMsg : String
     , floorType : String
+    , placement : PlacementState
     }
 
 
@@ -47,11 +66,13 @@ init _ =
       , itemsDecor = [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 40, height = 100 }, { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 20, height = 20 } ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
+      , canvasGrid = { active = False, items = Dict.empty }
       , customInputW = ""
       , customInputH = ""
       , isOpenToaster = False
       , toasterMsg = ""
       , floorType = "src/img/laminateFloor.jpg"
+      , placement = Idle
       }
     , Cmd.none
     )
@@ -69,6 +90,8 @@ type Msg
     | OpenToaster String
     | HideToaster
     | SetFloorType String
+    | SelectItem RoomItem
+    | ClickCanvas Position
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -101,6 +124,34 @@ update msg model =
 
         SetFloorType floor ->
             ( { model | floorType = floor }, Cmd.none )
+
+        SelectItem item ->
+            let
+                oldGrid =
+                    model.canvasGrid
+
+                newGrid =
+                    { oldGrid | active = True }
+            in
+            ( { model | canvasGrid = newGrid, placement = HoldingItem item }, Cmd.none )
+
+        ClickCanvas position ->
+            case model.placement of
+                Idle ->
+                    ( model, Cmd.none )
+
+                HoldingItem item ->
+                    let
+                        oldGrid =
+                            model.canvasGrid
+
+                        updatedItems =
+                            Dict.insert position item oldGrid.items
+
+                        newGrid =
+                            { oldGrid | active = False, items = updatedItems }
+                    in
+                    ( { model | placement = Idle, canvasGrid = newGrid }, Cmd.none )
 
 
 submitCustomSize : String -> String -> Msg
@@ -176,7 +227,7 @@ viewMenu model =
             [ Attr.class ("menu p-4 animate__animated " ++ animationClass) ]
             [ p [ Attr.class "menu-label" ] [ text "Furniture" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center" ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsFurniture)
+                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsFurniture)
             , p [ Attr.class "menu-label" ] [ text "Utilities" ]
             , ul [ Attr.class "menu-list" ]
                 (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center" ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsUtilities)
@@ -273,6 +324,24 @@ renderCanvas model =
 
         hStr =
             String.fromFloat model.canvasSize.height
+
+        gridSize =
+            "10"
+
+        renderedItems =
+            model.canvasGrid.items
+                |> Dict.toList
+                |> List.map
+                    (\( ( x, y ), item ) ->
+                        Svg.image
+                            [ SvgAttr.xlinkHref item.imgSrc
+                            , SvgAttr.x (String.fromInt (x * 10))
+                            , SvgAttr.y (String.fromInt (y * 10))
+                            , SvgAttr.width (String.fromFloat item.width)
+                            , SvgAttr.height (String.fromFloat item.height)
+                            ]
+                            []
+                    )
     in
     svg
         [ SvgAttr.width wStr
@@ -281,7 +350,7 @@ renderCanvas model =
         , Attr.style "border" "2px solid #E0E0E0"
         , Attr.style "display" "block"
         ]
-        [ Svg.defs []
+        ([ Svg.defs []
             [ Svg.pattern
                 [ SvgAttr.id "floorPattern"
                 , SvgAttr.patternUnits "userSpaceOnUse"
@@ -297,13 +366,39 @@ renderCanvas model =
                     []
                 ]
             ]
-        , Svg.rect
+         , Svg.pattern
+            [ SvgAttr.id "gridPattern"
+            , SvgAttr.patternUnits "userSpaceOnUse"
+            , SvgAttr.width gridSize
+            , SvgAttr.height gridSize
+            ]
+            [ Svg.path
+                [ SvgAttr.d ("M " ++ gridSize ++ " 0 L 0 0 0 " ++ gridSize)
+                , SvgAttr.fill "none"
+                , SvgAttr.stroke "rgba(0, 0, 0, 1)"
+                , SvgAttr.strokeWidth "1"
+                ]
+                []
+            ]
+         , Svg.rect
             [ SvgAttr.width wStr
             , SvgAttr.height hStr
             , SvgAttr.fill "url(#floorPattern)"
             ]
             []
-        ]
+         , if model.canvasGrid.active then
+            Svg.rect
+                [ SvgAttr.width wStr
+                , SvgAttr.height hStr
+                , SvgAttr.fill "url(#gridPattern)"
+                ]
+                []
+
+           else
+            Svg.text ""
+         ]
+            ++ renderedItems
+        )
 
 
 viewSquareInput : String -> (String -> Msg) -> Html Msg
