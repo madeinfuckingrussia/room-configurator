@@ -4,7 +4,8 @@ import Browser
 import Dict exposing (Dict)
 import Html exposing (Attribute, Html, a, aside, button, div, form, i, img, input, li, nav, p, span, text, ul)
 import Html.Attributes as Attr exposing (width)
-import Html.Events exposing (onClick, onSubmit)
+import Html.Events exposing (on, onClick, onSubmit)
+import Json.Decode as Decode
 import Platform.Cmd as Cmd
 import Svg exposing (svg)
 import Svg.Attributes as SvgAttr
@@ -55,15 +56,27 @@ type alias Model =
     , isOpenToaster : Bool
     , toasterMsg : String
     , floorType : String
+    , mousePosition : Position
     , placement : PlacementState
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { itemsFurniture = [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 50, height = 120 }, { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50 }, { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 50, height = 90 } ]
-      , itemsUtilities = [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 50, height = 70 }, { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 20, height = 20 }, { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 80, height = 30 } ]
-      , itemsDecor = [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 40, height = 100 }, { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 20, height = 20 } ]
+    ( { itemsFurniture =
+            [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200 }
+            , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50 }
+            , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80 }
+            ]
+      , itemsUtilities =
+            [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 120, height = 80 }
+            , { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 40, height = 40 }
+            , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50 }
+            ]
+      , itemsDecor =
+            [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160 }
+            , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50 }
+            ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
       , canvasGrid = { active = False, items = Dict.empty }
@@ -72,6 +85,7 @@ init _ =
       , isOpenToaster = False
       , toasterMsg = ""
       , floorType = "src/img/laminateFloor.jpg"
+      , mousePosition = ( 0, 0 )
       , placement = Idle
       }
     , Cmd.none
@@ -92,6 +106,7 @@ type Msg
     | SetFloorType String
     | SelectItem RoomItem
     | ClickCanvas Position
+    | MouseMoved Position
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -153,6 +168,9 @@ update msg model =
                     in
                     ( { model | placement = Idle, canvasGrid = newGrid }, Cmd.none )
 
+        MouseMoved pos ->
+            ( { model | mousePosition = pos }, Cmd.none )
+
 
 submitCustomSize : String -> String -> Msg
 submitCustomSize w h =
@@ -169,6 +187,13 @@ submitCustomSize w h =
 
         _ ->
             OpenToaster "Inputs should be of type number"
+
+
+mousePositionDecoder : Decode.Decoder Position
+mousePositionDecoder =
+    Decode.map2 (\x y -> ( floor (x / 10), floor (y / 10) ))
+        (Decode.field "offsetX" Decode.float)
+        (Decode.field "offsetY" Decode.float)
 
 
 
@@ -230,10 +255,10 @@ viewMenu model =
                 (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsFurniture)
             , p [ Attr.class "menu-label" ] [ text "Utilities" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center" ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsUtilities)
+                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsUtilities)
             , p [ Attr.class "menu-label" ] [ text "Decor" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center" ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsDecor)
+                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsDecor)
             ]
         ]
 
@@ -289,10 +314,10 @@ viewBottomBar model =
         [ div [ Attr.class "container is-flex is-justify-content-center" ]
             [ div [ Attr.class "navbar-brand is-flex is-align-items-center" ]
                 [ i [ Attr.class "fa-solid fa-ruler-combined fa-lg mr-3" ] []
-                , a (sizeBtnAttrs model 3 3 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 3 3) ]) [ text "3x3" ]
-                , a (sizeBtnAttrs model 4 3 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 4 3) ]) [ text "4x3" ]
-                , a (sizeBtnAttrs model 6 5 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless", onClick (ResizeCanvas 6 5) ]) [ text "6x5" ]
-                , a (sizeBtnAttrs model 6 6 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3", onClick (ResizeCanvas 6 6) ]) [ text "6x6" ]
+                , a (sizeBtnAttrs model 3 3 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ]) [ text "3x3" ]
+                , a (sizeBtnAttrs model 4 3 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ]) [ text "4x3" ]
+                , a (sizeBtnAttrs model 6 5 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ]) [ text "6x5" ]
+                , a (sizeBtnAttrs model 6 6 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3" ]) [ text "6x6" ]
                 , text "Custom size (m)"
                 , form
                     [ Attr.class "is-flex is-align-items-center"
@@ -339,6 +364,7 @@ renderCanvas model =
                             , SvgAttr.y (String.fromInt (y * 10))
                             , SvgAttr.width (String.fromFloat item.width)
                             , SvgAttr.height (String.fromFloat item.height)
+                            , SvgAttr.preserveAspectRatio "none"
                             ]
                             []
                     )
@@ -349,6 +375,8 @@ renderCanvas model =
         , SvgAttr.viewBox ("0 0 " ++ wStr ++ " " ++ hStr)
         , Attr.style "border" "2px solid #E0E0E0"
         , Attr.style "display" "block"
+        , on "mousemove" (Decode.map MouseMoved mousePositionDecoder)
+        , onClick (ClickCanvas model.mousePosition)
         ]
         ([ Svg.defs []
             [ Svg.pattern
@@ -368,6 +396,20 @@ renderCanvas model =
             ]
          , Svg.pattern
             [ SvgAttr.id "gridPattern"
+            , SvgAttr.patternUnits "userSpaceOnUse"
+            , SvgAttr.width gridSize
+            , SvgAttr.height gridSize
+            ]
+            [ Svg.path
+                [ SvgAttr.d ("M " ++ gridSize ++ " 0 L 0 0 0 " ++ gridSize)
+                , SvgAttr.fill "none"
+                , SvgAttr.stroke "rgba(0, 0, 0, 1)"
+                , SvgAttr.strokeWidth "1"
+                ]
+                []
+            ]
+         , Svg.pattern
+            [ SvgAttr.id "roomItem"
             , SvgAttr.patternUnits "userSpaceOnUse"
             , SvgAttr.width gridSize
             , SvgAttr.height gridSize

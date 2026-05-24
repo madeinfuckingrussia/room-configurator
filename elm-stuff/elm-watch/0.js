@@ -5184,21 +5184,22 @@ var $author$project$Main$init = function (_v0) {
 			isOpenToaster: false,
 			itemsDecor: _List_fromArray(
 				[
-					{height: 100, imgSrc: 'src/img/carpetDecor.png', name: 'Carpet', width: 40},
-					{height: 20, imgSrc: 'src/img/plantDecor.png', name: 'Plant', width: 20}
+					{height: 160, imgSrc: 'src/img/carpetDecor.png', name: 'Carpet', width: 230},
+					{height: 50, imgSrc: 'src/img/plantDecor.png', name: 'Plant', width: 50}
 				]),
 			itemsFurniture: _List_fromArray(
 				[
-					{height: 120, imgSrc: 'src/img/bedFurniture.png', name: 'Bed', width: 50},
+					{height: 200, imgSrc: 'src/img/bedFurniture.png', name: 'Bed', width: 140},
 					{height: 50, imgSrc: 'src/img/chairFurniture.png', name: 'Chair', width: 50},
-					{height: 90, imgSrc: 'src/img/tableFurniture.png', name: 'Table', width: 50}
+					{height: 80, imgSrc: 'src/img/tableFurniture.png', name: 'Table', width: 140}
 				]),
 			itemsUtilities: _List_fromArray(
 				[
-					{height: 70, imgSrc: 'src/img/desktopUtilities.png', name: 'Desktop', width: 50},
-					{height: 20, imgSrc: 'src/img/lampUtilities.png', name: 'Lamp', width: 20},
-					{height: 30, imgSrc: 'src/img/tvUtilities.png', name: 'TV', width: 80}
+					{height: 80, imgSrc: 'src/img/desktopUtilities.png', name: 'Desktop', width: 120},
+					{height: 40, imgSrc: 'src/img/lampUtilities.png', name: 'Lamp', width: 40},
+					{height: 50, imgSrc: 'src/img/tvUtilities.png', name: 'TV', width: 120}
 				]),
+			mousePosition: _Utils_Tuple2(0, 0),
 			placement: $author$project$Main$Idle,
 			toasterMsg: ''
 		},
@@ -5391,7 +5392,7 @@ var $author$project$Main$update = F2(
 							placement: $author$project$Main$HoldingItem(item)
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'ClickCanvas':
 				var position = msg.a;
 				var _v1 = model.placement;
 				if (_v1.$ === 'Idle') {
@@ -5409,6 +5410,13 @@ var $author$project$Main$update = F2(
 							{canvasGrid: newGrid, placement: $author$project$Main$Idle}),
 						$elm$core$Platform$Cmd$none);
 				}
+			default:
+				var pos = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{mousePosition: pos}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -5421,6 +5429,12 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$Main$ClickCanvas = function (a) {
+	return {$: 'ClickCanvas', a: a};
+};
+var $author$project$Main$MouseMoved = function (a) {
+	return {$: 'MouseMoved', a: a};
+};
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
@@ -5429,9 +5443,39 @@ var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $author$project$Main$mousePositionDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	F2(
+		function (x, y) {
+			return _Utils_Tuple2(
+				$elm$core$Basics$floor(x / 10),
+				$elm$core$Basics$floor(y / 10));
+		}),
+	A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$float));
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
+var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
@@ -5473,7 +5517,8 @@ var $author$project$Main$renderCanvas = function (model) {
 						$elm$svg$Svg$Attributes$width(
 						$elm$core$String$fromFloat(item.width)),
 						$elm$svg$Svg$Attributes$height(
-						$elm$core$String$fromFloat(item.height))
+						$elm$core$String$fromFloat(item.height)),
+						$elm$svg$Svg$Attributes$preserveAspectRatio('none')
 					]),
 				_List_Nil);
 		},
@@ -5488,7 +5533,13 @@ var $author$project$Main$renderCanvas = function (model) {
 				$elm$svg$Svg$Attributes$height(hStr),
 				$elm$svg$Svg$Attributes$viewBox('0 0 ' + (wStr + (' ' + hStr))),
 				A2($elm$html$Html$Attributes$style, 'border', '2px solid #E0E0E0'),
-				A2($elm$html$Html$Attributes$style, 'display', 'block')
+				A2($elm$html$Html$Attributes$style, 'display', 'block'),
+				A2(
+				$elm$html$Html$Events$on,
+				'mousemove',
+				A2($elm$json$Json$Decode$map, $author$project$Main$MouseMoved, $author$project$Main$mousePositionDecoder)),
+				$elm$html$Html$Events$onClick(
+				$author$project$Main$ClickCanvas(model.mousePosition))
 			]),
 		_Utils_ap(
 			_List_fromArray(
@@ -5544,6 +5595,28 @@ var $author$project$Main$renderCanvas = function (model) {
 							_List_Nil)
 						])),
 					A2(
+					$elm$svg$Svg$pattern,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$id('roomItem'),
+							$elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
+							$elm$svg$Svg$Attributes$width(gridSize),
+							$elm$svg$Svg$Attributes$height(gridSize)
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$path,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$d('M ' + (gridSize + (' 0 L 0 0 0 ' + gridSize))),
+									$elm$svg$Svg$Attributes$fill('none'),
+									$elm$svg$Svg$Attributes$stroke('rgba(0, 0, 0, 1)'),
+									$elm$svg$Svg$Attributes$strokeWidth('1')
+								]),
+							_List_Nil)
+						])),
+					A2(
 					$elm$svg$Svg$rect,
 					_List_fromArray(
 						[
@@ -5565,10 +5638,6 @@ var $author$project$Main$renderCanvas = function (model) {
 			renderedItems));
 };
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$ResizeCanvas = F2(
-	function (a, b) {
-		return {$: 'ResizeCanvas', a: a, b: b};
-	});
 var $author$project$Main$SetCustomInputH = function (a) {
 	return {$: 'SetCustomInputH', a: a};
 };
@@ -5580,23 +5649,6 @@ var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$i = _VirtualDom_node('i');
 var $elm$html$Html$nav = _VirtualDom_node('nav');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
 	return _Utils_Tuple2(msg, true);
 };
@@ -5619,6 +5671,10 @@ var $elm$html$Html$Events$onSubmit = function (msg) {
 			$elm$html$Html$Events$alwaysPreventDefault,
 			$elm$json$Json$Decode$succeed(msg)));
 };
+var $author$project$Main$ResizeCanvas = F2(
+	function (a, b) {
+		return {$: 'ResizeCanvas', a: a, b: b};
+	});
 var $author$project$Main$sizeBtnAttrs = F3(
 	function (model, w, h) {
 		var isActive = _Utils_eq(model.canvasSize.width, w * 100) && _Utils_eq(model.canvasSize.height, h * 100);
@@ -5663,7 +5719,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
@@ -5752,9 +5807,7 @@ var $author$project$Main$viewBottomBar = function (model) {
 									A3($author$project$Main$sizeBtnAttrs, model, 3, 3),
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
-											$elm$html$Html$Events$onClick(
-											A2($author$project$Main$ResizeCanvas, 3, 3))
+											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
 										])),
 								_List_fromArray(
 									[
@@ -5766,9 +5819,7 @@ var $author$project$Main$viewBottomBar = function (model) {
 									A3($author$project$Main$sizeBtnAttrs, model, 4, 3),
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
-											$elm$html$Html$Events$onClick(
-											A2($author$project$Main$ResizeCanvas, 4, 3))
+											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
 										])),
 								_List_fromArray(
 									[
@@ -5780,9 +5831,7 @@ var $author$project$Main$viewBottomBar = function (model) {
 									A3($author$project$Main$sizeBtnAttrs, model, 6, 5),
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless'),
-											$elm$html$Html$Events$onClick(
-											A2($author$project$Main$ResizeCanvas, 6, 5))
+											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
 										])),
 								_List_fromArray(
 									[
@@ -5794,9 +5843,7 @@ var $author$project$Main$viewBottomBar = function (model) {
 									A3($author$project$Main$sizeBtnAttrs, model, 6, 6),
 									_List_fromArray(
 										[
-											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless mr-3'),
-											$elm$html$Html$Events$onClick(
-											A2($author$project$Main$ResizeCanvas, 6, 6))
+											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless mr-3')
 										])),
 								_List_fromArray(
 									[
@@ -5997,7 +6044,9 @@ var $author$project$Main$viewMenu = function (model) {
 											$elm$html$Html$a,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center')
+													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
+													$elm$html$Html$Events$onClick(
+													$author$project$Main$SelectItem(item))
 												]),
 											_List_fromArray(
 												[
@@ -6058,7 +6107,9 @@ var $author$project$Main$viewMenu = function (model) {
 											$elm$html$Html$a,
 											_List_fromArray(
 												[
-													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center')
+													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
+													$elm$html$Html$Events$onClick(
+													$author$project$Main$SelectItem(item))
 												]),
 											_List_fromArray(
 												[
