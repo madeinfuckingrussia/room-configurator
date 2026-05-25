@@ -157,16 +157,15 @@ update msg model =
 
                 HoldingItem item ->
                     let
-                        oldGrid =
-                            model.canvasGrid
-
-                        updatedItems =
-                            Dict.insert position item oldGrid.items
-
-                        newGrid =
-                            { oldGrid | active = False, items = updatedItems }
+                        clearedModel =
+                            { model | isOpenToaster = False, toasterMsg = "" }
                     in
-                    ( { model | placement = Idle, canvasGrid = newGrid }, Cmd.none )
+                    case checkPlacement model position item model.canvasGrid of
+                        Err toasterMsg ->
+                            update toasterMsg model
+
+                        Ok newGrid ->
+                            ( { clearedModel | placement = Idle, canvasGrid = newGrid }, Cmd.none )
 
         MouseMoved pos ->
             ( { model | mousePosition = pos }, Cmd.none )
@@ -187,6 +186,32 @@ submitCustomSize w h =
 
         _ ->
             OpenToaster "Inputs should be of type number"
+
+
+checkPlacement : Model -> Position -> RoomItem -> Grid -> Result Msg Grid
+checkPlacement model position item oldGrid =
+    let
+        ( x, y ) =
+            position
+
+        posCheckX =
+            toFloat x * 10 + item.width
+
+        posCheckY =
+            toFloat y * 10 + item.height
+    in
+    if posCheckX > model.canvasSize.width || posCheckY > model.canvasSize.height then
+        Err (OpenToaster (item.name ++ " can't be placed there"))
+
+    else if Dict.member position oldGrid.items then
+        Err (OpenToaster "This position is already taken")
+
+    else
+        let
+            newItems =
+                Dict.insert position item oldGrid.items
+        in
+        Ok { oldGrid | active = False, items = newItems }
 
 
 mousePositionDecoder : Decode.Decoder Position
@@ -310,14 +335,25 @@ viewRoomSettings model =
 
 viewBottomBar : Model -> Html Msg
 viewBottomBar model =
-    nav [ Attr.class "navbar is-fixed-bottom is-dark" ]
+    let
+        isBarDisabled =
+            not (Dict.isEmpty model.canvasGrid.items)
+
+        disabledStyles =
+            if isBarDisabled then
+                [ Attr.style "opacity" "0.5", Attr.style "pointer-events" "none" ]
+
+            else
+                []
+    in
+    nav (Attr.class "navbar is-fixed-bottom is-dark" :: disabledStyles)
         [ div [ Attr.class "container is-flex is-justify-content-center" ]
             [ div [ Attr.class "navbar-brand is-flex is-align-items-center" ]
                 [ i [ Attr.class "fa-solid fa-ruler-combined fa-lg mr-3" ] []
-                , a (sizeBtnAttrs model 3 3 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ]) [ text "3x3" ]
-                , a (sizeBtnAttrs model 4 3 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ]) [ text "4x3" ]
-                , a (sizeBtnAttrs model 6 5 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless" ]) [ text "6x5" ]
-                , a (sizeBtnAttrs model 6 6 ++ [ Attr.class "navbar-item has-text-weight-bold box m-0 is-shadowless mr-3" ]) [ text "6x6" ]
+                , a (sizeBtnAttrs model 3 3) [ text "3x3" ]
+                , a (sizeBtnAttrs model 4 3) [ text "4x3" ]
+                , a (sizeBtnAttrs model 6 5) [ text "6x5" ]
+                , a (sizeBtnAttrs model 6 6) [ text "6x6" ]
                 , text "Custom size (m)"
                 , form
                     [ Attr.class "is-flex is-align-items-center"
@@ -331,6 +367,7 @@ viewBottomBar model =
                         , Attr.style "width" "1.8rem"
                         , Attr.style "height" "1.8rem"
                         , Attr.type_ "submit"
+                        , Attr.disabled isBarDisabled
                         ]
                         [ span [ Attr.class "icon is-small m-0" ]
                             [ i [ Attr.class "fas fa-check" ] [] ]
@@ -368,6 +405,28 @@ renderCanvas model =
                             ]
                             []
                     )
+
+        previewItem =
+            case model.placement of
+                Idle ->
+                    []
+
+                HoldingItem item ->
+                    let
+                        ( mx, my ) =
+                            model.mousePosition
+                    in
+                    [ Svg.image
+                        [ SvgAttr.xlinkHref item.imgSrc
+                        , SvgAttr.x (String.fromInt (mx * 10))
+                        , SvgAttr.y (String.fromInt (my * 10))
+                        , SvgAttr.width (String.fromFloat item.width)
+                        , SvgAttr.height (String.fromFloat item.height)
+                        , SvgAttr.preserveAspectRatio "none"
+                        , Attr.style "opacity" "0.5"
+                        ]
+                        []
+                    ]
     in
     svg
         [ SvgAttr.width wStr
@@ -439,7 +498,7 @@ renderCanvas model =
            else
             Svg.text ""
          ]
-            ++ renderedItems
+            ++ (renderedItems ++ previewItem)
         )
 
 

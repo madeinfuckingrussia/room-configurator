@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1779653734301"
+    "1779706620860"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8688,6 +8688,9 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $author$project$Main$HoldingItem = function (a) {
 	return {$: 'HoldingItem', a: a};
 };
+var $author$project$Main$OpenToaster = function (a) {
+	return {$: 'OpenToaster', a: a};
+};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -8797,101 +8800,176 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $author$project$Main$checkPlacement = F4(
+	function (model, position, item, oldGrid) {
+		var _v0 = position;
+		var x = _v0.a;
+		var y = _v0.b;
+		var posCheckX = (x * 10) + item.width;
+		var posCheckY = (y * 10) + item.height;
+		if ((_Utils_cmp(posCheckX, model.canvasSize.width) > 0) || (_Utils_cmp(posCheckY, model.canvasSize.height) > 0)) {
+			return $elm$core$Result$Err(
+				$author$project$Main$OpenToaster(item.name + ' can\'t be placed there'));
+		} else {
+			if (A2($elm$core$Dict$member, position, oldGrid.items)) {
+				return $elm$core$Result$Err(
+					$author$project$Main$OpenToaster('This position is already taken'));
+			} else {
+				var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
+				return $elm$core$Result$Ok(
+					_Utils_update(
+						oldGrid,
+						{active: false, items: newItems}));
+			}
+		}
+	});
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'ToggleMenu':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{isOpenMenu: !model.isOpenMenu}),
-					$elm$core$Platform$Cmd$none);
-			case 'ResizeCanvas':
-				var w = msg.a;
-				var h = msg.b;
-				var old = model.canvasSize;
-				var newCanvas = _Utils_update(
-					old,
-					{height: h * 100, width: w * 100});
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{canvasSize: newCanvas, isOpenToaster: false}),
-					$elm$core$Platform$Cmd$none);
-			case 'SetCustomInputW':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{customInputW: value, isOpenToaster: false}),
-					$elm$core$Platform$Cmd$none);
-			case 'SetCustomInputH':
-				var value = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{customInputH: value, isOpenToaster: false}),
-					$elm$core$Platform$Cmd$none);
-			case 'OpenToaster':
-				var message = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{isOpenToaster: true, toasterMsg: message}),
-					$elm$core$Platform$Cmd$none);
-			case 'HideToaster':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{isOpenToaster: false}),
-					$elm$core$Platform$Cmd$none);
-			case 'SetFloorType':
-				var floor = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{floorType: floor}),
-					$elm$core$Platform$Cmd$none);
-			case 'SelectItem':
-				var item = msg.a;
-				var oldGrid = model.canvasGrid;
-				var newGrid = _Utils_update(
-					oldGrid,
-					{active: true});
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							canvasGrid: newGrid,
-							placement: $author$project$Main$HoldingItem(item)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'ClickCanvas':
-				var position = msg.a;
-				var _v1 = model.placement;
-				if (_v1.$ === 'Idle') {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				} else {
-					var item = _v1.a;
-					var oldGrid = model.canvasGrid;
-					var updatedItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
-					var newGrid = _Utils_update(
-						oldGrid,
-						{active: false, items: updatedItems});
+		update:
+		while (true) {
+			switch (msg.$) {
+				case 'ToggleMenu':
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{canvasGrid: newGrid, placement: $author$project$Main$Idle}),
+							{isOpenMenu: !model.isOpenMenu}),
 						$elm$core$Platform$Cmd$none);
-				}
-			default:
-				var pos = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{mousePosition: pos}),
-					$elm$core$Platform$Cmd$none);
+				case 'ResizeCanvas':
+					var w = msg.a;
+					var h = msg.b;
+					var old = model.canvasSize;
+					var newCanvas = _Utils_update(
+						old,
+						{height: h * 100, width: w * 100});
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{canvasSize: newCanvas, isOpenToaster: false}),
+						$elm$core$Platform$Cmd$none);
+				case 'SetCustomInputW':
+					var value = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{customInputW: value, isOpenToaster: false}),
+						$elm$core$Platform$Cmd$none);
+				case 'SetCustomInputH':
+					var value = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{customInputH: value, isOpenToaster: false}),
+						$elm$core$Platform$Cmd$none);
+				case 'OpenToaster':
+					var message = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{isOpenToaster: true, toasterMsg: message}),
+						$elm$core$Platform$Cmd$none);
+				case 'HideToaster':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{isOpenToaster: false}),
+						$elm$core$Platform$Cmd$none);
+				case 'SetFloorType':
+					var floor = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{floorType: floor}),
+						$elm$core$Platform$Cmd$none);
+				case 'SelectItem':
+					var item = msg.a;
+					var oldGrid = model.canvasGrid;
+					var newGrid = _Utils_update(
+						oldGrid,
+						{active: true});
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								canvasGrid: newGrid,
+								placement: $author$project$Main$HoldingItem(item)
+							}),
+						$elm$core$Platform$Cmd$none);
+				case 'ClickCanvas':
+					var position = msg.a;
+					var _v1 = model.placement;
+					if (_v1.$ === 'Idle') {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					} else {
+						var item = _v1.a;
+						var clearedModel = _Utils_update(
+							model,
+							{isOpenToaster: false, toasterMsg: ''});
+						var _v2 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
+						if (_v2.$ === 'Err') {
+							var toasterMsg = _v2.a;
+							var $temp$msg = toasterMsg,
+								$temp$model = model;
+							msg = $temp$msg;
+							model = $temp$model;
+							continue update;
+						} else {
+							var newGrid = _v2.a;
+							return _Utils_Tuple2(
+								_Utils_update(
+									clearedModel,
+									{canvasGrid: newGrid, placement: $author$project$Main$Idle}),
+								$elm$core$Platform$Cmd$none);
+						}
+					}
+				default:
+					var pos = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{mousePosition: pos}),
+						$elm$core$Platform$Cmd$none);
+			}
 		}
 	});
 var $elm$json$Json$Encode$string = _Json_wrap;
@@ -8975,11 +9053,11 @@ var $author$project$Main$renderCanvas = function (model) {
 	var wStr = $elm$core$String$fromFloat(model.canvasSize.width);
 	var renderedItems = A2(
 		$elm$core$List$map,
-		function (_v0) {
-			var _v1 = _v0.a;
-			var x = _v1.a;
-			var y = _v1.b;
-			var item = _v0.b;
+		function (_v2) {
+			var _v3 = _v2.a;
+			var x = _v3.a;
+			var y = _v3.b;
+			var item = _v2.b;
 			return A2(
 				$elm$svg$Svg$image,
 				_List_fromArray(
@@ -8998,6 +9076,37 @@ var $author$project$Main$renderCanvas = function (model) {
 				_List_Nil);
 		},
 		$elm$core$Dict$toList(model.canvasGrid.items));
+	var previewItem = function () {
+		var _v0 = model.placement;
+		if (_v0.$ === 'Idle') {
+			return _List_Nil;
+		} else {
+			var item = _v0.a;
+			var _v1 = model.mousePosition;
+			var mx = _v1.a;
+			var my = _v1.b;
+			return _List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$image,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
+							$elm$svg$Svg$Attributes$x(
+							$elm$core$String$fromInt(mx * 10)),
+							$elm$svg$Svg$Attributes$y(
+							$elm$core$String$fromInt(my * 10)),
+							$elm$svg$Svg$Attributes$width(
+							$elm$core$String$fromFloat(item.width)),
+							$elm$svg$Svg$Attributes$height(
+							$elm$core$String$fromFloat(item.height)),
+							$elm$svg$Svg$Attributes$preserveAspectRatio('none'),
+							A2($elm$html$Html$Attributes$style, 'opacity', '0.5')
+						]),
+					_List_Nil)
+				]);
+		}
+	}();
 	var hStr = $elm$core$String$fromFloat(model.canvasSize.height);
 	var gridSize = '10';
 	return A2(
@@ -9110,7 +9219,7 @@ var $author$project$Main$renderCanvas = function (model) {
 						]),
 					_List_Nil) : $elm$svg$Svg$text('')
 				]),
-			renderedItems));
+			_Utils_ap(renderedItems, previewItem)));
 };
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$SetCustomInputH = function (a) {
@@ -9121,8 +9230,24 @@ var $author$project$Main$SetCustomInputW = function (a) {
 };
 var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$button = _VirtualDom_node('button');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$form = _VirtualDom_node('form');
 var $elm$html$Html$i = _VirtualDom_node('i');
+var $elm$core$Dict$isEmpty = function (dict) {
+	if (dict.$ === 'RBEmpty_elm_builtin') {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $elm$html$Html$nav = _VirtualDom_node('nav');
 var $elm$html$Html$Events$alwaysPreventDefault = function (msg) {
 	return _Utils_Tuple2(msg, true);
@@ -9162,9 +9287,6 @@ var $author$project$Main$sizeBtnAttrs = F3(
 			]);
 	});
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $author$project$Main$OpenToaster = function (a) {
-	return {$: 'OpenToaster', a: a};
-};
 var $elm$core$String$toFloat = _String_toFloat;
 var $author$project$Main$submitCustomSize = F2(
 	function (w, h) {
@@ -9213,14 +9335,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$html$Html$Attributes$boolProperty = F2(
-	function (key, bool) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$bool(bool));
-	});
 var $elm$html$Html$Attributes$required = $elm$html$Html$Attributes$boolProperty('required');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$viewSquareInput = F2(
@@ -9245,12 +9359,18 @@ var $author$project$Main$viewSquareInput = F2(
 			_List_Nil);
 	});
 var $author$project$Main$viewBottomBar = function (model) {
+	var isBarDisabled = !$elm$core$Dict$isEmpty(model.canvasGrid.items);
+	var disabledStyles = isBarDisabled ? _List_fromArray(
+		[
+			A2($elm$html$Html$Attributes$style, 'opacity', '0.5'),
+			A2($elm$html$Html$Attributes$style, 'pointer-events', 'none')
+		]) : _List_Nil;
 	return A2(
 		$elm$html$Html$nav,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('navbar is-fixed-bottom is-dark')
-			]),
+		A2(
+			$elm$core$List$cons,
+			$elm$html$Html$Attributes$class('navbar is-fixed-bottom is-dark'),
+			disabledStyles),
 		_List_fromArray(
 			[
 				A2(
@@ -9278,48 +9398,28 @@ var $author$project$Main$viewBottomBar = function (model) {
 								_List_Nil),
 								A2(
 								$elm$html$Html$a,
-								_Utils_ap(
-									A3($author$project$Main$sizeBtnAttrs, model, 3, 3),
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
-										])),
+								A3($author$project$Main$sizeBtnAttrs, model, 3, 3),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('3x3')
 									])),
 								A2(
 								$elm$html$Html$a,
-								_Utils_ap(
-									A3($author$project$Main$sizeBtnAttrs, model, 4, 3),
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
-										])),
+								A3($author$project$Main$sizeBtnAttrs, model, 4, 3),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('4x3')
 									])),
 								A2(
 								$elm$html$Html$a,
-								_Utils_ap(
-									A3($author$project$Main$sizeBtnAttrs, model, 6, 5),
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless')
-										])),
+								A3($author$project$Main$sizeBtnAttrs, model, 6, 5),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('6x5')
 									])),
 								A2(
 								$elm$html$Html$a,
-								_Utils_ap(
-									A3($author$project$Main$sizeBtnAttrs, model, 6, 6),
-									_List_fromArray(
-										[
-											$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless mr-3')
-										])),
+								A3($author$project$Main$sizeBtnAttrs, model, 6, 6),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('6x6')
@@ -9345,7 +9445,8 @@ var $author$project$Main$viewBottomBar = function (model) {
 												$elm$html$Html$Attributes$class('button is-small is-dark p-0 ml-2'),
 												A2($elm$html$Html$Attributes$style, 'width', '1.8rem'),
 												A2($elm$html$Html$Attributes$style, 'height', '1.8rem'),
-												$elm$html$Html$Attributes$type_('submit')
+												$elm$html$Html$Attributes$type_('submit'),
+												$elm$html$Html$Attributes$disabled(isBarDisabled)
 											]),
 										_List_fromArray(
 											[
