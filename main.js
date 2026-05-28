@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1779967706800"
+    "1779973465105"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8664,6 +8664,7 @@ var $author$project$Main$init = function (_v0) {
 						['Carpet']),
 					height: 160,
 					imgSrc: 'src/img/carpetDecor.png',
+					layer: 0,
 					name: 'Carpet',
 					width: 230
 				},
@@ -8672,6 +8673,7 @@ var $author$project$Main$init = function (_v0) {
 						['Carpet', 'Table', 'Chair']),
 					height: 50,
 					imgSrc: 'src/img/plantDecor.png',
+					layer: 3,
 					name: 'Plant',
 					width: 50
 				}
@@ -8683,6 +8685,7 @@ var $author$project$Main$init = function (_v0) {
 						['Carpet']),
 					height: 200,
 					imgSrc: 'src/img/bedFurniture.png',
+					layer: 3,
 					name: 'Bed',
 					width: 140
 				},
@@ -8691,6 +8694,7 @@ var $author$project$Main$init = function (_v0) {
 						['Carpet']),
 					height: 50,
 					imgSrc: 'src/img/chairFurniture.png',
+					layer: 2,
 					name: 'Chair',
 					width: 50
 				},
@@ -8699,6 +8703,7 @@ var $author$project$Main$init = function (_v0) {
 						['Carpet']),
 					height: 80,
 					imgSrc: 'src/img/tableFurniture.png',
+					layer: 1,
 					name: 'Table',
 					width: 140
 				}
@@ -8710,6 +8715,7 @@ var $author$project$Main$init = function (_v0) {
 						['Carpet']),
 					height: 80,
 					imgSrc: 'src/img/desktopUtilities.png',
+					layer: 3,
 					name: 'Desktop',
 					width: 120
 				},
@@ -8718,6 +8724,7 @@ var $author$project$Main$init = function (_v0) {
 						['Carpet', 'Table', 'Chair']),
 					height: 40,
 					imgSrc: 'src/img/lampUtilities.png',
+					layer: 3,
 					name: 'Lamp',
 					width: 40
 				},
@@ -8726,6 +8733,7 @@ var $author$project$Main$init = function (_v0) {
 						['Carpet']),
 					height: 50,
 					imgSrc: 'src/img/tvUtilities.png',
+					layer: 3,
 					name: 'TV',
 					width: 120
 				}
@@ -8931,6 +8939,15 @@ var $elm$core$Dict$member = F2(
 			return false;
 		}
 	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
 var $author$project$Main$checkPlacement = F4(
 	function (model, position, item, oldGrid) {
 		var _v0 = position;
@@ -8950,7 +8967,7 @@ var $author$project$Main$checkPlacement = F4(
 			var oy2 = oy1 + oldItem.height;
 			var ox1 = oldx * 10;
 			var ox2 = ox1 + oldItem.width;
-			return ((_Utils_cmp(nx2, ox1) < 1) || ((_Utils_cmp(nx1, ox2) > -1) || ((_Utils_cmp(ny2, oy1) < 1) || (_Utils_cmp(ny1, oy2) > -1)))) ? true : false;
+			return ((_Utils_cmp(nx2, ox1) < 1) || ((_Utils_cmp(nx1, ox2) > -1) || ((_Utils_cmp(ny2, oy1) < 1) || (_Utils_cmp(ny1, oy2) > -1)))) ? true : (A2($elm$core$List$member, oldItem.name, item.allowedOn) ? true : false);
 		};
 		var checkAllCollisions = A2(
 			$elm$core$List$all,
@@ -9144,6 +9161,7 @@ var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
 var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$core$List$sortBy = _List_sortBy;
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
@@ -9167,11 +9185,11 @@ var $author$project$Main$renderCanvas = function (model) {
 	var wStr = $elm$core$String$fromFloat(model.canvasSize.width);
 	var renderedItems = A2(
 		$elm$core$List$map,
-		function (_v2) {
-			var _v3 = _v2.a;
-			var x = _v3.a;
-			var y = _v3.b;
-			var item = _v2.b;
+		function (_v3) {
+			var _v4 = _v3.a;
+			var x = _v4.a;
+			var y = _v4.b;
+			var item = _v3.b;
 			return A2(
 				$elm$svg$Svg$image,
 				_List_fromArray(
@@ -9189,7 +9207,13 @@ var $author$project$Main$renderCanvas = function (model) {
 					]),
 				_List_Nil);
 		},
-		$elm$core$Dict$toList(model.canvasGrid.items));
+		A2(
+			$elm$core$List$sortBy,
+			function (_v2) {
+				var item = _v2.b;
+				return item.layer;
+			},
+			$elm$core$Dict$toList(model.canvasGrid.items)));
 	var previewItem = function () {
 		var _v0 = model.placement;
 		if (_v0.$ === 'Idle') {

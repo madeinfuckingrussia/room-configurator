@@ -27,6 +27,7 @@ type alias RoomItem =
     , width : Float
     , height : Float
     , allowedOn : List String
+    , layer : Int
     }
 
 
@@ -65,18 +66,18 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { itemsFurniture =
-            [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200, allowedOn = [ "Carpet" ] }
-            , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50, allowedOn = [ "Carpet" ] }
-            , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80, allowedOn = [ "Carpet" ] }
+            [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200, allowedOn = [ "Carpet" ], layer = 3 }
+            , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50, allowedOn = [ "Carpet" ], layer = 2 }
+            , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80, allowedOn = [ "Carpet" ], layer = 1 }
             ]
       , itemsUtilities =
-            [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 120, height = 80, allowedOn = [ "Carpet" ] }
-            , { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 40, height = 40, allowedOn = [ "Carpet", "Table", "Chair" ] }
-            , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50, allowedOn = [ "Carpet" ] }
+            [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 120, height = 80, allowedOn = [ "Carpet" ], layer = 3 }
+            , { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 40, height = 40, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3 }
+            , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50, allowedOn = [ "Carpet" ], layer = 3 }
             ]
       , itemsDecor =
-            [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160, allowedOn = [ "Carpet" ] }
-            , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50, allowedOn = [ "Carpet", "Table", "Chair" ] }
+            [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160, allowedOn = [ "Carpet" ], layer = 0 }
+            , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3 }
             ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
@@ -228,6 +229,9 @@ checkPlacement model position item oldGrid =
                     oy1 + oldItem.height
             in
             if (nx2 <= ox1) || (nx1 >= ox2) || (ny2 <= oy1) || (ny1 >= oy2) then
+                True
+
+            else if List.member oldItem.name item.allowedOn then
                 True
 
             else
@@ -432,6 +436,7 @@ renderCanvas model =
         renderedItems =
             model.canvasGrid.items
                 |> Dict.toList
+                |> List.sortBy (\( _, item ) -> item.layer)
                 |> List.map
                     (\( ( x, y ), item ) ->
                         Svg.image

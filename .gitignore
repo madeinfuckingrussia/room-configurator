@@ -1,0 +1,13 @@
+# Elm-spezifische Ordner
+elm-stuff/
+
+# Falls du ein Build-Tool wie Vite, Webpack oder elm-live nutzt
+dist/
+build/
+
+# Node-Abhängigkeiten (falls vorhanden)
+node_modules/
+
+# Betriebssystem-Dateien
+.DS_Store
+Thumbs.db
