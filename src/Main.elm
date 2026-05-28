@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Dict exposing (Dict)
+import Dict exposing (Dict, toList)
 import Html exposing (Attribute, Html, a, aside, button, div, form, i, img, input, li, nav, p, span, text, ul)
 import Html.Attributes as Attr exposing (width)
 import Html.Events exposing (on, onClick, onSubmit)
@@ -26,6 +26,7 @@ type alias RoomItem =
     , imgSrc : String
     , width : Float
     , height : Float
+    , allowedOn : List String
     }
 
 
@@ -64,18 +65,18 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { itemsFurniture =
-            [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200 }
-            , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50 }
-            , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80 }
+            [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200, allowedOn = [ "Carpet" ] }
+            , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50, allowedOn = [ "Carpet" ] }
+            , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80, allowedOn = [ "Carpet" ] }
             ]
       , itemsUtilities =
-            [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 120, height = 80 }
-            , { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 40, height = 40 }
-            , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50 }
+            [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 120, height = 80, allowedOn = [ "Carpet" ] }
+            , { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 40, height = 40, allowedOn = [ "Carpet", "Table", "Chair" ] }
+            , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50, allowedOn = [ "Carpet" ] }
             ]
       , itemsDecor =
-            [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160 }
-            , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50 }
+            [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160, allowedOn = [ "Carpet" ] }
+            , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50, allowedOn = [ "Carpet", "Table", "Chair" ] }
             ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
@@ -199,12 +200,50 @@ checkPlacement model position item oldGrid =
 
         posCheckY =
             toFloat y * 10 + item.height
+
+        nx1 =
+            toFloat x * 10
+
+        nx2 =
+            nx1 + item.width
+
+        ny1 =
+            toFloat y * 10
+
+        ny2 =
+            ny1 + item.height
+
+        checkCollision ( ( oldx, oldy ), oldItem ) =
+            let
+                ox1 =
+                    toFloat oldx * 10
+
+                ox2 =
+                    ox1 + oldItem.width
+
+                oy1 =
+                    toFloat oldy * 10
+
+                oy2 =
+                    oy1 + oldItem.height
+            in
+            if (nx2 <= ox1) || (nx1 >= ox2) || (ny2 <= oy1) || (ny1 >= oy2) then
+                True
+
+            else
+                False
+
+        checkAllCollisions =
+            oldGrid.items |> Dict.toList |> List.all checkCollision
     in
     if posCheckX > model.canvasSize.width || posCheckY > model.canvasSize.height then
         Err (OpenToaster (item.name ++ " can't be placed there"))
 
     else if Dict.member position oldGrid.items then
-        Err (OpenToaster "This position is already taken")
+        Err (OpenToaster "This tile position is already taken")
+
+    else if not checkAllCollisions then
+        Err (OpenToaster "This position is already taken by another item")
 
     else
         let
@@ -560,7 +599,7 @@ sizeBtnAttrs model w h =
             else
                 ""
     in
-    [ Attr.class ("navbar-item has-text-weight-bold box m-0 is-shadowless " ++ activeClass)
+    [ Attr.class ("navbar-item has-text-weight-bold box m-0 mx-1 is-shadowless" ++ activeClass)
     , onClick (ResizeCanvas w h)
     ]
 

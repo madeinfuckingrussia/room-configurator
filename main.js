@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1779706620860"
+    "1779967706800"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8659,20 +8659,76 @@ var $author$project$Main$init = function (_v0) {
 			isOpenToaster: false,
 			itemsDecor: _List_fromArray(
 				[
-					{height: 160, imgSrc: 'src/img/carpetDecor.png', name: 'Carpet', width: 230},
-					{height: 50, imgSrc: 'src/img/plantDecor.png', name: 'Plant', width: 50}
+					{
+					allowedOn: _List_fromArray(
+						['Carpet']),
+					height: 160,
+					imgSrc: 'src/img/carpetDecor.png',
+					name: 'Carpet',
+					width: 230
+				},
+					{
+					allowedOn: _List_fromArray(
+						['Carpet', 'Table', 'Chair']),
+					height: 50,
+					imgSrc: 'src/img/plantDecor.png',
+					name: 'Plant',
+					width: 50
+				}
 				]),
 			itemsFurniture: _List_fromArray(
 				[
-					{height: 200, imgSrc: 'src/img/bedFurniture.png', name: 'Bed', width: 140},
-					{height: 50, imgSrc: 'src/img/chairFurniture.png', name: 'Chair', width: 50},
-					{height: 80, imgSrc: 'src/img/tableFurniture.png', name: 'Table', width: 140}
+					{
+					allowedOn: _List_fromArray(
+						['Carpet']),
+					height: 200,
+					imgSrc: 'src/img/bedFurniture.png',
+					name: 'Bed',
+					width: 140
+				},
+					{
+					allowedOn: _List_fromArray(
+						['Carpet']),
+					height: 50,
+					imgSrc: 'src/img/chairFurniture.png',
+					name: 'Chair',
+					width: 50
+				},
+					{
+					allowedOn: _List_fromArray(
+						['Carpet']),
+					height: 80,
+					imgSrc: 'src/img/tableFurniture.png',
+					name: 'Table',
+					width: 140
+				}
 				]),
 			itemsUtilities: _List_fromArray(
 				[
-					{height: 80, imgSrc: 'src/img/desktopUtilities.png', name: 'Desktop', width: 120},
-					{height: 40, imgSrc: 'src/img/lampUtilities.png', name: 'Lamp', width: 40},
-					{height: 50, imgSrc: 'src/img/tvUtilities.png', name: 'TV', width: 120}
+					{
+					allowedOn: _List_fromArray(
+						['Carpet']),
+					height: 80,
+					imgSrc: 'src/img/desktopUtilities.png',
+					name: 'Desktop',
+					width: 120
+				},
+					{
+					allowedOn: _List_fromArray(
+						['Carpet', 'Table', 'Chair']),
+					height: 40,
+					imgSrc: 'src/img/lampUtilities.png',
+					name: 'Lamp',
+					width: 40
+				},
+					{
+					allowedOn: _List_fromArray(
+						['Carpet']),
+					height: 50,
+					imgSrc: 'src/img/tvUtilities.png',
+					name: 'TV',
+					width: 120
+				}
 				]),
 			mousePosition: _Utils_Tuple2(0, 0),
 			placement: $author$project$Main$Idle,
@@ -8691,6 +8747,41 @@ var $author$project$Main$HoldingItem = function (a) {
 var $author$project$Main$OpenToaster = function (a) {
 	return {$: 'OpenToaster', a: a};
 };
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
+var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -8845,7 +8936,26 @@ var $author$project$Main$checkPlacement = F4(
 		var _v0 = position;
 		var x = _v0.a;
 		var y = _v0.b;
+		var nx1 = x * 10;
+		var nx2 = nx1 + item.width;
 		var posCheckX = (x * 10) + item.width;
+		var ny1 = y * 10;
+		var ny2 = ny1 + item.height;
+		var checkCollision = function (_v1) {
+			var _v2 = _v1.a;
+			var oldx = _v2.a;
+			var oldy = _v2.b;
+			var oldItem = _v1.b;
+			var oy1 = oldy * 10;
+			var oy2 = oy1 + oldItem.height;
+			var ox1 = oldx * 10;
+			var ox2 = ox1 + oldItem.width;
+			return ((_Utils_cmp(nx2, ox1) < 1) || ((_Utils_cmp(nx1, ox2) > -1) || ((_Utils_cmp(ny2, oy1) < 1) || (_Utils_cmp(ny1, oy2) > -1)))) ? true : false;
+		};
+		var checkAllCollisions = A2(
+			$elm$core$List$all,
+			checkCollision,
+			$elm$core$Dict$toList(oldGrid.items));
 		var posCheckY = (y * 10) + item.height;
 		if ((_Utils_cmp(posCheckX, model.canvasSize.width) > 0) || (_Utils_cmp(posCheckY, model.canvasSize.height) > 0)) {
 			return $elm$core$Result$Err(
@@ -8853,17 +8963,21 @@ var $author$project$Main$checkPlacement = F4(
 		} else {
 			if (A2($elm$core$Dict$member, position, oldGrid.items)) {
 				return $elm$core$Result$Err(
-					$author$project$Main$OpenToaster('This position is already taken'));
+					$author$project$Main$OpenToaster('This tile position is already taken'));
 			} else {
-				var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
-				return $elm$core$Result$Ok(
-					_Utils_update(
-						oldGrid,
-						{active: false, items: newItems}));
+				if (!checkAllCollisions) {
+					return $elm$core$Result$Err(
+						$author$project$Main$OpenToaster('This position is already taken by another item'));
+				} else {
+					var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
+					return $elm$core$Result$Ok(
+						_Utils_update(
+							oldGrid,
+							{active: false, items: newItems}));
+				}
 			}
 		}
 	});
-var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		update:
@@ -9281,7 +9395,7 @@ var $author$project$Main$sizeBtnAttrs = F3(
 		var activeClass = isActive ? 'has-background-warning has-text-black' : '';
 		return _List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 is-shadowless ' + activeClass),
+				$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 mx-1 is-shadowless' + activeClass),
 				$elm$html$Html$Events$onClick(
 				A2($author$project$Main$ResizeCanvas, w, h))
 			]);
