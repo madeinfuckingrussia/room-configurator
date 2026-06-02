@@ -50,6 +50,7 @@ type alias Model =
     { itemsFurniture : List RoomItem
     , itemsUtilities : List RoomItem
     , itemsDecor : List RoomItem
+    , itemsStructure : List RoomItem
     , isOpenMenu : Bool
     , canvasSize : CanvasSize
     , canvasGrid : Grid
@@ -79,6 +80,8 @@ init _ =
             [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160, allowedOn = [ "Carpet" ], layer = 0 }
             , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3 }
             ]
+      , itemsStructure =
+            [ { name = "Door", imgSrc = "src/img/doorStructure.svg", width = 140, height = 140, allowedOn = [ "Carpet" ], layer = 0 }, { name = "Window", imgSrc = "src/img/windowStructure.svg", width = 140, height = 10, allowedOn = [ "Bed", "Chair", "Table", "Desktop", "Lamp", "TV", "Carpet", "Plant" ], layer = 4 } ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
       , canvasGrid = { active = False, items = Dict.empty }
@@ -327,6 +330,9 @@ viewMenu model =
             , p [ Attr.class "menu-label" ] [ text "Decor" ]
             , ul [ Attr.class "menu-list" ]
                 (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsDecor)
+            , p [ Attr.class "menu-label" ] [ text "Structure" ]
+            , ul [ Attr.class "menu-list" ]
+                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsStructure)
             ]
         ]
 

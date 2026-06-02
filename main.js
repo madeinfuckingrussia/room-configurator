@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1779973465105"
+    "1780442435667"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8708,6 +8708,27 @@ var $author$project$Main$init = function (_v0) {
 					width: 140
 				}
 				]),
+			itemsStructure: _List_fromArray(
+				[
+					{
+					allowedOn: _List_fromArray(
+						['Carpet']),
+					height: 140,
+					imgSrc: 'src/img/doorStructure.svg',
+					layer: 0,
+					name: 'Door',
+					width: 140
+				},
+					{
+					allowedOn: _List_fromArray(
+						['Bed', 'Chair', 'Table', 'Desktop', 'Lamp', 'TV', 'Carpet', 'Plant']),
+					height: 10,
+					imgSrc: 'src/img/windowStructure.svg',
+					layer: 4,
+					name: 'Window',
+					width: 140
+				}
+				]),
 			itemsUtilities: _List_fromArray(
 				[
 					{
@@ -9855,7 +9876,70 @@ var $author$project$Main$viewMenu = function (model) {
 												]))
 										]));
 							},
-							model.itemsDecor))
+							model.itemsDecor)),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('menu-label')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Structure')
+							])),
+						A2(
+						$elm$html$Html$ul,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('menu-list')
+							]),
+						A2(
+							$elm$core$List$map,
+							function (item) {
+								return A2(
+									$elm$html$Html$li,
+									_List_Nil,
+									_List_fromArray(
+										[
+											A2(
+											$elm$html$Html$a,
+											_List_fromArray(
+												[
+													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
+													$elm$html$Html$Events$onClick(
+													$author$project$Main$SelectItem(item))
+												]),
+											_List_fromArray(
+												[
+													$elm$html$Html$text(item.name),
+													A2(
+													$elm$html$Html$span,
+													_List_fromArray(
+														[
+															$elm$html$Html$Attributes$class('is-flex is-align-items-center is-justify-content-center ml-3'),
+															A2($elm$html$Html$Attributes$style, 'width', '35px'),
+															A2($elm$html$Html$Attributes$style, 'height', '35px')
+														]),
+													_List_fromArray(
+														[
+															A2(
+															$elm$html$Html$img,
+															_List_fromArray(
+																[
+																	$elm$html$Html$Attributes$src(item.imgSrc),
+																	A2($elm$html$Html$Attributes$style, 'border', '1.7px solid #363636'),
+																	A2($elm$html$Html$Attributes$style, 'border-radius', '4px'),
+																	A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 4px rgba(0,0,0,1)'),
+																	A2($elm$html$Html$Attributes$style, 'width', '100%'),
+																	A2($elm$html$Html$Attributes$style, 'height', '100%'),
+																	A2($elm$html$Html$Attributes$style, 'object-fit', 'contain')
+																]),
+															_List_Nil)
+														]))
+												]))
+										]));
+							},
+							model.itemsStructure))
 					]))
 			]));
 };
