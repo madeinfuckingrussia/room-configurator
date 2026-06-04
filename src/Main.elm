@@ -1,13 +1,13 @@
 module Main exposing (main)
 
 import Browser
-import Dict exposing (Dict, toList)
+import Dict exposing (Dict)
 import Html exposing (Attribute, Html, a, aside, button, div, form, i, img, input, li, nav, p, span, text, ul)
 import Html.Attributes as Attr exposing (width)
 import Html.Events exposing (on, onClick, onSubmit)
 import Json.Decode as Decode
 import Platform.Cmd as Cmd
-import Svg exposing (svg)
+import Svg exposing (Svg, svg)
 import Svg.Attributes as SvgAttr
 
 
@@ -28,6 +28,7 @@ type alias RoomItem =
     , height : Float
     , allowedOn : List String
     , layer : Int
+    , rotation : Int
     }
 
 
@@ -44,6 +45,7 @@ type alias Grid =
 type PlacementState
     = Idle
     | HoldingItem RoomItem
+    | ModifyingItem Position RoomItem
 
 
 type alias Model =
@@ -67,21 +69,23 @@ type alias Model =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { itemsFurniture =
-            [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200, allowedOn = [ "Carpet" ], layer = 3 }
-            , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50, allowedOn = [ "Carpet" ], layer = 2 }
-            , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80, allowedOn = [ "Carpet" ], layer = 1 }
+            [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
+            , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50, allowedOn = [ "Carpet" ], layer = 2, rotation = 0 }
+            , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80, allowedOn = [ "Carpet" ], layer = 1, rotation = 0 }
             ]
       , itemsUtilities =
-            [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 120, height = 80, allowedOn = [ "Carpet" ], layer = 3 }
-            , { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 40, height = 40, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3 }
-            , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50, allowedOn = [ "Carpet" ], layer = 3 }
+            [ { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 120, height = 80, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
+            , { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 40, height = 40, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3, rotation = 0 }
+            , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
             ]
       , itemsDecor =
-            [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160, allowedOn = [ "Carpet" ], layer = 0 }
-            , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3 }
+            [ { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160, allowedOn = [ "Carpet" ], layer = 0, rotation = 0 }
+            , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3, rotation = 0 }
             ]
       , itemsStructure =
-            [ { name = "Door", imgSrc = "src/img/doorStructure.svg", width = 140, height = 140, allowedOn = [ "Carpet" ], layer = 0 }, { name = "Window", imgSrc = "src/img/windowStructure.svg", width = 140, height = 10, allowedOn = [ "Bed", "Chair", "Table", "Desktop", "Lamp", "TV", "Carpet", "Plant" ], layer = 4 } ]
+            [ { name = "Door", imgSrc = "src/img/doorStructure.svg", width = 140, height = 140, allowedOn = [ "Carpet" ], layer = 0, rotation = 0 }
+            , { name = "Window", imgSrc = "src/img/windowStructure.svg", width = 140, height = 10, allowedOn = [ "Bed", "Chair", "Table", "Desktop", "Lamp", "TV", "Carpet", "Plant" ], layer = 4, rotation = 0 }
+            ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
       , canvasGrid = { active = False, items = Dict.empty }
@@ -112,6 +116,8 @@ type Msg
     | SelectItem RoomItem
     | ClickCanvas Position
     | MouseMoved Position
+    | Delete Position
+    | Rotate Position RoomItem
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -158,7 +164,12 @@ update msg model =
         ClickCanvas position ->
             case model.placement of
                 Idle ->
-                    ( model, Cmd.none )
+                    case findItemAtPos position model.canvasGrid.items of
+                        Just ( oldPos, item ) ->
+                            ( { model | placement = ModifyingItem oldPos item }, Cmd.none )
+
+                        Nothing ->
+                            ( model, Cmd.none )
 
                 HoldingItem item ->
                     let
@@ -172,8 +183,49 @@ update msg model =
                         Ok newGrid ->
                             ( { clearedModel | placement = Idle, canvasGrid = newGrid }, Cmd.none )
 
+                ModifyingItem curPosition item ->
+                    ( { model | placement = Idle }, Cmd.none )
+
         MouseMoved pos ->
             ( { model | mousePosition = pos }, Cmd.none )
+
+        Delete pos ->
+            let
+                oldGrid =
+                    model.canvasGrid
+
+                newGrid =
+                    { oldGrid | items = Dict.remove pos oldGrid.items }
+            in
+            ( { model | canvasGrid = newGrid }, Cmd.none )
+
+        Rotate pos item ->
+            let
+                oldGrid =
+                    model.canvasGrid
+
+                clearedItems =
+                    Dict.remove pos oldGrid.items
+
+                clearedGrid =
+                    { oldGrid | items = clearedItems }
+
+                newRotation =
+                    if item.rotation >= 270 then
+                        0
+
+                    else
+                        item.rotation + 90
+
+                newItem =
+                    { item | width = item.height, height = item.width, rotation = newRotation }
+            in
+            case checkPlacement model pos newItem clearedGrid of
+                Ok newGrid ->
+                    ( { model | canvasGrid = newGrid, placement = ModifyingItem pos newItem }, Cmd.none )
+
+                Err toasterMsg ->
+                    update toasterMsg model
 
 
 submitCustomSize : String -> String -> Msg
@@ -258,6 +310,38 @@ checkPlacement model position item oldGrid =
                 Dict.insert position item oldGrid.items
         in
         Ok { oldGrid | active = False, items = newItems }
+
+
+findItemAtPos : Position -> Dict Position RoomItem -> Maybe ( Position, RoomItem )
+findItemAtPos ( clickX, clickY ) items =
+    let
+        px =
+            toFloat clickX * 10
+
+        py =
+            toFloat clickY * 10
+
+        isHit ( ( oldx, oldy ), oldItem ) =
+            let
+                ox1 =
+                    toFloat oldx * 10
+
+                ox2 =
+                    ox1 + oldItem.width
+
+                oy1 =
+                    toFloat oldy * 10
+
+                oy2 =
+                    oy1 + oldItem.height
+            in
+            (px >= ox1 && px < ox2) && (py >= oy1 && py < oy2)
+    in
+    items
+        |> Dict.toList
+        |> List.filter isHit
+        |> List.sortBy (\( _, item ) -> -item.layer)
+        |> List.head
 
 
 mousePositionDecoder : Decode.Decoder Position
@@ -439,21 +523,64 @@ renderCanvas model =
         gridSize =
             "10"
 
+        modifyingData =
+            case model.placement of
+                ModifyingItem pos item ->
+                    Just ( pos, item )
+
+                _ ->
+                    Nothing
+
         renderedItems =
             model.canvasGrid.items
                 |> Dict.toList
                 |> List.sortBy (\( _, item ) -> item.layer)
                 |> List.map
                     (\( ( x, y ), item ) ->
-                        Svg.image
-                            [ SvgAttr.xlinkHref item.imgSrc
-                            , SvgAttr.x (String.fromInt (x * 10))
-                            , SvgAttr.y (String.fromInt (y * 10))
-                            , SvgAttr.width (String.fromFloat item.width)
-                            , SvgAttr.height (String.fromFloat item.height)
-                            , SvgAttr.preserveAspectRatio "none"
+                        let
+                            isModifying =
+                                case modifyingData of
+                                    Just ( ( modX, modY ), _ ) ->
+                                        x == modX && y == modY
+
+                                    Nothing ->
+                                        False
+
+                            cx =
+                                (toFloat x * 10.0) + (item.width / 2.0)
+
+                            cy =
+                                (toFloat y * 10.0) + (item.height / 2.0)
+
+                            angle =
+                                String.fromInt item.rotation
+
+                            groupTransform =
+                                "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
+                        in
+                        Svg.g []
+                            [ Svg.image
+                                [ SvgAttr.xlinkHref item.imgSrc
+                                , SvgAttr.x (String.fromInt (x * 10))
+                                , SvgAttr.y (String.fromInt (y * 10))
+                                , SvgAttr.width (String.fromFloat item.width)
+                                , SvgAttr.height (String.fromFloat item.height)
+                                , SvgAttr.transform groupTransform
+                                , SvgAttr.opacity
+                                    (if isModifying then
+                                        "0.6"
+
+                                     else
+                                        "1.0"
+                                    )
+                                ]
+                                []
+                            , if isModifying then
+                                renderModifyingOverlay ( x, y ) item
+
+                              else
+                                Svg.g [] []
                             ]
-                            []
                     )
 
         previewItem =
@@ -477,6 +604,9 @@ renderCanvas model =
                         ]
                         []
                     ]
+
+                ModifyingItem position item ->
+                    []
     in
     svg
         [ SvgAttr.width wStr
@@ -550,6 +680,68 @@ renderCanvas model =
          ]
             ++ (renderedItems ++ previewItem)
         )
+
+
+renderModifyingOverlay : Position -> RoomItem -> Svg Msg
+renderModifyingOverlay ( x, y ) item =
+    let
+        posX =
+            toFloat x * 10
+
+        posY =
+            toFloat y * 10
+    in
+    Svg.g []
+        [ Svg.rect
+            [ SvgAttr.x (String.fromFloat posX)
+            , SvgAttr.y (String.fromFloat posY)
+            , SvgAttr.width (String.fromFloat item.width)
+            , SvgAttr.height (String.fromFloat item.height)
+            , SvgAttr.fill "none"
+            , SvgAttr.stroke "#007aff"
+            , SvgAttr.strokeWidth "2"
+            , SvgAttr.strokeDasharray "4 4"
+            ]
+            []
+        , Svg.g
+            [ SvgAttr.transform ("translate(" ++ String.fromFloat (posX + item.width - 15) ++ "," ++ String.fromFloat (posY - 5) ++ ")")
+            , Html.Events.onClick (Delete ( x, y ))
+            , SvgAttr.cursor "pointer"
+            ]
+            [ Svg.circle
+                [ SvgAttr.r "10"
+                , SvgAttr.fill "#ff3b30"
+                ]
+                []
+            , Svg.text_
+                [ SvgAttr.x "-4"
+                , SvgAttr.y "4"
+                , SvgAttr.fill "white"
+                , SvgAttr.fontSize "12"
+                , SvgAttr.fontWeight "bold"
+                ]
+                [ Svg.text "X" ]
+            ]
+        , Svg.g
+            [ SvgAttr.transform ("translate(" ++ String.fromFloat (posX + item.width - 12) ++ "," ++ String.fromFloat (posY + item.height - 12) ++ ")")
+            , Html.Events.onClick (Rotate ( x, y ) item)
+            , SvgAttr.cursor "pointer"
+            ]
+            [ Svg.circle
+                [ SvgAttr.r "12"
+                , SvgAttr.fill "#34c759"
+                ]
+                []
+            , Svg.text_
+                [ SvgAttr.x "-4"
+                , SvgAttr.y "4"
+                , SvgAttr.fill "white"
+                , SvgAttr.fontSize "12"
+                , SvgAttr.fontWeight "bold"
+                ]
+                [ Svg.text "⟳" ]
+            ]
+        ]
 
 
 viewSquareInput : String -> (String -> Msg) -> Html Msg

@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1780442435667"
+    "1780575357917"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8666,6 +8666,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/carpetDecor.png',
 					layer: 0,
 					name: 'Carpet',
+					rotation: 0,
 					width: 230
 				},
 					{
@@ -8675,6 +8676,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/plantDecor.png',
 					layer: 3,
 					name: 'Plant',
+					rotation: 0,
 					width: 50
 				}
 				]),
@@ -8687,6 +8689,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/bedFurniture.png',
 					layer: 3,
 					name: 'Bed',
+					rotation: 0,
 					width: 140
 				},
 					{
@@ -8696,6 +8699,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/chairFurniture.png',
 					layer: 2,
 					name: 'Chair',
+					rotation: 0,
 					width: 50
 				},
 					{
@@ -8705,6 +8709,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/tableFurniture.png',
 					layer: 1,
 					name: 'Table',
+					rotation: 0,
 					width: 140
 				}
 				]),
@@ -8717,6 +8722,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/doorStructure.svg',
 					layer: 0,
 					name: 'Door',
+					rotation: 0,
 					width: 140
 				},
 					{
@@ -8726,6 +8732,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/windowStructure.svg',
 					layer: 4,
 					name: 'Window',
+					rotation: 0,
 					width: 140
 				}
 				]),
@@ -8738,6 +8745,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/desktopUtilities.png',
 					layer: 3,
 					name: 'Desktop',
+					rotation: 0,
 					width: 120
 				},
 					{
@@ -8747,6 +8755,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/lampUtilities.png',
 					layer: 3,
 					name: 'Lamp',
+					rotation: 0,
 					width: 40
 				},
 					{
@@ -8756,6 +8765,7 @@ var $author$project$Main$init = function (_v0) {
 					imgSrc: 'src/img/tvUtilities.png',
 					layer: 3,
 					name: 'TV',
+					rotation: 0,
 					width: 120
 				}
 				]),
@@ -8773,6 +8783,10 @@ var $author$project$Main$subscriptions = function (_v0) {
 var $author$project$Main$HoldingItem = function (a) {
 	return {$: 'HoldingItem', a: a};
 };
+var $author$project$Main$ModifyingItem = F2(
+	function (a, b) {
+		return {$: 'ModifyingItem', a: a, b: b};
+	});
 var $author$project$Main$OpenToaster = function (a) {
 	return {$: 'OpenToaster', a: a};
 };
@@ -9016,6 +9030,421 @@ var $author$project$Main$checkPlacement = F4(
 			}
 		}
 	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$List$sortBy = _List_sortBy;
+var $author$project$Main$findItemAtPos = F2(
+	function (_v0, items) {
+		var clickX = _v0.a;
+		var clickY = _v0.b;
+		var py = clickY * 10;
+		var px = clickX * 10;
+		var isHit = function (_v2) {
+			var _v3 = _v2.a;
+			var oldx = _v3.a;
+			var oldy = _v3.b;
+			var oldItem = _v2.b;
+			var oy1 = oldy * 10;
+			var oy2 = oy1 + oldItem.height;
+			var ox1 = oldx * 10;
+			var ox2 = ox1 + oldItem.width;
+			return ((_Utils_cmp(px, ox1) > -1) && (_Utils_cmp(px, ox2) < 0)) && ((_Utils_cmp(py, oy1) > -1) && (_Utils_cmp(py, oy2) < 0));
+		};
+		return $elm$core$List$head(
+			A2(
+				$elm$core$List$sortBy,
+				function (_v1) {
+					var item = _v1.b;
+					return -item.layer;
+				},
+				A2(
+					$elm$core$List$filter,
+					isHit,
+					$elm$core$Dict$toList(items))));
+	});
+var $elm$core$Dict$getMin = function (dict) {
+	getMin:
+	while (true) {
+		if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+			var left = dict.d;
+			var $temp$dict = left;
+			dict = $temp$dict;
+			continue getMin;
+		} else {
+			return dict;
+		}
+	}
+};
+var $elm$core$Dict$moveRedLeft = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.e.d.$ === 'RBNode_elm_builtin') && (dict.e.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var lLeft = _v1.d;
+			var lRight = _v1.e;
+			var _v2 = dict.e;
+			var rClr = _v2.a;
+			var rK = _v2.b;
+			var rV = _v2.c;
+			var rLeft = _v2.d;
+			var _v3 = rLeft.a;
+			var rlK = rLeft.b;
+			var rlV = rLeft.c;
+			var rlL = rLeft.d;
+			var rlR = rLeft.e;
+			var rRight = _v2.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				rlK,
+				rlV,
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					rlL),
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rlR, rRight));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v4 = dict.d;
+			var lClr = _v4.a;
+			var lK = _v4.b;
+			var lV = _v4.c;
+			var lLeft = _v4.d;
+			var lRight = _v4.e;
+			var _v5 = dict.e;
+			var rClr = _v5.a;
+			var rK = _v5.b;
+			var rV = _v5.c;
+			var rLeft = _v5.d;
+			var rRight = _v5.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$moveRedRight = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.d.d.$ === 'RBNode_elm_builtin') && (dict.d.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var _v2 = _v1.d;
+			var _v3 = _v2.a;
+			var llK = _v2.b;
+			var llV = _v2.c;
+			var llLeft = _v2.d;
+			var llRight = _v2.e;
+			var lRight = _v1.e;
+			var _v4 = dict.e;
+			var rClr = _v4.a;
+			var rK = _v4.b;
+			var rV = _v4.c;
+			var rLeft = _v4.d;
+			var rRight = _v4.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				lK,
+				lV,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					lRight,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight)));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v5 = dict.d;
+			var lClr = _v5.a;
+			var lK = _v5.b;
+			var lV = _v5.c;
+			var lLeft = _v5.d;
+			var lRight = _v5.e;
+			var _v6 = dict.e;
+			var rClr = _v6.a;
+			var rK = _v6.b;
+			var rV = _v6.c;
+			var rLeft = _v6.d;
+			var rRight = _v6.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$removeHelpPrepEQGT = F7(
+	function (targetKey, dict, color, key, value, left, right) {
+		if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+			var _v1 = left.a;
+			var lK = left.b;
+			var lV = left.c;
+			var lLeft = left.d;
+			var lRight = left.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				lK,
+				lV,
+				lLeft,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, lRight, right));
+		} else {
+			_v2$2:
+			while (true) {
+				if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Black')) {
+					if (right.d.$ === 'RBNode_elm_builtin') {
+						if (right.d.a.$ === 'Black') {
+							var _v3 = right.a;
+							var _v4 = right.d;
+							var _v5 = _v4.a;
+							return $elm$core$Dict$moveRedRight(dict);
+						} else {
+							break _v2$2;
+						}
+					} else {
+						var _v6 = right.a;
+						var _v7 = right.d;
+						return $elm$core$Dict$moveRedRight(dict);
+					}
+				} else {
+					break _v2$2;
+				}
+			}
+			return dict;
+		}
+	});
+var $elm$core$Dict$removeMin = function (dict) {
+	if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+		var color = dict.a;
+		var key = dict.b;
+		var value = dict.c;
+		var left = dict.d;
+		var lColor = left.a;
+		var lLeft = left.d;
+		var right = dict.e;
+		if (lColor.$ === 'Black') {
+			if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+				var _v3 = lLeft.a;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					key,
+					value,
+					$elm$core$Dict$removeMin(left),
+					right);
+			} else {
+				var _v4 = $elm$core$Dict$moveRedLeft(dict);
+				if (_v4.$ === 'RBNode_elm_builtin') {
+					var nColor = _v4.a;
+					var nKey = _v4.b;
+					var nValue = _v4.c;
+					var nLeft = _v4.d;
+					var nRight = _v4.e;
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						$elm$core$Dict$removeMin(nLeft),
+						nRight);
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			}
+		} else {
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				key,
+				value,
+				$elm$core$Dict$removeMin(left),
+				right);
+		}
+	} else {
+		return $elm$core$Dict$RBEmpty_elm_builtin;
+	}
+};
+var $elm$core$Dict$removeHelp = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		} else {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_cmp(targetKey, key) < 0) {
+				if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Black')) {
+					var _v4 = left.a;
+					var lLeft = left.d;
+					if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+						var _v6 = lLeft.a;
+						return A5(
+							$elm$core$Dict$RBNode_elm_builtin,
+							color,
+							key,
+							value,
+							A2($elm$core$Dict$removeHelp, targetKey, left),
+							right);
+					} else {
+						var _v7 = $elm$core$Dict$moveRedLeft(dict);
+						if (_v7.$ === 'RBNode_elm_builtin') {
+							var nColor = _v7.a;
+							var nKey = _v7.b;
+							var nValue = _v7.c;
+							var nLeft = _v7.d;
+							var nRight = _v7.e;
+							return A5(
+								$elm$core$Dict$balance,
+								nColor,
+								nKey,
+								nValue,
+								A2($elm$core$Dict$removeHelp, targetKey, nLeft),
+								nRight);
+						} else {
+							return $elm$core$Dict$RBEmpty_elm_builtin;
+						}
+					}
+				} else {
+					return A5(
+						$elm$core$Dict$RBNode_elm_builtin,
+						color,
+						key,
+						value,
+						A2($elm$core$Dict$removeHelp, targetKey, left),
+						right);
+				}
+			} else {
+				return A2(
+					$elm$core$Dict$removeHelpEQGT,
+					targetKey,
+					A7($elm$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
+			}
+		}
+	});
+var $elm$core$Dict$removeHelpEQGT = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBNode_elm_builtin') {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_eq(targetKey, key)) {
+				var _v1 = $elm$core$Dict$getMin(right);
+				if (_v1.$ === 'RBNode_elm_builtin') {
+					var minKey = _v1.b;
+					var minValue = _v1.c;
+					return A5(
+						$elm$core$Dict$balance,
+						color,
+						minKey,
+						minValue,
+						left,
+						$elm$core$Dict$removeMin(right));
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			} else {
+				return A5(
+					$elm$core$Dict$balance,
+					color,
+					key,
+					value,
+					left,
+					A2($elm$core$Dict$removeHelp, targetKey, right));
+			}
+		} else {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		}
+	});
+var $elm$core$Dict$remove = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		update:
@@ -9090,37 +9519,104 @@ var $author$project$Main$update = F2(
 				case 'ClickCanvas':
 					var position = msg.a;
 					var _v1 = model.placement;
-					if (_v1.$ === 'Idle') {
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					} else {
-						var item = _v1.a;
-						var clearedModel = _Utils_update(
-							model,
-							{isOpenToaster: false, toasterMsg: ''});
-						var _v2 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
-						if (_v2.$ === 'Err') {
-							var toasterMsg = _v2.a;
-							var $temp$msg = toasterMsg,
-								$temp$model = model;
-							msg = $temp$msg;
-							model = $temp$model;
-							continue update;
-						} else {
-							var newGrid = _v2.a;
+					switch (_v1.$) {
+						case 'Idle':
+							var _v2 = A2($author$project$Main$findItemAtPos, position, model.canvasGrid.items);
+							if (_v2.$ === 'Just') {
+								var _v3 = _v2.a;
+								var oldPos = _v3.a;
+								var item = _v3.b;
+								return _Utils_Tuple2(
+									_Utils_update(
+										model,
+										{
+											placement: A2($author$project$Main$ModifyingItem, oldPos, item)
+										}),
+									$elm$core$Platform$Cmd$none);
+							} else {
+								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+							}
+						case 'HoldingItem':
+							var item = _v1.a;
+							var clearedModel = _Utils_update(
+								model,
+								{isOpenToaster: false, toasterMsg: ''});
+							var _v4 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
+							if (_v4.$ === 'Err') {
+								var toasterMsg = _v4.a;
+								var $temp$msg = toasterMsg,
+									$temp$model = model;
+								msg = $temp$msg;
+								model = $temp$model;
+								continue update;
+							} else {
+								var newGrid = _v4.a;
+								return _Utils_Tuple2(
+									_Utils_update(
+										clearedModel,
+										{canvasGrid: newGrid, placement: $author$project$Main$Idle}),
+									$elm$core$Platform$Cmd$none);
+							}
+						default:
+							var curPosition = _v1.a;
+							var item = _v1.b;
 							return _Utils_Tuple2(
 								_Utils_update(
-									clearedModel,
-									{canvasGrid: newGrid, placement: $author$project$Main$Idle}),
+									model,
+									{placement: $author$project$Main$Idle}),
 								$elm$core$Platform$Cmd$none);
-						}
 					}
-				default:
+				case 'MouseMoved':
 					var pos = msg.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{mousePosition: pos}),
 						$elm$core$Platform$Cmd$none);
+				case 'Delete':
+					var pos = msg.a;
+					var oldGrid = model.canvasGrid;
+					var newGrid = _Utils_update(
+						oldGrid,
+						{
+							items: A2($elm$core$Dict$remove, pos, oldGrid.items)
+						});
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{canvasGrid: newGrid}),
+						$elm$core$Platform$Cmd$none);
+				default:
+					var pos = msg.a;
+					var item = msg.b;
+					var oldGrid = model.canvasGrid;
+					var newRotation = (item.rotation >= 270) ? 0 : (item.rotation + 90);
+					var newItem = _Utils_update(
+						item,
+						{height: item.width, rotation: newRotation, width: item.height});
+					var clearedItems = A2($elm$core$Dict$remove, pos, oldGrid.items);
+					var clearedGrid = _Utils_update(
+						oldGrid,
+						{items: clearedItems});
+					var _v5 = A4($author$project$Main$checkPlacement, model, pos, newItem, clearedGrid);
+					if (_v5.$ === 'Ok') {
+						var newGrid = _v5.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									canvasGrid: newGrid,
+									placement: A2($author$project$Main$ModifyingItem, pos, newItem)
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						var toasterMsg = _v5.a;
+						var $temp$msg = toasterMsg,
+							$temp$model = model;
+						msg = $temp$msg;
+						model = $temp$model;
+						continue update;
+					}
 			}
 		}
 	});
@@ -9145,6 +9641,7 @@ var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $elm$svg$Svg$image = $elm$svg$Svg$trustedNode('image');
@@ -9177,23 +9674,143 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
+var $elm$svg$Svg$Attributes$opacity = _VirtualDom_attribute('opacity');
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
 var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
-var $elm$core$List$sortBy = _List_sortBy;
+var $author$project$Main$Delete = function (a) {
+	return {$: 'Delete', a: a};
+};
+var $author$project$Main$Rotate = F2(
+	function (a, b) {
+		return {$: 'Rotate', a: a, b: b};
+	});
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cursor = _VirtualDom_attribute('cursor');
+var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
+var $elm$svg$Svg$Attributes$fontWeight = _VirtualDom_attribute('font-weight');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeDasharray = _VirtualDom_attribute('stroke-dasharray');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Main$renderModifyingOverlay = F2(
+	function (_v0, item) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var posY = y * 10;
+		var posX = x * 10;
+		return A2(
+			$elm$svg$Svg$g,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x(
+							$elm$core$String$fromFloat(posX)),
+							$elm$svg$Svg$Attributes$y(
+							$elm$core$String$fromFloat(posY)),
+							$elm$svg$Svg$Attributes$width(
+							$elm$core$String$fromFloat(item.width)),
+							$elm$svg$Svg$Attributes$height(
+							$elm$core$String$fromFloat(item.height)),
+							$elm$svg$Svg$Attributes$fill('none'),
+							$elm$svg$Svg$Attributes$stroke('#007aff'),
+							$elm$svg$Svg$Attributes$strokeWidth('2'),
+							$elm$svg$Svg$Attributes$strokeDasharray('4 4')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							'translate(' + ($elm$core$String$fromFloat((posX + item.width) - 15) + (',' + ($elm$core$String$fromFloat(posY - 5) + ')')))),
+							$elm$html$Html$Events$onClick(
+							$author$project$Main$Delete(
+								_Utils_Tuple2(x, y))),
+							$elm$svg$Svg$Attributes$cursor('pointer')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$circle,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$r('10'),
+									$elm$svg$Svg$Attributes$fill('#ff3b30')
+								]),
+							_List_Nil),
+							A2(
+							$elm$svg$Svg$text_,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$x('-4'),
+									$elm$svg$Svg$Attributes$y('4'),
+									$elm$svg$Svg$Attributes$fill('white'),
+									$elm$svg$Svg$Attributes$fontSize('12'),
+									$elm$svg$Svg$Attributes$fontWeight('bold')
+								]),
+							_List_fromArray(
+								[
+									$elm$svg$Svg$text('X')
+								]))
+						])),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							'translate(' + ($elm$core$String$fromFloat((posX + item.width) - 12) + (',' + ($elm$core$String$fromFloat((posY + item.height) - 12) + ')')))),
+							$elm$html$Html$Events$onClick(
+							A2(
+								$author$project$Main$Rotate,
+								_Utils_Tuple2(x, y),
+								item)),
+							$elm$svg$Svg$Attributes$cursor('pointer')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$circle,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$r('12'),
+									$elm$svg$Svg$Attributes$fill('#34c759')
+								]),
+							_List_Nil),
+							A2(
+							$elm$svg$Svg$text_,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$x('-4'),
+									$elm$svg$Svg$Attributes$y('4'),
+									$elm$svg$Svg$Attributes$fill('white'),
+									$elm$svg$Svg$Attributes$fontSize('12'),
+									$elm$svg$Svg$Attributes$fontWeight('bold')
+								]),
+							_List_fromArray(
+								[
+									$elm$svg$Svg$text('⟳')
+								]))
+						]))
+				]));
+	});
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 	return A3(
 		_VirtualDom_attributeNS,
@@ -9201,71 +9818,113 @@ var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 		'xlink:href',
 		_VirtualDom_noJavaScriptUri(value));
 };
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Main$renderCanvas = function (model) {
 	var wStr = $elm$core$String$fromFloat(model.canvasSize.width);
+	var previewItem = function () {
+		var _v7 = model.placement;
+		switch (_v7.$) {
+			case 'Idle':
+				return _List_Nil;
+			case 'HoldingItem':
+				var item = _v7.a;
+				var _v8 = model.mousePosition;
+				var mx = _v8.a;
+				var my = _v8.b;
+				return _List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$image,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
+								$elm$svg$Svg$Attributes$x(
+								$elm$core$String$fromInt(mx * 10)),
+								$elm$svg$Svg$Attributes$y(
+								$elm$core$String$fromInt(my * 10)),
+								$elm$svg$Svg$Attributes$width(
+								$elm$core$String$fromFloat(item.width)),
+								$elm$svg$Svg$Attributes$height(
+								$elm$core$String$fromFloat(item.height)),
+								$elm$svg$Svg$Attributes$preserveAspectRatio('none'),
+								A2($elm$html$Html$Attributes$style, 'opacity', '0.5')
+							]),
+						_List_Nil)
+					]);
+			default:
+				var position = _v7.a;
+				var item = _v7.b;
+				return _List_Nil;
+		}
+	}();
+	var modifyingData = function () {
+		var _v6 = model.placement;
+		if (_v6.$ === 'ModifyingItem') {
+			var pos = _v6.a;
+			var item = _v6.b;
+			return $elm$core$Maybe$Just(
+				_Utils_Tuple2(pos, item));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	}();
 	var renderedItems = A2(
 		$elm$core$List$map,
-		function (_v3) {
-			var _v4 = _v3.a;
-			var x = _v4.a;
-			var y = _v4.b;
-			var item = _v3.b;
+		function (_v1) {
+			var _v2 = _v1.a;
+			var x = _v2.a;
+			var y = _v2.b;
+			var item = _v1.b;
+			var isModifying = function () {
+				if (modifyingData.$ === 'Just') {
+					var _v4 = modifyingData.a;
+					var _v5 = _v4.a;
+					var modX = _v5.a;
+					var modY = _v5.b;
+					return _Utils_eq(x, modX) && _Utils_eq(y, modY);
+				} else {
+					return false;
+				}
+			}();
+			var cy = (y * 10.0) + (item.height / 2.0);
+			var cx = (x * 10.0) + (item.width / 2.0);
+			var angle = $elm$core$String$fromInt(item.rotation);
+			var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(cx) + (', ' + ($elm$core$String$fromFloat(cy) + ')')))));
 			return A2(
-				$elm$svg$Svg$image,
+				$elm$svg$Svg$g,
+				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
-						$elm$svg$Svg$Attributes$x(
-						$elm$core$String$fromInt(x * 10)),
-						$elm$svg$Svg$Attributes$y(
-						$elm$core$String$fromInt(y * 10)),
-						$elm$svg$Svg$Attributes$width(
-						$elm$core$String$fromFloat(item.width)),
-						$elm$svg$Svg$Attributes$height(
-						$elm$core$String$fromFloat(item.height)),
-						$elm$svg$Svg$Attributes$preserveAspectRatio('none')
-					]),
-				_List_Nil);
+						A2(
+						$elm$svg$Svg$image,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
+								$elm$svg$Svg$Attributes$x(
+								$elm$core$String$fromInt(x * 10)),
+								$elm$svg$Svg$Attributes$y(
+								$elm$core$String$fromInt(y * 10)),
+								$elm$svg$Svg$Attributes$width(
+								$elm$core$String$fromFloat(item.width)),
+								$elm$svg$Svg$Attributes$height(
+								$elm$core$String$fromFloat(item.height)),
+								$elm$svg$Svg$Attributes$transform(groupTransform),
+								$elm$svg$Svg$Attributes$opacity(
+								isModifying ? '0.6' : '1.0')
+							]),
+						_List_Nil),
+						isModifying ? A2(
+						$author$project$Main$renderModifyingOverlay,
+						_Utils_Tuple2(x, y),
+						item) : A2($elm$svg$Svg$g, _List_Nil, _List_Nil)
+					]));
 		},
 		A2(
 			$elm$core$List$sortBy,
-			function (_v2) {
-				var item = _v2.b;
+			function (_v0) {
+				var item = _v0.b;
 				return item.layer;
 			},
 			$elm$core$Dict$toList(model.canvasGrid.items)));
-	var previewItem = function () {
-		var _v0 = model.placement;
-		if (_v0.$ === 'Idle') {
-			return _List_Nil;
-		} else {
-			var item = _v0.a;
-			var _v1 = model.mousePosition;
-			var mx = _v1.a;
-			var my = _v1.b;
-			return _List_fromArray(
-				[
-					A2(
-					$elm$svg$Svg$image,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
-							$elm$svg$Svg$Attributes$x(
-							$elm$core$String$fromInt(mx * 10)),
-							$elm$svg$Svg$Attributes$y(
-							$elm$core$String$fromInt(my * 10)),
-							$elm$svg$Svg$Attributes$width(
-							$elm$core$String$fromFloat(item.width)),
-							$elm$svg$Svg$Attributes$height(
-							$elm$core$String$fromFloat(item.height)),
-							$elm$svg$Svg$Attributes$preserveAspectRatio('none'),
-							A2($elm$html$Html$Attributes$style, 'opacity', '0.5')
-						]),
-					_List_Nil)
-				]);
-		}
-	}();
 	var hStr = $elm$core$String$fromFloat(model.canvasSize.height);
 	var gridSize = '10';
 	return A2(
