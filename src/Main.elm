@@ -219,7 +219,7 @@ update msg model =
                         item.rotation + 90
 
                 newItem =
-                    { item | width = item.height, height = item.width, rotation = newRotation }
+                    { item | rotation = newRotation }
             in
             case checkPlacement model pos newItem clearedGrid of
                 Ok newGrid ->
@@ -264,43 +264,58 @@ submitCustomSize w h =
             OpenToaster "Inputs should be of type number"
 
 
+getRotatedItemDimensions : RoomItem -> ( Float, Float )
+getRotatedItemDimensions item =
+    if item.rotation == 90 || item.rotation == 270 then
+        ( item.height, item.width )
+
+    else
+        ( item.width, item.height )
+
+
 checkPlacement : Model -> Position -> RoomItem -> Grid -> Result Msg Grid
 checkPlacement model position item oldGrid =
     let
         ( x, y ) =
             position
 
+        ( itemX, itemY ) =
+            getRotatedItemDimensions item
+
         posCheckX =
-            toFloat x * 10 + item.width
+            toFloat x * 10 + itemX
 
         posCheckY =
-            toFloat y * 10 + item.height
+            toFloat y * 10 + itemY
 
         nx1 =
             toFloat x * 10
 
         nx2 =
-            nx1 + item.width
+            nx1 + itemX
 
         ny1 =
             toFloat y * 10
 
         ny2 =
-            ny1 + item.height
+            ny1 + itemY
 
         checkCollision ( ( oldx, oldy ), oldItem ) =
             let
+                ( oldItemX, oldItemY ) =
+                    getRotatedItemDimensions oldItem
+
                 ox1 =
                     toFloat oldx * 10
 
                 ox2 =
-                    ox1 + oldItem.width
+                    ox1 + oldItemX
 
                 oy1 =
                     toFloat oldy * 10
 
                 oy2 =
-                    oy1 + oldItem.height
+                    oy1 + oldItemY
             in
             if (nx2 <= ox1) || (nx1 >= ox2) || (ny2 <= oy1) || (ny1 >= oy2) then
                 True
@@ -342,17 +357,20 @@ findItemAtPos ( clickX, clickY ) items =
 
         isHit ( ( oldx, oldy ), oldItem ) =
             let
+                ( oldItemX, oldItemY ) =
+                    getRotatedItemDimensions oldItem
+
                 ox1 =
                     toFloat oldx * 10
 
                 ox2 =
-                    ox1 + oldItem.width
+                    ox1 + oldItemX
 
                 oy1 =
                     toFloat oldy * 10
 
                 oy2 =
-                    oy1 + oldItem.height
+                    oy1 + oldItemY
             in
             (px >= ox1 && px < ox2) && (py >= oy1 && py < oy2)
     in
@@ -577,7 +595,7 @@ renderCanvas model =
                             groupTransform =
                                 "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
                         in
-                        Svg.g []
+                        Svg.g [ SvgAttr.transform groupTransform ]
                             [ Svg.image
                                 [ SvgAttr.xlinkHref item.imgSrc
                                 , SvgAttr.x (String.fromInt (x * 10))
@@ -585,7 +603,6 @@ renderCanvas model =
                                 , SvgAttr.width (String.fromFloat item.width)
                                 , SvgAttr.height (String.fromFloat item.height)
                                 , SvgAttr.preserveAspectRatio "none"
-                                , SvgAttr.transform groupTransform
                                 , SvgAttr.opacity
                                     (if isModifying then
                                         "0.6"
@@ -625,17 +642,30 @@ renderCanvas model =
                         groupTransform =
                             "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
                     in
-                    [ Svg.image
-                        [ SvgAttr.xlinkHref item.imgSrc
-                        , SvgAttr.x (String.fromInt (mx * 10))
-                        , SvgAttr.y (String.fromInt (my * 10))
-                        , SvgAttr.width (String.fromFloat item.width)
-                        , SvgAttr.height (String.fromFloat item.height)
-                        , SvgAttr.transform groupTransform
-                        , SvgAttr.preserveAspectRatio "none"
-                        , Attr.style "opacity" "0.5"
+                    [ Svg.g
+                        [ SvgAttr.transform groupTransform ]
+                        [ Svg.image
+                            [ SvgAttr.xlinkHref item.imgSrc
+                            , SvgAttr.x (String.fromInt (mx * 10))
+                            , SvgAttr.y (String.fromInt (my * 10))
+                            , SvgAttr.width (String.fromFloat item.width)
+                            , SvgAttr.height (String.fromFloat item.height)
+                            , SvgAttr.preserveAspectRatio "none"
+                            , Attr.style "opacity" "0.5"
+                            ]
+                            []
+                        , Svg.rect
+                            [ SvgAttr.x (String.fromInt (mx * 10))
+                            , SvgAttr.y (String.fromInt (my * 10))
+                            , SvgAttr.width (String.fromFloat item.width)
+                            , SvgAttr.height (String.fromFloat item.height)
+                            , SvgAttr.fill "none"
+                            , SvgAttr.stroke "#00a8ff"
+                            , SvgAttr.strokeWidth "2"
+                            , SvgAttr.strokeDasharray "4 4"
+                            ]
+                            []
                         ]
-                        []
                     ]
 
                 ModifyingItem position item ->
