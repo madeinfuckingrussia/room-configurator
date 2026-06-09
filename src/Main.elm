@@ -118,6 +118,7 @@ type Msg
     | MouseMoved Position
     | Delete Position
     | Rotate Position RoomItem
+    | MoveItem Position RoomItem
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -226,6 +227,24 @@ update msg model =
 
                 Err toasterMsg ->
                     update toasterMsg model
+
+        MoveItem pos item ->
+            let
+                oldGrid =
+                    model.canvasGrid
+
+                clearedItems =
+                    Dict.remove pos oldGrid.items
+
+                updatedGrid =
+                    { oldGrid | items = clearedItems, active = True }
+            in
+            ( { model | canvasGrid = updatedGrid, placement = HoldingItem item }, Cmd.none )
+
+
+onClickStopPropagation : msg -> Svg.Attribute msg
+onClickStopPropagation msg =
+    Html.Events.stopPropagationOn "click" (Decode.succeed ( msg, True ))
 
 
 submitCustomSize : String -> String -> Msg
@@ -565,6 +584,7 @@ renderCanvas model =
                                 , SvgAttr.y (String.fromInt (y * 10))
                                 , SvgAttr.width (String.fromFloat item.width)
                                 , SvgAttr.height (String.fromFloat item.height)
+                                , SvgAttr.preserveAspectRatio "none"
                                 , SvgAttr.transform groupTransform
                                 , SvgAttr.opacity
                                     (if isModifying then
@@ -592,6 +612,18 @@ renderCanvas model =
                     let
                         ( mx, my ) =
                             model.mousePosition
+
+                        cx =
+                            (toFloat mx * 10.0) + (item.width / 2.0)
+
+                        cy =
+                            (toFloat my * 10.0) + (item.height / 2.0)
+
+                        angle =
+                            String.fromInt item.rotation
+
+                        groupTransform =
+                            "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
                     in
                     [ Svg.image
                         [ SvgAttr.xlinkHref item.imgSrc
@@ -599,6 +631,7 @@ renderCanvas model =
                         , SvgAttr.y (String.fromInt (my * 10))
                         , SvgAttr.width (String.fromFloat item.width)
                         , SvgAttr.height (String.fromFloat item.height)
+                        , SvgAttr.transform groupTransform
                         , SvgAttr.preserveAspectRatio "none"
                         , Attr.style "opacity" "0.5"
                         ]
@@ -690,6 +723,21 @@ renderModifyingOverlay ( x, y ) item =
 
         posY =
             toFloat y * 10
+
+        btnSize =
+            24
+
+        btnSpacing =
+            8
+
+        totalWidth =
+            (btnSize * 3) + (btnSpacing * 2)
+
+        barX =
+            posX + ((item.width - totalWidth) / 2.0)
+
+        barY =
+            posY + ((item.height - btnSize) / 2.0)
     in
     Svg.g []
         [ Svg.rect
@@ -704,42 +752,75 @@ renderModifyingOverlay ( x, y ) item =
             ]
             []
         , Svg.g
-            [ SvgAttr.transform ("translate(" ++ String.fromFloat (posX + item.width - 15) ++ "," ++ String.fromFloat (posY - 5) ++ ")")
-            , Html.Events.onClick (Delete ( x, y ))
-            , SvgAttr.cursor "pointer"
+            [ SvgAttr.transform ("translate(" ++ String.fromFloat barX ++ "," ++ String.fromFloat barY ++ ")")
             ]
-            [ Svg.circle
-                [ SvgAttr.r "10"
-                , SvgAttr.fill "#ff3b30"
+            [ Svg.g [ onClickStopPropagation (MoveItem ( x, y ) item), SvgAttr.cursor "pointer" ]
+                [ Svg.rect
+                    [ SvgAttr.x "0"
+                    , SvgAttr.y "0"
+                    , SvgAttr.width (String.fromFloat btnSize)
+                    , SvgAttr.height (String.fromFloat btnSize)
+                    , SvgAttr.fill "white"
+                    , SvgAttr.stroke "black"
+                    , SvgAttr.strokeWidth "1"
+                    ]
+                    []
+                , Svg.path
+                    [ SvgAttr.d "M 12,4 L 12,20 M 4,12 L 20,12 M 12,4 L 9,7 M 12,4 L 15,7 M 12,20 L 9,17 M 12,20 L 15,17 M 4,12 L 7,9 M 4,12 L 7,15 M 20,12 L 17,9 M 20,12 L 17,15"
+                    , SvgAttr.stroke "black"
+                    , SvgAttr.strokeWidth "1.5"
+                    , SvgAttr.fill "none"
+                    ]
+                    []
                 ]
-                []
-            , Svg.text_
-                [ SvgAttr.x "-4"
-                , SvgAttr.y "4"
-                , SvgAttr.fill "white"
-                , SvgAttr.fontSize "12"
-                , SvgAttr.fontWeight "bold"
+            , Svg.g
+                [ SvgAttr.transform ("translate(" ++ String.fromFloat (btnSize + btnSpacing) ++ ",0)")
+                , Html.Events.onClick (Rotate ( x, y ) item)
+                , SvgAttr.cursor "pointer"
                 ]
-                [ Svg.text "X" ]
-            ]
-        , Svg.g
-            [ SvgAttr.transform ("translate(" ++ String.fromFloat (posX + item.width - 12) ++ "," ++ String.fromFloat (posY + item.height - 12) ++ ")")
-            , Html.Events.onClick (Rotate ( x, y ) item)
-            , SvgAttr.cursor "pointer"
-            ]
-            [ Svg.circle
-                [ SvgAttr.r "12"
-                , SvgAttr.fill "#34c759"
+                [ Svg.rect
+                    [ SvgAttr.x "0"
+                    , SvgAttr.y "0"
+                    , SvgAttr.width (String.fromFloat btnSize)
+                    , SvgAttr.height (String.fromFloat btnSize)
+                    , SvgAttr.fill "white"
+                    , SvgAttr.stroke "black"
+                    , SvgAttr.strokeWidth "1"
+                    ]
+                    []
+                , Svg.text_
+                    [ SvgAttr.x "6"
+                    , SvgAttr.y "17"
+                    , SvgAttr.fill "black"
+                    , SvgAttr.fontSize "14"
+                    , SvgAttr.fontWeight "bold"
+                    ]
+                    [ Svg.text "⟳" ]
                 ]
-                []
-            , Svg.text_
-                [ SvgAttr.x "-4"
-                , SvgAttr.y "4"
-                , SvgAttr.fill "white"
-                , SvgAttr.fontSize "12"
-                , SvgAttr.fontWeight "bold"
+            , Svg.g
+                [ SvgAttr.transform ("translate(" ++ String.fromFloat ((btnSize * 2) + (btnSpacing * 2)) ++ ",0)")
+                , Html.Events.onClick (Delete ( x, y ))
+                , SvgAttr.cursor "pointer"
                 ]
-                [ Svg.text "⟳" ]
+                [ Svg.rect
+                    [ SvgAttr.x "0"
+                    , SvgAttr.y "0"
+                    , SvgAttr.width (String.fromFloat btnSize)
+                    , SvgAttr.height (String.fromFloat btnSize)
+                    , SvgAttr.fill "white"
+                    , SvgAttr.stroke "black"
+                    , SvgAttr.strokeWidth "1"
+                    ]
+                    []
+                , Svg.text_
+                    [ SvgAttr.x "7"
+                    , SvgAttr.y "17"
+                    , SvgAttr.fill "black"
+                    , SvgAttr.fontSize "14"
+                    , SvgAttr.fontWeight "bold"
+                    ]
+                    [ Svg.text "X" ]
+                ]
             ]
         ]
 

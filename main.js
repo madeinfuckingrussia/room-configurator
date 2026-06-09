@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1780575357917"
+    "1781037421565"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -9586,7 +9586,7 @@ var $author$project$Main$update = F2(
 							model,
 							{canvasGrid: newGrid}),
 						$elm$core$Platform$Cmd$none);
-				default:
+				case 'Rotate':
 					var pos = msg.a;
 					var item = msg.b;
 					var oldGrid = model.canvasGrid;
@@ -9617,6 +9617,22 @@ var $author$project$Main$update = F2(
 						model = $temp$model;
 						continue update;
 					}
+				default:
+					var pos = msg.a;
+					var item = msg.b;
+					var oldGrid = model.canvasGrid;
+					var clearedItems = A2($elm$core$Dict$remove, pos, oldGrid.items);
+					var updatedGrid = _Utils_update(
+						oldGrid,
+						{active: true, items: clearedItems});
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								canvasGrid: updatedGrid,
+								placement: $author$project$Main$HoldingItem(item)
+							}),
+						$elm$core$Platform$Cmd$none);
 			}
 		}
 	});
@@ -9683,15 +9699,34 @@ var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $author$project$Main$Delete = function (a) {
 	return {$: 'Delete', a: a};
 };
+var $author$project$Main$MoveItem = F2(
+	function (a, b) {
+		return {$: 'MoveItem', a: a, b: b};
+	});
 var $author$project$Main$Rotate = F2(
 	function (a, b) {
 		return {$: 'Rotate', a: a, b: b};
 	});
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$svg$Svg$Attributes$cursor = _VirtualDom_attribute('cursor');
 var $elm$svg$Svg$Attributes$fontSize = _VirtualDom_attribute('font-size');
 var $elm$svg$Svg$Attributes$fontWeight = _VirtualDom_attribute('font-weight');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $author$project$Main$onClickStopPropagation = function (msg) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'click',
+		$elm$json$Json$Decode$succeed(
+			_Utils_Tuple2(msg, true)));
+};
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeDasharray = _VirtualDom_attribute('stroke-dasharray');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
@@ -9708,6 +9743,11 @@ var $author$project$Main$renderModifyingOverlay = F2(
 		var y = _v0.b;
 		var posY = y * 10;
 		var posX = x * 10;
+		var btnSpacing = 8;
+		var btnSize = 24;
+		var totalWidth = (btnSize * 3) + (btnSpacing * 2);
+		var barY = posY + ((item.height - btnSize) / 2.0);
+		var barX = posX + ((item.width - totalWidth) / 2.0);
 		return A2(
 			$elm$svg$Svg$g,
 			_List_Nil,
@@ -9736,73 +9776,136 @@ var $author$project$Main$renderModifyingOverlay = F2(
 					_List_fromArray(
 						[
 							$elm$svg$Svg$Attributes$transform(
-							'translate(' + ($elm$core$String$fromFloat((posX + item.width) - 15) + (',' + ($elm$core$String$fromFloat(posY - 5) + ')')))),
-							$elm$html$Html$Events$onClick(
-							$author$project$Main$Delete(
-								_Utils_Tuple2(x, y))),
-							$elm$svg$Svg$Attributes$cursor('pointer')
+							'translate(' + ($elm$core$String$fromFloat(barX) + (',' + ($elm$core$String$fromFloat(barY) + ')'))))
 						]),
 					_List_fromArray(
 						[
 							A2(
-							$elm$svg$Svg$circle,
+							$elm$svg$Svg$g,
 							_List_fromArray(
 								[
-									$elm$svg$Svg$Attributes$r('10'),
-									$elm$svg$Svg$Attributes$fill('#ff3b30')
-								]),
-							_List_Nil),
-							A2(
-							$elm$svg$Svg$text_,
-							_List_fromArray(
-								[
-									$elm$svg$Svg$Attributes$x('-4'),
-									$elm$svg$Svg$Attributes$y('4'),
-									$elm$svg$Svg$Attributes$fill('white'),
-									$elm$svg$Svg$Attributes$fontSize('12'),
-									$elm$svg$Svg$Attributes$fontWeight('bold')
+									$author$project$Main$onClickStopPropagation(
+									A2(
+										$author$project$Main$MoveItem,
+										_Utils_Tuple2(x, y),
+										item)),
+									$elm$svg$Svg$Attributes$cursor('pointer')
 								]),
 							_List_fromArray(
 								[
-									$elm$svg$Svg$text('X')
-								]))
-						])),
-					A2(
-					$elm$svg$Svg$g,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$transform(
-							'translate(' + ($elm$core$String$fromFloat((posX + item.width) - 12) + (',' + ($elm$core$String$fromFloat((posY + item.height) - 12) + ')')))),
-							$elm$html$Html$Events$onClick(
+									A2(
+									$elm$svg$Svg$rect,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$x('0'),
+											$elm$svg$Svg$Attributes$y('0'),
+											$elm$svg$Svg$Attributes$width(
+											$elm$core$String$fromFloat(btnSize)),
+											$elm$svg$Svg$Attributes$height(
+											$elm$core$String$fromFloat(btnSize)),
+											$elm$svg$Svg$Attributes$fill('white'),
+											$elm$svg$Svg$Attributes$stroke('black'),
+											$elm$svg$Svg$Attributes$strokeWidth('1')
+										]),
+									_List_Nil),
+									A2(
+									$elm$svg$Svg$path,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$d('M 12,4 L 12,20 M 4,12 L 20,12 M 12,4 L 9,7 M 12,4 L 15,7 M 12,20 L 9,17 M 12,20 L 15,17 M 4,12 L 7,9 M 4,12 L 7,15 M 20,12 L 17,9 M 20,12 L 17,15'),
+											$elm$svg$Svg$Attributes$stroke('black'),
+											$elm$svg$Svg$Attributes$strokeWidth('1.5'),
+											$elm$svg$Svg$Attributes$fill('none')
+										]),
+									_List_Nil)
+								])),
 							A2(
-								$author$project$Main$Rotate,
-								_Utils_Tuple2(x, y),
-								item)),
-							$elm$svg$Svg$Attributes$cursor('pointer')
-						]),
-					_List_fromArray(
-						[
-							A2(
-							$elm$svg$Svg$circle,
+							$elm$svg$Svg$g,
 							_List_fromArray(
 								[
-									$elm$svg$Svg$Attributes$r('12'),
-									$elm$svg$Svg$Attributes$fill('#34c759')
+									$elm$svg$Svg$Attributes$transform(
+									'translate(' + ($elm$core$String$fromFloat(btnSize + btnSpacing) + ',0)')),
+									$elm$html$Html$Events$onClick(
+									A2(
+										$author$project$Main$Rotate,
+										_Utils_Tuple2(x, y),
+										item)),
+									$elm$svg$Svg$Attributes$cursor('pointer')
 								]),
-							_List_Nil),
-							A2(
-							$elm$svg$Svg$text_,
 							_List_fromArray(
 								[
-									$elm$svg$Svg$Attributes$x('-4'),
-									$elm$svg$Svg$Attributes$y('4'),
-									$elm$svg$Svg$Attributes$fill('white'),
-									$elm$svg$Svg$Attributes$fontSize('12'),
-									$elm$svg$Svg$Attributes$fontWeight('bold')
+									A2(
+									$elm$svg$Svg$rect,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$x('0'),
+											$elm$svg$Svg$Attributes$y('0'),
+											$elm$svg$Svg$Attributes$width(
+											$elm$core$String$fromFloat(btnSize)),
+											$elm$svg$Svg$Attributes$height(
+											$elm$core$String$fromFloat(btnSize)),
+											$elm$svg$Svg$Attributes$fill('white'),
+											$elm$svg$Svg$Attributes$stroke('black'),
+											$elm$svg$Svg$Attributes$strokeWidth('1')
+										]),
+									_List_Nil),
+									A2(
+									$elm$svg$Svg$text_,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$x('6'),
+											$elm$svg$Svg$Attributes$y('17'),
+											$elm$svg$Svg$Attributes$fill('black'),
+											$elm$svg$Svg$Attributes$fontSize('14'),
+											$elm$svg$Svg$Attributes$fontWeight('bold')
+										]),
+									_List_fromArray(
+										[
+											$elm$svg$Svg$text('⟳')
+										]))
+								])),
+							A2(
+							$elm$svg$Svg$g,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$transform(
+									'translate(' + ($elm$core$String$fromFloat((btnSize * 2) + (btnSpacing * 2)) + ',0)')),
+									$elm$html$Html$Events$onClick(
+									$author$project$Main$Delete(
+										_Utils_Tuple2(x, y))),
+									$elm$svg$Svg$Attributes$cursor('pointer')
 								]),
 							_List_fromArray(
 								[
-									$elm$svg$Svg$text('⟳')
+									A2(
+									$elm$svg$Svg$rect,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$x('0'),
+											$elm$svg$Svg$Attributes$y('0'),
+											$elm$svg$Svg$Attributes$width(
+											$elm$core$String$fromFloat(btnSize)),
+											$elm$svg$Svg$Attributes$height(
+											$elm$core$String$fromFloat(btnSize)),
+											$elm$svg$Svg$Attributes$fill('white'),
+											$elm$svg$Svg$Attributes$stroke('black'),
+											$elm$svg$Svg$Attributes$strokeWidth('1')
+										]),
+									_List_Nil),
+									A2(
+									$elm$svg$Svg$text_,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$x('7'),
+											$elm$svg$Svg$Attributes$y('17'),
+											$elm$svg$Svg$Attributes$fill('black'),
+											$elm$svg$Svg$Attributes$fontSize('14'),
+											$elm$svg$Svg$Attributes$fontWeight('bold')
+										]),
+									_List_fromArray(
+										[
+											$elm$svg$Svg$text('X')
+										]))
 								]))
 						]))
 				]));
@@ -9827,9 +9930,13 @@ var $author$project$Main$renderCanvas = function (model) {
 				return _List_Nil;
 			case 'HoldingItem':
 				var item = _v7.a;
+				var angle = $elm$core$String$fromInt(item.rotation);
 				var _v8 = model.mousePosition;
 				var mx = _v8.a;
 				var my = _v8.b;
+				var cx = (mx * 10.0) + (item.width / 2.0);
+				var cy = (my * 10.0) + (item.height / 2.0);
+				var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(cx) + (', ' + ($elm$core$String$fromFloat(cy) + ')')))));
 				return _List_fromArray(
 					[
 						A2(
@@ -9845,6 +9952,7 @@ var $author$project$Main$renderCanvas = function (model) {
 								$elm$core$String$fromFloat(item.width)),
 								$elm$svg$Svg$Attributes$height(
 								$elm$core$String$fromFloat(item.height)),
+								$elm$svg$Svg$Attributes$transform(groupTransform),
 								$elm$svg$Svg$Attributes$preserveAspectRatio('none'),
 								A2($elm$html$Html$Attributes$style, 'opacity', '0.5')
 							]),
@@ -9907,6 +10015,7 @@ var $author$project$Main$renderCanvas = function (model) {
 								$elm$core$String$fromFloat(item.width)),
 								$elm$svg$Svg$Attributes$height(
 								$elm$core$String$fromFloat(item.height)),
+								$elm$svg$Svg$Attributes$preserveAspectRatio('none'),
 								$elm$svg$Svg$Attributes$transform(groupTransform),
 								$elm$svg$Svg$Attributes$opacity(
 								isModifying ? '0.6' : '1.0')
@@ -10124,16 +10233,6 @@ var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
-var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
-	return {$: 'MayStopPropagation', a: a};
-};
-var $elm$html$Html$Events$stopPropagationOn = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
-	});
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
