@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1781044953858"
+    "1781567352756"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8937,46 +8937,6 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
-var $elm$core$Dict$member = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (_v0.$ === 'Just') {
-			return true;
-		} else {
-			return false;
-		}
-	});
 var $elm$core$List$member = F2(
 	function (x, xs) {
 		return A2(
@@ -8991,51 +8951,48 @@ var $author$project$Main$checkPlacement = F4(
 		var _v0 = position;
 		var x = _v0.a;
 		var y = _v0.b;
-		var nx1 = x * 10;
-		var ny1 = y * 10;
+		var cx = (x * 10) + (item.width / 2.0);
+		var cy = (y * 10) + (item.height / 2.0);
 		var _v1 = $author$project$Main$getRotatedItemDimensions(item);
 		var itemX = _v1.a;
 		var itemY = _v1.b;
-		var nx2 = nx1 + itemX;
-		var posCheckX = (x * 10) + itemX;
-		var ny2 = ny1 + itemY;
+		var nx1 = cx - (itemX / 2.0);
+		var nx2 = cx + (itemX / 2.0);
+		var ny1 = cy - (itemY / 2.0);
+		var ny2 = cy + (itemY / 2.0);
 		var checkCollision = function (_v3) {
 			var _v4 = _v3.a;
 			var oldx = _v4.a;
 			var oldy = _v4.b;
 			var oldItem = _v3.b;
-			var oy1 = oldy * 10;
-			var ox1 = oldx * 10;
+			var oldCy = (oldy * 10) + (oldItem.height / 2.0);
+			var oldCx = (oldx * 10) + (oldItem.width / 2.0);
 			var _v2 = $author$project$Main$getRotatedItemDimensions(oldItem);
 			var oldItemX = _v2.a;
 			var oldItemY = _v2.b;
-			var ox2 = ox1 + oldItemX;
-			var oy2 = oy1 + oldItemY;
+			var ox1 = oldCx - (oldItemX / 2.0);
+			var ox2 = oldCx + (oldItemX / 2.0);
+			var oy1 = oldCy - (oldItemY / 2.0);
+			var oy2 = oldCy + (oldItemY / 2.0);
 			return ((_Utils_cmp(nx2, ox1) < 1) || ((_Utils_cmp(nx1, ox2) > -1) || ((_Utils_cmp(ny2, oy1) < 1) || (_Utils_cmp(ny1, oy2) > -1)))) ? true : (A2($elm$core$List$member, oldItem.name, item.allowedOn) ? true : false);
 		};
 		var checkAllCollisions = A2(
 			$elm$core$List$all,
 			checkCollision,
 			$elm$core$Dict$toList(oldGrid.items));
-		var posCheckY = (y * 10) + itemY;
-		if ((_Utils_cmp(posCheckX, model.canvasSize.width) > 0) || (_Utils_cmp(posCheckY, model.canvasSize.height) > 0)) {
+		if ((_Utils_cmp(nx2, model.canvasSize.width) > 0) || ((_Utils_cmp(ny2, model.canvasSize.height) > 0) || ((nx1 < 0) || (ny1 < 0)))) {
 			return $elm$core$Result$Err(
 				$author$project$Main$OpenToaster(item.name + ' can\'t be placed there'));
 		} else {
-			if (A2($elm$core$Dict$member, position, oldGrid.items)) {
+			if (!checkAllCollisions) {
 				return $elm$core$Result$Err(
-					$author$project$Main$OpenToaster('This tile position is already taken'));
+					$author$project$Main$OpenToaster('This position is already taken by another item'));
 			} else {
-				if (!checkAllCollisions) {
-					return $elm$core$Result$Err(
-						$author$project$Main$OpenToaster('This position is already taken by another item'));
-				} else {
-					var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
-					return $elm$core$Result$Ok(
-						_Utils_update(
-							oldGrid,
-							{active: false, items: newItems}));
-				}
+				var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
+				return $elm$core$Result$Ok(
+					_Utils_update(
+						oldGrid,
+						{active: false, items: newItems}));
 			}
 		}
 	});
@@ -9069,19 +9026,21 @@ var $author$project$Main$findItemAtPos = F2(
 		var clickY = _v0.b;
 		var py = clickY * 10;
 		var px = clickX * 10;
-		var isHit = function (_v3) {
-			var _v4 = _v3.a;
-			var oldx = _v4.a;
-			var oldy = _v4.b;
-			var oldItem = _v3.b;
+		var isHit = function (_v2) {
+			var _v3 = _v2.a;
+			var oldx = _v3.a;
+			var oldy = _v3.b;
+			var oldItem = _v2.b;
 			var oy1 = oldy * 10;
 			var ox1 = oldx * 10;
-			var _v2 = $author$project$Main$getRotatedItemDimensions(oldItem);
-			var oldItemX = _v2.a;
-			var oldItemY = _v2.b;
-			var ox2 = ox1 + oldItemX;
-			var oy2 = oy1 + oldItemY;
-			return ((_Utils_cmp(px, ox1) > -1) && (_Utils_cmp(px, ox2) < 0)) && ((_Utils_cmp(py, oy1) > -1) && (_Utils_cmp(py, oy2) < 0));
+			var isRotated = (oldItem.rotation === 90) || (oldItem.rotation === 270);
+			var cy = oy1 + (oldItem.height / 2.0);
+			var yMax = isRotated ? (cy + (oldItem.width / 2.0)) : (cy + (oldItem.height / 2.0));
+			var yMin = isRotated ? (cy - (oldItem.width / 2.0)) : (cy - (oldItem.height / 2.0));
+			var cx = ox1 + (oldItem.width / 2.0);
+			var xMax = isRotated ? (cx + (oldItem.height / 2.0)) : (cx + (oldItem.width / 2.0));
+			var xMin = isRotated ? (cx - (oldItem.height / 2.0)) : (cx - (oldItem.width / 2.0));
+			return ((_Utils_cmp(px, xMin) > -1) && (_Utils_cmp(px, xMax) < 0)) && ((_Utils_cmp(py, yMin) > -1) && (_Utils_cmp(py, yMax) < 0));
 		};
 		return $elm$core$List$head(
 			A2(
@@ -9755,11 +9714,15 @@ var $author$project$Main$renderModifyingOverlay = F2(
 		var y = _v0.b;
 		var posY = y * 10;
 		var posX = x * 10;
+		var cy = (y * 10.0) + (item.height / 2.0);
+		var cx = (x * 10.0) + (item.width / 2.0);
 		var btnSpacing = 8;
 		var btnSize = 24;
 		var totalWidth = (btnSize * 3) + (btnSpacing * 2);
 		var barY = posY + ((item.height - btnSize) / 2.0);
 		var barX = posX + ((item.width - totalWidth) / 2.0);
+		var angle = $elm$core$String$fromInt(item.rotation);
+		var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(cx) + (', ' + ($elm$core$String$fromFloat(cy) + ')')))));
 		return A2(
 			$elm$svg$Svg$g,
 			_List_Nil,
@@ -9780,7 +9743,8 @@ var $author$project$Main$renderModifyingOverlay = F2(
 							$elm$svg$Svg$Attributes$fill('none'),
 							$elm$svg$Svg$Attributes$stroke('#007aff'),
 							$elm$svg$Svg$Attributes$strokeWidth('2'),
-							$elm$svg$Svg$Attributes$strokeDasharray('4 4')
+							$elm$svg$Svg$Attributes$strokeDasharray('4 4'),
+							$elm$svg$Svg$Attributes$transform(groupTransform)
 						]),
 					_List_Nil),
 					A2(
@@ -10037,30 +10001,36 @@ var $author$project$Main$renderCanvas = function (model) {
 			var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(cx) + (', ' + ($elm$core$String$fromFloat(cy) + ')')))));
 			return A2(
 				$elm$svg$Svg$g,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$transform(groupTransform)
-					]),
+				_List_Nil,
 				_List_fromArray(
 					[
 						A2(
-						$elm$svg$Svg$image,
+						$elm$svg$Svg$g,
 						_List_fromArray(
 							[
-								$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
-								$elm$svg$Svg$Attributes$x(
-								$elm$core$String$fromInt(x * 10)),
-								$elm$svg$Svg$Attributes$y(
-								$elm$core$String$fromInt(y * 10)),
-								$elm$svg$Svg$Attributes$width(
-								$elm$core$String$fromFloat(item.width)),
-								$elm$svg$Svg$Attributes$height(
-								$elm$core$String$fromFloat(item.height)),
-								$elm$svg$Svg$Attributes$preserveAspectRatio('none'),
-								$elm$svg$Svg$Attributes$opacity(
-								isModifying ? '0.6' : '1.0')
+								$elm$svg$Svg$Attributes$transform(groupTransform)
 							]),
-						_List_Nil),
+						_List_fromArray(
+							[
+								A2(
+								$elm$svg$Svg$image,
+								_List_fromArray(
+									[
+										$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
+										$elm$svg$Svg$Attributes$x(
+										$elm$core$String$fromInt(x * 10)),
+										$elm$svg$Svg$Attributes$y(
+										$elm$core$String$fromInt(y * 10)),
+										$elm$svg$Svg$Attributes$width(
+										$elm$core$String$fromFloat(item.width)),
+										$elm$svg$Svg$Attributes$height(
+										$elm$core$String$fromFloat(item.height)),
+										$elm$svg$Svg$Attributes$preserveAspectRatio('none'),
+										$elm$svg$Svg$Attributes$opacity(
+										isModifying ? '0.6' : '1.0')
+									]),
+								_List_Nil)
+							])),
 						isModifying ? A2(
 						$author$project$Main$renderModifyingOverlay,
 						_Utils_Tuple2(x, y),

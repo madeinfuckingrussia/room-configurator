@@ -282,40 +282,46 @@ checkPlacement model position item oldGrid =
         ( itemX, itemY ) =
             getRotatedItemDimensions item
 
-        posCheckX =
-            toFloat x * 10 + itemX
+        cx =
+            (toFloat x * 10) + (item.width / 2.0)
 
-        posCheckY =
-            toFloat y * 10 + itemY
+        cy =
+            (toFloat y * 10) + (item.height / 2.0)
 
         nx1 =
-            toFloat x * 10
+            cx - (itemX / 2.0)
 
         nx2 =
-            nx1 + itemX
+            cx + (itemX / 2.0)
 
         ny1 =
-            toFloat y * 10
+            cy - (itemY / 2.0)
 
         ny2 =
-            ny1 + itemY
+            cy + (itemY / 2.0)
 
         checkCollision ( ( oldx, oldy ), oldItem ) =
             let
                 ( oldItemX, oldItemY ) =
                     getRotatedItemDimensions oldItem
 
+                oldCx =
+                    (toFloat oldx * 10) + (oldItem.width / 2.0)
+
+                oldCy =
+                    (toFloat oldy * 10) + (oldItem.height / 2.0)
+
                 ox1 =
-                    toFloat oldx * 10
+                    oldCx - (oldItemX / 2.0)
 
                 ox2 =
-                    ox1 + oldItemX
+                    oldCx + (oldItemX / 2.0)
 
                 oy1 =
-                    toFloat oldy * 10
+                    oldCy - (oldItemY / 2.0)
 
                 oy2 =
-                    oy1 + oldItemY
+                    oldCy + (oldItemY / 2.0)
             in
             if (nx2 <= ox1) || (nx1 >= ox2) || (ny2 <= oy1) || (ny1 >= oy2) then
                 True
@@ -329,11 +335,8 @@ checkPlacement model position item oldGrid =
         checkAllCollisions =
             oldGrid.items |> Dict.toList |> List.all checkCollision
     in
-    if posCheckX > model.canvasSize.width || posCheckY > model.canvasSize.height then
+    if nx2 > model.canvasSize.width || ny2 > model.canvasSize.height || nx1 < 0 || ny1 < 0 then
         Err (OpenToaster (item.name ++ " can't be placed there"))
-
-    else if Dict.member position oldGrid.items then
-        Err (OpenToaster "This tile position is already taken")
 
     else if not checkAllCollisions then
         Err (OpenToaster "This position is already taken by another item")
@@ -357,22 +360,50 @@ findItemAtPos ( clickX, clickY ) items =
 
         isHit ( ( oldx, oldy ), oldItem ) =
             let
-                ( oldItemX, oldItemY ) =
-                    getRotatedItemDimensions oldItem
-
                 ox1 =
                     toFloat oldx * 10
-
-                ox2 =
-                    ox1 + oldItemX
 
                 oy1 =
                     toFloat oldy * 10
 
-                oy2 =
-                    oy1 + oldItemY
+                cx =
+                    ox1 + (oldItem.width / 2.0)
+
+                cy =
+                    oy1 + (oldItem.height / 2.0)
+
+                isRotated =
+                    oldItem.rotation == 90 || oldItem.rotation == 270
+
+                xMin =
+                    if isRotated then
+                        cx - (oldItem.height / 2.0)
+
+                    else
+                        cx - (oldItem.width / 2.0)
+
+                xMax =
+                    if isRotated then
+                        cx + (oldItem.height / 2.0)
+
+                    else
+                        cx + (oldItem.width / 2.0)
+
+                yMin =
+                    if isRotated then
+                        cy - (oldItem.width / 2.0)
+
+                    else
+                        cy - (oldItem.height / 2.0)
+
+                yMax =
+                    if isRotated then
+                        cy + (oldItem.width / 2.0)
+
+                    else
+                        cy + (oldItem.height / 2.0)
             in
-            (px >= ox1 && px < ox2) && (py >= oy1 && py < oy2)
+            (px >= xMin && px < xMax) && (py >= yMin && py < yMax)
     in
     items
         |> Dict.toList
@@ -595,23 +626,25 @@ renderCanvas model =
                             groupTransform =
                                 "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
                         in
-                        Svg.g [ SvgAttr.transform groupTransform ]
-                            [ Svg.image
-                                [ SvgAttr.xlinkHref item.imgSrc
-                                , SvgAttr.x (String.fromInt (x * 10))
-                                , SvgAttr.y (String.fromInt (y * 10))
-                                , SvgAttr.width (String.fromFloat item.width)
-                                , SvgAttr.height (String.fromFloat item.height)
-                                , SvgAttr.preserveAspectRatio "none"
-                                , SvgAttr.opacity
-                                    (if isModifying then
-                                        "0.6"
+                        Svg.g []
+                            [ Svg.g [ SvgAttr.transform groupTransform ]
+                                [ Svg.image
+                                    [ SvgAttr.xlinkHref item.imgSrc
+                                    , SvgAttr.x (String.fromInt (x * 10))
+                                    , SvgAttr.y (String.fromInt (y * 10))
+                                    , SvgAttr.width (String.fromFloat item.width)
+                                    , SvgAttr.height (String.fromFloat item.height)
+                                    , SvgAttr.preserveAspectRatio "none"
+                                    , SvgAttr.opacity
+                                        (if isModifying then
+                                            "0.6"
 
-                                     else
-                                        "1.0"
-                                    )
+                                         else
+                                            "1.0"
+                                        )
+                                    ]
+                                    []
                                 ]
-                                []
                             , if isModifying then
                                 renderModifyingOverlay ( x, y ) item
 
@@ -768,6 +801,18 @@ renderModifyingOverlay ( x, y ) item =
 
         barY =
             posY + ((item.height - btnSize) / 2.0)
+
+        cx =
+            (toFloat x * 10.0) + (item.width / 2.0)
+
+        cy =
+            (toFloat y * 10.0) + (item.height / 2.0)
+
+        angle =
+            String.fromInt item.rotation
+
+        groupTransform =
+            "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
     in
     Svg.g []
         [ Svg.rect
@@ -779,6 +824,7 @@ renderModifyingOverlay ( x, y ) item =
             , SvgAttr.stroke "#007aff"
             , SvgAttr.strokeWidth "2"
             , SvgAttr.strokeDasharray "4 4"
+            , SvgAttr.transform groupTransform
             ]
             []
         , Svg.g
