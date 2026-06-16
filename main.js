@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1781642190893"
+    "1781644471106"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8937,6 +8937,46 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
 var $elm$core$List$member = F2(
 	function (x, xs) {
 		return A2(
@@ -8984,15 +9024,20 @@ var $author$project$Main$checkPlacement = F4(
 			return $elm$core$Result$Err(
 				$author$project$Main$OpenToaster(item.name + ' can\'t be placed there'));
 		} else {
-			if (!checkAllCollisions) {
+			if (A2($elm$core$Dict$member, position, oldGrid.items)) {
 				return $elm$core$Result$Err(
-					$author$project$Main$OpenToaster('This position is already taken by another item'));
+					$author$project$Main$OpenToaster('This tile is already taken by another item'));
 			} else {
-				var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
-				return $elm$core$Result$Ok(
-					_Utils_update(
-						oldGrid,
-						{active: false, items: newItems}));
+				if (!checkAllCollisions) {
+					return $elm$core$Result$Err(
+						$author$project$Main$OpenToaster('This position is already taken by another item'));
+				} else {
+					var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
+					return $elm$core$Result$Ok(
+						_Utils_update(
+							oldGrid,
+							{active: false, items: newItems}));
+				}
 			}
 		}
 	});

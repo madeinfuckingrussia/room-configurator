@@ -338,6 +338,9 @@ checkPlacement model position item oldGrid =
     if nx2 > model.canvasSize.width || ny2 > model.canvasSize.height || nx1 < 0 || ny1 < 0 then
         Err (OpenToaster (item.name ++ " can't be placed there"))
 
+    else if Dict.member position oldGrid.items then
+        Err (OpenToaster "This tile is already taken by another item")
+
     else if not checkAllCollisions then
         Err (OpenToaster "This position is already taken by another item")
 
