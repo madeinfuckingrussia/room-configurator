@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1781903088466"
+    "1781907718712"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -10871,10 +10871,10 @@ var $author$project$Main$ResizeCanvas = F2(
 var $author$project$Main$sizeBtnAttrs = F3(
 	function (model, w, h) {
 		var isActive = _Utils_eq(model.canvasSize.width, w * 100) && _Utils_eq(model.canvasSize.height, h * 100);
-		var activeClass = isActive ? 'has-background-warning has-text-black' : '';
+		var activeClass = isActive ? 'has-background-warning has-text-black' : 'is-dark has-text-white';
 		return _List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('navbar-item has-text-weight-bold box m-0 mx-1 is-shadowless' + activeClass),
+				$elm$html$Html$Attributes$class('button navbar-item has-text-weight-bold m-0 mx-2 is-borderless ' + activeClass),
 				$elm$html$Html$Events$onClick(
 				A2($author$project$Main$ResizeCanvas, w, h))
 			]);
@@ -10980,28 +10980,28 @@ var $author$project$Main$viewBottomBar = function (model) {
 									]),
 								_List_Nil),
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A3($author$project$Main$sizeBtnAttrs, model, 3, 3),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('3x3')
 									])),
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A3($author$project$Main$sizeBtnAttrs, model, 4, 3),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('4x3')
 									])),
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A3($author$project$Main$sizeBtnAttrs, model, 6, 5),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('6x5')
 									])),
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A3($author$project$Main$sizeBtnAttrs, model, 6, 6),
 								_List_fromArray(
 									[
@@ -11137,7 +11137,7 @@ var $author$project$Main$viewMenu = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$div,
+											$elm$html$Html$button,
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
@@ -11200,7 +11200,7 @@ var $author$project$Main$viewMenu = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$div,
+											$elm$html$Html$button,
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
@@ -11263,7 +11263,7 @@ var $author$project$Main$viewMenu = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$div,
+											$elm$html$Html$button,
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
@@ -11326,7 +11326,7 @@ var $author$project$Main$viewMenu = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$div,
+											$elm$html$Html$button,
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
@@ -11414,7 +11414,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/graniteFloor.jpg'),
 								_List_fromArray(
 									[
@@ -11444,7 +11444,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/herringboneFloor.jpg'),
 								_List_fromArray(
 									[
@@ -11474,7 +11474,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/laminateFloor.jpg'),
 								_List_fromArray(
 									[
@@ -11504,7 +11504,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/patioFloor.jpg'),
 								_List_fromArray(
 									[
@@ -11534,7 +11534,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$div,
+								$elm$html$Html$button,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/plankFloor.jpg'),
 								_List_fromArray(
 									[
@@ -11600,6 +11600,144 @@ var $author$project$Main$viewToast = function (message) {
 					]))
 			]));
 };
+var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
+var $author$project$Main$viewTopBar = function (model) {
+	return A2(
+		$elm$html$Html$nav,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('navbar is-fixed-top is-dark')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container is-flex is-justify-content-center')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('navbar-brand is-flex is-align-items-center')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Attributes$title('Alles löschen')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon is-small has-text-danger')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fa-solid fa-trash')
+													]),
+												_List_Nil)
+											]))
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Attributes$title('Rückgängig')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon is-small has-text-grey-light')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fa-solid fa-rotate-left')
+													]),
+												_List_Nil)
+											]))
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Attributes$title('Speichern')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon is-small has-text-primary')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fa-solid fa-floppy-disk')
+													]),
+												_List_Nil)
+											]))
+									])),
+								A2(
+								$elm$html$Html$button,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
+										$elm$html$Html$Attributes$type_('button'),
+										$elm$html$Html$Attributes$title('Link teilen')
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$span,
+										_List_fromArray(
+											[
+												$elm$html$Html$Attributes$class('icon is-small has-text-info')
+											]),
+										_List_fromArray(
+											[
+												A2(
+												$elm$html$Html$i,
+												_List_fromArray(
+													[
+														$elm$html$Html$Attributes$class('fa-solid fa-link')
+													]),
+												_List_Nil)
+											]))
+									]))
+							]))
+					]))
+			]));
+};
 var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
@@ -11633,6 +11771,20 @@ var $author$project$Main$view = function (model) {
 								_List_fromArray(
 									[
 										$author$project$Main$viewMenu(model)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+										A2($elm$html$Html$Attributes$style, 'z-index', '10'),
+										A2($elm$html$Html$Attributes$style, 'top', '0'),
+										A2($elm$html$Html$Attributes$style, 'width', '100%'),
+										$elm$html$Html$Attributes$class('is-flex is-justify-content-center p-2')
+									]),
+								_List_fromArray(
+									[
+										$author$project$Main$viewTopBar(model)
 									])),
 								A2(
 								$elm$html$Html$div,

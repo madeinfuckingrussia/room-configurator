@@ -650,6 +650,14 @@ view model =
             , div [ Attr.class "hero-body p-0 is-relative" ]
                 [ div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "left" "0" ]
                     [ viewMenu model ]
+                , div
+                    [ Attr.style "position" "absolute"
+                    , Attr.style "z-index" "10"
+                    , Attr.style "top" "0"
+                    , Attr.style "width" "100%"
+                    , Attr.class "is-flex is-justify-content-center p-2"
+                    ]
+                    [ viewTopBar model ]
                 , div [ Attr.class "is-flex is-justify-content-center is-align-items-center", Attr.style "width" "100%", Attr.style "height" "100%" ]
                     [ renderCanvas model ]
                 , div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "right" "0" ]
@@ -691,16 +699,16 @@ viewMenu model =
             [ Attr.class ("menu p-4 animate__animated " ++ animationClass) ]
             [ p [ Attr.class "menu-label" ] [ text "Furniture" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ div [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsFurniture)
+                (List.map (\item -> li [] [ button [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsFurniture)
             , p [ Attr.class "menu-label" ] [ text "Utilities" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ div [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsUtilities)
+                (List.map (\item -> li [] [ button [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsUtilities)
             , p [ Attr.class "menu-label" ] [ text "Decor" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ div [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsDecor)
+                (List.map (\item -> li [] [ button [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsDecor)
             , p [ Attr.class "menu-label" ] [ text "Structure" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ div [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsStructure)
+                (List.map (\item -> li [] [ button [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsStructure)
             ]
         ]
 
@@ -712,35 +720,35 @@ viewRoomSettings model =
         [ p [ Attr.class "menu-label has-text-centered" ] [ text "Floor" ]
         , ul [ Attr.class "menu-list" ]
             [ li []
-                [ div (floorBtnAttrs model "src/img/graniteFloor.jpg")
+                [ button (floorBtnAttrs model "src/img/graniteFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/graniteFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Granite"
                     ]
                 ]
             , li []
-                [ div (floorBtnAttrs model "src/img/herringboneFloor.jpg")
+                [ button (floorBtnAttrs model "src/img/herringboneFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/herringboneFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Herringbone"
                     ]
                 ]
             , li []
-                [ div (floorBtnAttrs model "src/img/laminateFloor.jpg")
+                [ button (floorBtnAttrs model "src/img/laminateFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/laminateFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Laminate"
                     ]
                 ]
             , li []
-                [ div (floorBtnAttrs model "src/img/patioFloor.jpg")
+                [ button (floorBtnAttrs model "src/img/patioFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/patioFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Patio"
                     ]
                 ]
             , li []
-                [ div (floorBtnAttrs model "src/img/plankFloor.jpg")
+                [ button (floorBtnAttrs model "src/img/plankFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/plankFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Plank"
@@ -767,10 +775,10 @@ viewBottomBar model =
         [ div [ Attr.class "container is-flex is-justify-content-center" ]
             [ div [ Attr.class "navbar-brand is-flex is-align-items-center" ]
                 [ i [ Attr.class "fa-solid fa-ruler-combined fa-lg mr-3" ] []
-                , div (sizeBtnAttrs model 3 3) [ text "3x3" ]
-                , div (sizeBtnAttrs model 4 3) [ text "4x3" ]
-                , div (sizeBtnAttrs model 6 5) [ text "6x5" ]
-                , div (sizeBtnAttrs model 6 6) [ text "6x6" ]
+                , button (sizeBtnAttrs model 3 3) [ text "3x3" ]
+                , button (sizeBtnAttrs model 4 3) [ text "4x3" ]
+                , button (sizeBtnAttrs model 6 5) [ text "6x5" ]
+                , button (sizeBtnAttrs model 6 6) [ text "6x6" ]
                 , text "Custom size (m)"
                 , form
                     [ Attr.class "is-flex is-align-items-center"
@@ -789,6 +797,55 @@ viewBottomBar model =
                         [ span [ Attr.class "icon is-small m-0" ]
                             [ i [ Attr.class "fas fa-check" ] [] ]
                         ]
+                    ]
+                ]
+            ]
+        ]
+
+
+viewTopBar : Model -> Html Msg
+viewTopBar model =
+    nav [ Attr.class "navbar is-fixed-top is-dark" ]
+        [ div [ Attr.class "container is-flex is-justify-content-center" ]
+            [ div [ Attr.class "navbar-brand is-flex is-align-items-center" ]
+                [ button
+                    [ Attr.class "button is-small is-dark mx-1"
+                    , Attr.type_ "button"
+                    , Attr.title "Alles löschen"
+
+                    -- , onClick ClearCanvasMsg
+                    ]
+                    [ span [ Attr.class "icon is-small has-text-danger" ]
+                        [ i [ Attr.class "fa-solid fa-trash" ] [] ]
+                    ]
+                , button
+                    [ Attr.class "button is-small is-dark mx-1"
+                    , Attr.type_ "button"
+                    , Attr.title "Rückgängig"
+                    ]
+                    [ span [ Attr.class "icon is-small has-text-grey-light" ]
+                        [ i [ Attr.class "fa-solid fa-rotate-left" ] [] ]
+                    ]
+                , button
+                    [ Attr.class "button is-small is-dark mx-1"
+                    , Attr.type_ "button"
+                    , Attr.title "Speichern"
+
+                    -- , onClick SaveModelMsg
+                    ]
+                    [ span [ Attr.class "icon is-small has-text-primary" ]
+                        [ i [ Attr.class "fa-solid fa-floppy-disk" ] [] ]
+                    ]
+                , -- 4. Link kopieren / Teilen
+                  button
+                    [ Attr.class "button is-small is-dark mx-1"
+                    , Attr.type_ "button"
+                    , Attr.title "Link teilen"
+
+                    -- , onClick CopyLinkMsg
+                    ]
+                    [ span [ Attr.class "icon is-small has-text-info" ]
+                        [ i [ Attr.class "fa-solid fa-link" ] [] ]
                     ]
                 ]
             ]
@@ -1173,9 +1230,9 @@ sizeBtnAttrs model w h =
                 "has-background-warning has-text-black"
 
             else
-                ""
+                "is-dark has-text-white"
     in
-    [ Attr.class ("navbar-item has-text-weight-bold box m-0 mx-1 is-shadowless" ++ activeClass)
+    [ Attr.class ("button navbar-item has-text-weight-bold m-0 mx-2 is-borderless " ++ activeClass)
     , onClick (ResizeCanvas w h)
     ]
 
