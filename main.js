@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1781644471106"
+    "1781903088466"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7853,6 +7853,29 @@ function _Browser_load(url)
 		}
 	}));
 }
+
+
+function _Url_percentEncode(string)
+{
+	return encodeURIComponent(string);
+}
+
+function _Url_percentDecode(string)
+{
+	try
+	{
+		return $elm$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch (e)
+	{
+		return $elm$core$Maybe$Nothing;
+	}
+}var $author$project$Main$LinkClicked = function (a) {
+	return {$: 'LinkClicked', a: a};
+};
+var $author$project$Main$UrlChanged = function (a) {
+	return {$: 'UrlChanged', a: a};
+};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -8641,193 +8664,10 @@ var $elm$core$Task$perform = F2(
 			$elm$core$Task$Perform(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
-var $elm$browser$Browser$element = _Browser_element;
+var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$Idle = {$: 'Idle'};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$init = function (_v0) {
-	return _Utils_Tuple2(
-		{
-			canvasGrid: {active: false, items: $elm$core$Dict$empty},
-			canvasSize: {height: 300, width: 400},
-			customInputH: '',
-			customInputW: '',
-			floorType: 'src/img/laminateFloor.jpg',
-			isOpenMenu: true,
-			isOpenToaster: false,
-			itemsDecor: _List_fromArray(
-				[
-					{
-					allowedOn: _List_fromArray(
-						['Carpet']),
-					height: 160,
-					imgSrc: 'src/img/carpetDecor.png',
-					layer: 0,
-					name: 'Carpet',
-					rotation: 0,
-					width: 230
-				},
-					{
-					allowedOn: _List_fromArray(
-						['Carpet', 'Table', 'Chair']),
-					height: 50,
-					imgSrc: 'src/img/plantDecor.png',
-					layer: 3,
-					name: 'Plant',
-					rotation: 0,
-					width: 50
-				}
-				]),
-			itemsFurniture: _List_fromArray(
-				[
-					{
-					allowedOn: _List_fromArray(
-						['Carpet']),
-					height: 200,
-					imgSrc: 'src/img/bedFurniture.png',
-					layer: 3,
-					name: 'Bed',
-					rotation: 0,
-					width: 140
-				},
-					{
-					allowedOn: _List_fromArray(
-						['Carpet']),
-					height: 50,
-					imgSrc: 'src/img/chairFurniture.png',
-					layer: 2,
-					name: 'Chair',
-					rotation: 0,
-					width: 50
-				},
-					{
-					allowedOn: _List_fromArray(
-						['Carpet']),
-					height: 80,
-					imgSrc: 'src/img/tableFurniture.png',
-					layer: 1,
-					name: 'Table',
-					rotation: 0,
-					width: 140
-				}
-				]),
-			itemsStructure: _List_fromArray(
-				[
-					{
-					allowedOn: _List_fromArray(
-						['Carpet']),
-					height: 140,
-					imgSrc: 'src/img/doorStructure.svg',
-					layer: 0,
-					name: 'Door',
-					rotation: 0,
-					width: 140
-				},
-					{
-					allowedOn: _List_fromArray(
-						['Bed', 'Chair', 'Table', 'Desktop', 'Lamp', 'TV', 'Carpet', 'Plant']),
-					height: 10,
-					imgSrc: 'src/img/windowStructure.svg',
-					layer: 4,
-					name: 'Window',
-					rotation: 0,
-					width: 140
-				}
-				]),
-			itemsUtilities: _List_fromArray(
-				[
-					{
-					allowedOn: _List_fromArray(
-						['Carpet']),
-					height: 80,
-					imgSrc: 'src/img/desktopUtilities.png',
-					layer: 3,
-					name: 'Desktop',
-					rotation: 0,
-					width: 120
-				},
-					{
-					allowedOn: _List_fromArray(
-						['Carpet', 'Table', 'Chair']),
-					height: 40,
-					imgSrc: 'src/img/lampUtilities.png',
-					layer: 3,
-					name: 'Lamp',
-					rotation: 0,
-					width: 40
-				},
-					{
-					allowedOn: _List_fromArray(
-						['Carpet']),
-					height: 50,
-					imgSrc: 'src/img/tvUtilities.png',
-					layer: 3,
-					name: 'TV',
-					rotation: 0,
-					width: 120
-				}
-				]),
-			mousePosition: _Utils_Tuple2(0, 0),
-			placement: $author$project$Main$Idle,
-			toasterMsg: ''
-		},
-		$elm$core$Platform$Cmd$none);
-};
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $author$project$Main$subscriptions = function (_v0) {
-	return $elm$core$Platform$Sub$none;
-};
-var $author$project$Main$HoldingItem = function (a) {
-	return {$: 'HoldingItem', a: a};
-};
-var $author$project$Main$ModifyingItem = F2(
-	function (a, b) {
-		return {$: 'ModifyingItem', a: a, b: b};
-	});
-var $author$project$Main$OpenToaster = function (a) {
-	return {$: 'OpenToaster', a: a};
-};
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $elm$core$Basics$not = _Basics_not;
-var $elm$core$List$all = F2(
-	function (isOkay, list) {
-		return !A2(
-			$elm$core$List$any,
-			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
-			list);
-	});
-var $elm$core$Basics$ge = _Utils_ge;
-var $author$project$Main$getRotatedItemDimensions = function (item) {
-	return ((item.rotation === 90) || (item.rotation === 270)) ? _Utils_Tuple2(item.height, item.width) : _Utils_Tuple2(item.width, item.height);
-};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -8937,6 +8777,46 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $author$project$Main$encodingDict = $elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2('Bed', 'b'),
+			_Utils_Tuple2('Chair', 'c'),
+			_Utils_Tuple2('Table', 't'),
+			_Utils_Tuple2('Desktop', 'd'),
+			_Utils_Tuple2('Lamp', 'l'),
+			_Utils_Tuple2('TV', 'v'),
+			_Utils_Tuple2('Carpet', 'r'),
+			_Utils_Tuple2('Plant', 'p'),
+			_Utils_Tuple2('Door', 'o'),
+			_Utils_Tuple2('Window', 'w'),
+			_Utils_Tuple2('src/img/graniteFloor.jpg', 'fg'),
+			_Utils_Tuple2('src/img/herringboneFloor.jpg', 'fh'),
+			_Utils_Tuple2('src/img/laminateFloor.jpg', 'fl'),
+			_Utils_Tuple2('src/img/patioFloor.jpg', 'fp'),
+			_Utils_Tuple2('src/img/plankFloor.jpg', 'fk')
+		]));
+var $author$project$Main$decodingDict = $elm$core$Dict$fromList(
+	A2(
+		$elm$core$List$map,
+		function (_v0) {
+			var key = _v0.a;
+			var value = _v0.b;
+			return _Utils_Tuple2(value, key);
+		},
+		$elm$core$Dict$toList($author$project$Main$encodingDict)));
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -8968,90 +8848,6 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
-var $elm$core$Dict$member = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (_v0.$ === 'Just') {
-			return true;
-		} else {
-			return false;
-		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
-var $author$project$Main$checkPlacement = F4(
-	function (model, position, item, oldGrid) {
-		var _v0 = position;
-		var x = _v0.a;
-		var y = _v0.b;
-		var cx = (x * 10) + (item.width / 2.0);
-		var cy = (y * 10) + (item.height / 2.0);
-		var _v1 = $author$project$Main$getRotatedItemDimensions(item);
-		var itemX = _v1.a;
-		var itemY = _v1.b;
-		var nx1 = cx - (itemX / 2.0);
-		var nx2 = cx + (itemX / 2.0);
-		var ny1 = cy - (itemY / 2.0);
-		var ny2 = cy + (itemY / 2.0);
-		var checkCollision = function (_v3) {
-			var _v4 = _v3.a;
-			var oldx = _v4.a;
-			var oldy = _v4.b;
-			var oldItem = _v3.b;
-			var oldCy = (oldy * 10) + (oldItem.height / 2.0);
-			var oldCx = (oldx * 10) + (oldItem.width / 2.0);
-			var _v2 = $author$project$Main$getRotatedItemDimensions(oldItem);
-			var oldItemX = _v2.a;
-			var oldItemY = _v2.b;
-			var ox1 = oldCx - (oldItemX / 2.0);
-			var ox2 = oldCx + (oldItemX / 2.0);
-			var oy1 = oldCy - (oldItemY / 2.0);
-			var oy2 = oldCy + (oldItemY / 2.0);
-			return ((_Utils_cmp(nx2, ox1) < 1) || ((_Utils_cmp(nx1, ox2) > -1) || ((_Utils_cmp(ny2, oy1) < 1) || (_Utils_cmp(ny1, oy2) > -1)))) ? true : (A2($elm$core$List$member, oldItem.name, item.allowedOn) ? true : false);
-		};
-		var checkAllCollisions = A2(
-			$elm$core$List$all,
-			checkCollision,
-			$elm$core$Dict$toList(oldGrid.items));
-		if ((_Utils_cmp(nx2, model.canvasSize.width) > 0) || ((_Utils_cmp(ny2, model.canvasSize.height) > 0) || ((nx1 < 0) || (ny1 < 0)))) {
-			return $elm$core$Result$Err(
-				$author$project$Main$OpenToaster(item.name + ' can\'t be placed there'));
-		} else {
-			if (A2($elm$core$Dict$member, position, oldGrid.items)) {
-				return $elm$core$Result$Err(
-					$author$project$Main$OpenToaster('This tile is already taken by another item'));
-			} else {
-				if (!checkAllCollisions) {
-					return $elm$core$Result$Err(
-						$author$project$Main$OpenToaster('This position is already taken by another item'));
-				} else {
-					var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
-					return $elm$core$Result$Ok(
-						_Utils_update(
-							oldGrid,
-							{active: false, items: newItems}));
-				}
-			}
-		}
-	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -9061,44 +8857,98 @@ var $elm$core$List$head = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $elm$core$List$sortBy = _List_sortBy;
-var $author$project$Main$findItemAtPos = F2(
-	function (_v0, items) {
-		var clickX = _v0.a;
-		var clickY = _v0.b;
-		var py = clickY * 10;
-		var px = clickX * 10;
-		var isHit = function (_v2) {
-			var _v3 = _v2.a;
-			var oldx = _v3.a;
-			var oldy = _v3.b;
-			var oldItem = _v2.b;
-			var oy1 = oldy * 10;
-			var ox1 = oldx * 10;
-			var isRotated = (oldItem.rotation === 90) || (oldItem.rotation === 270);
-			var cy = oy1 + (oldItem.height / 2.0);
-			var yMax = isRotated ? (cy + (oldItem.width / 2.0)) : (cy + (oldItem.height / 2.0));
-			var yMin = isRotated ? (cy - (oldItem.width / 2.0)) : (cy - (oldItem.height / 2.0));
-			var cx = ox1 + (oldItem.width / 2.0);
-			var xMax = isRotated ? (cx + (oldItem.height / 2.0)) : (cx + (oldItem.width / 2.0));
-			var xMin = isRotated ? (cx - (oldItem.height / 2.0)) : (cx - (oldItem.width / 2.0));
-			return ((_Utils_cmp(px, xMin) > -1) && (_Utils_cmp(px, xMax) < 0)) && ((_Utils_cmp(py, yMin) > -1) && (_Utils_cmp(py, yMax) < 0));
-		};
-		return $elm$core$List$head(
-			A2(
-				$elm$core$List$sortBy,
-				function (_v1) {
-					var item = _v1.b;
-					return -item.layer;
-				},
-				A2(
-					$elm$core$List$filter,
-					isHit,
-					$elm$core$Dict$toList(items))));
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
 	});
+var $author$project$Main$floorDecoder = function (encoded) {
+	if ($elm$core$String$isEmpty(encoded)) {
+		return 'src/img/laminateFloor.jpg';
+	} else {
+		var floorCode = A2(
+			$elm$core$Maybe$withDefault,
+			'fl',
+			$elm$core$List$head(
+				A2($elm$core$String$split, ';', encoded)));
+		return A2(
+			$elm$core$Maybe$withDefault,
+			'src/img/laminateFloor.jpg',
+			A2($elm$core$Dict$get, floorCode, $author$project$Main$decodingDict));
+	}
+};
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$url$Url$Parser$State = F5(
+	function (visited, unvisited, params, frag, value) {
+		return {frag: frag, params: params, unvisited: unvisited, value: value, visited: visited};
+	});
+var $elm$url$Url$Parser$getFirstMatch = function (states) {
+	getFirstMatch:
+	while (true) {
+		if (!states.b) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var state = states.a;
+			var rest = states.b;
+			var _v1 = state.unvisited;
+			if (!_v1.b) {
+				return $elm$core$Maybe$Just(state.value);
+			} else {
+				if ((_v1.a === '') && (!_v1.b.b)) {
+					return $elm$core$Maybe$Just(state.value);
+				} else {
+					var $temp$states = rest;
+					states = $temp$states;
+					continue getFirstMatch;
+				}
+			}
+		}
+	}
+};
+var $elm$url$Url$Parser$removeFinalEmpty = function (segments) {
+	if (!segments.b) {
+		return _List_Nil;
+	} else {
+		if ((segments.a === '') && (!segments.b.b)) {
+			return _List_Nil;
+		} else {
+			var segment = segments.a;
+			var rest = segments.b;
+			return A2(
+				$elm$core$List$cons,
+				segment,
+				$elm$url$Url$Parser$removeFinalEmpty(rest));
+		}
+	}
+};
+var $elm$url$Url$Parser$preparePath = function (path) {
+	var _v0 = A2($elm$core$String$split, '/', path);
+	if (_v0.b && (_v0.a === '')) {
+		var segments = _v0.b;
+		return $elm$url$Url$Parser$removeFinalEmpty(segments);
+	} else {
+		var segments = _v0;
+		return $elm$url$Url$Parser$removeFinalEmpty(segments);
+	}
+};
+var $elm$url$Url$Parser$addToParametersHelp = F2(
+	function (value, maybeList) {
+		if (maybeList.$ === 'Nothing') {
+			return $elm$core$Maybe$Just(
+				_List_fromArray(
+					[value]));
+		} else {
+			var list = maybeList.a;
+			return $elm$core$Maybe$Just(
+				A2($elm$core$List$cons, value, list));
+		}
+	});
+var $elm$url$Url$percentDecode = _Url_percentDecode;
 var $elm$core$Dict$getMin = function (dict) {
 	getMin:
 	while (true) {
@@ -9461,11 +9311,773 @@ var $elm$core$Dict$remove = F2(
 			return x;
 		}
 	});
+var $elm$core$Dict$update = F3(
+	function (targetKey, alter, dictionary) {
+		var _v0 = alter(
+			A2($elm$core$Dict$get, targetKey, dictionary));
+		if (_v0.$ === 'Just') {
+			var value = _v0.a;
+			return A3($elm$core$Dict$insert, targetKey, value, dictionary);
+		} else {
+			return A2($elm$core$Dict$remove, targetKey, dictionary);
+		}
+	});
+var $elm$url$Url$Parser$addParam = F2(
+	function (segment, dict) {
+		var _v0 = A2($elm$core$String$split, '=', segment);
+		if ((_v0.b && _v0.b.b) && (!_v0.b.b.b)) {
+			var rawKey = _v0.a;
+			var _v1 = _v0.b;
+			var rawValue = _v1.a;
+			var _v2 = $elm$url$Url$percentDecode(rawKey);
+			if (_v2.$ === 'Nothing') {
+				return dict;
+			} else {
+				var key = _v2.a;
+				var _v3 = $elm$url$Url$percentDecode(rawValue);
+				if (_v3.$ === 'Nothing') {
+					return dict;
+				} else {
+					var value = _v3.a;
+					return A3(
+						$elm$core$Dict$update,
+						key,
+						$elm$url$Url$Parser$addToParametersHelp(value),
+						dict);
+				}
+			}
+		} else {
+			return dict;
+		}
+	});
+var $elm$url$Url$Parser$prepareQuery = function (maybeQuery) {
+	if (maybeQuery.$ === 'Nothing') {
+		return $elm$core$Dict$empty;
+	} else {
+		var qry = maybeQuery.a;
+		return A3(
+			$elm$core$List$foldr,
+			$elm$url$Url$Parser$addParam,
+			$elm$core$Dict$empty,
+			A2($elm$core$String$split, '&', qry));
+	}
+};
+var $elm$url$Url$Parser$parse = F2(
+	function (_v0, url) {
+		var parser = _v0.a;
+		return $elm$url$Url$Parser$getFirstMatch(
+			parser(
+				A5(
+					$elm$url$Url$Parser$State,
+					_List_Nil,
+					$elm$url$Url$Parser$preparePath(url.path),
+					$elm$url$Url$Parser$prepareQuery(url.query),
+					url.fragment,
+					$elm$core$Basics$identity)));
+	});
+var $author$project$Main$allAvailableItems = _List_fromArray(
+	[
+		{
+		allowedOn: _List_fromArray(
+			['Carpet']),
+		height: 200,
+		imgSrc: 'src/img/bedFurniture.png',
+		layer: 3,
+		name: 'Bed',
+		rotation: 0,
+		width: 140
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Carpet']),
+		height: 50,
+		imgSrc: 'src/img/chairFurniture.png',
+		layer: 2,
+		name: 'Chair',
+		rotation: 0,
+		width: 50
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Carpet']),
+		height: 80,
+		imgSrc: 'src/img/tableFurniture.png',
+		layer: 1,
+		name: 'Table',
+		rotation: 0,
+		width: 140
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Carpet']),
+		height: 80,
+		imgSrc: 'src/img/desktopUtilities.png',
+		layer: 3,
+		name: 'Desktop',
+		rotation: 0,
+		width: 120
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Carpet', 'Table', 'Chair']),
+		height: 40,
+		imgSrc: 'src/img/lampUtilities.png',
+		layer: 3,
+		name: 'Lamp',
+		rotation: 0,
+		width: 40
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Carpet']),
+		height: 50,
+		imgSrc: 'src/img/tvUtilities.png',
+		layer: 3,
+		name: 'TV',
+		rotation: 0,
+		width: 120
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Carpet']),
+		height: 160,
+		imgSrc: 'src/img/carpetDecor.png',
+		layer: 0,
+		name: 'Carpet',
+		rotation: 0,
+		width: 230
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Carpet', 'Table', 'Chair']),
+		height: 50,
+		imgSrc: 'src/img/plantDecor.png',
+		layer: 3,
+		name: 'Plant',
+		rotation: 0,
+		width: 50
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Carpet']),
+		height: 140,
+		imgSrc: 'src/img/doorStructure.svg',
+		layer: 0,
+		name: 'Door',
+		rotation: 0,
+		width: 140
+	},
+		{
+		allowedOn: _List_fromArray(
+			['Bed', 'Chair', 'Table', 'Desktop', 'Lamp', 'TV', 'Carpet', 'Plant']),
+		height: 10,
+		imgSrc: 'src/img/windowStructure.svg',
+		layer: 4,
+		name: 'Window',
+		rotation: 0,
+		width: 140
+	}
+	]);
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Main$roomDecoder = function (encoded) {
+	if ($elm$core$String$isEmpty(encoded)) {
+		return $elm$core$Dict$empty;
+	} else {
+		var parts = A2($elm$core$String$split, ';', encoded);
+		var parseItem = function (str) {
+			var _v0 = A2($elm$core$String$split, ',', str);
+			if ((((_v0.b && _v0.b.b) && _v0.b.b.b) && _v0.b.b.b.b) && (!_v0.b.b.b.b.b)) {
+				var code = _v0.a;
+				var _v1 = _v0.b;
+				var xStr = _v1.a;
+				var _v2 = _v1.b;
+				var yStr = _v2.a;
+				var _v3 = _v2.b;
+				var rStr = _v3.a;
+				var y = A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$String$toInt(yStr));
+				var x = A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$String$toInt(xStr));
+				var r = A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$String$toInt(rStr));
+				var name = A2(
+					$elm$core$Maybe$withDefault,
+					'',
+					A2($elm$core$Dict$get, code, $author$project$Main$decodingDict));
+				var matchedItem = $elm$core$List$head(
+					A2(
+						$elm$core$List$filter,
+						function (i) {
+							return _Utils_eq(i.name, name);
+						},
+						$author$project$Main$allAvailableItems));
+				if (matchedItem.$ === 'Just') {
+					var baseItem = matchedItem.a;
+					return $elm$core$Maybe$Just(
+						_Utils_Tuple2(
+							_Utils_Tuple2(x, y),
+							_Utils_update(
+								baseItem,
+								{rotation: r})));
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		};
+		var itemStrings = A2($elm$core$List$drop, 1, parts);
+		return $elm$core$Dict$fromList(
+			A2($elm$core$List$filterMap, parseItem, itemStrings));
+	}
+};
+var $elm$url$Url$Parser$Parser = function (a) {
+	return {$: 'Parser', a: a};
+};
+var $elm$url$Url$Parser$query = function (_v0) {
+	var queryParser = _v0.a;
+	return $elm$url$Url$Parser$Parser(
+		function (_v1) {
+			var visited = _v1.visited;
+			var unvisited = _v1.unvisited;
+			var params = _v1.params;
+			var frag = _v1.frag;
+			var value = _v1.value;
+			return _List_fromArray(
+				[
+					A5(
+					$elm$url$Url$Parser$State,
+					visited,
+					unvisited,
+					params,
+					frag,
+					value(
+						queryParser(params)))
+				]);
+		});
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$url$Url$Parser$slash = F2(
+	function (_v0, _v1) {
+		var parseBefore = _v0.a;
+		var parseAfter = _v1.a;
+		return $elm$url$Url$Parser$Parser(
+			function (state) {
+				return A2(
+					$elm$core$List$concatMap,
+					parseAfter,
+					parseBefore(state));
+			});
+	});
+var $elm$url$Url$Parser$questionMark = F2(
+	function (parser, queryParser) {
+		return A2(
+			$elm$url$Url$Parser$slash,
+			parser,
+			$elm$url$Url$Parser$query(queryParser));
+	});
+var $elm$url$Url$Parser$Internal$Parser = function (a) {
+	return {$: 'Parser', a: a};
+};
+var $elm$url$Url$Parser$Query$custom = F2(
+	function (key, func) {
+		return $elm$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return func(
+					A2(
+						$elm$core$Maybe$withDefault,
+						_List_Nil,
+						A2($elm$core$Dict$get, key, dict)));
+			});
+	});
+var $elm$url$Url$Parser$Query$string = function (key) {
+	return A2(
+		$elm$url$Url$Parser$Query$custom,
+		key,
+		function (stringList) {
+			if (stringList.b && (!stringList.b.b)) {
+				var str = stringList.a;
+				return $elm$core$Maybe$Just(str);
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		});
+};
+var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
+	function (state) {
+		return _List_fromArray(
+			[state]);
+	});
+var $author$project$Main$roomParser = A2(
+	$elm$url$Url$Parser$questionMark,
+	$elm$url$Url$Parser$top,
+	$elm$url$Url$Parser$Query$string('room'));
+var $author$project$Main$init = F3(
+	function (_v0, url, key) {
+		var parsedRoom = function () {
+			var _v1 = A2($elm$url$Url$Parser$parse, $author$project$Main$roomParser, url);
+			if ((_v1.$ === 'Just') && (_v1.a.$ === 'Just')) {
+				var roomString = _v1.a.a;
+				return roomString;
+			} else {
+				return '';
+			}
+		}();
+		var initialGridItems = $author$project$Main$roomDecoder(parsedRoom);
+		var initialFloor = (parsedRoom === '') ? 'src/img/laminateFloor.jpg' : $author$project$Main$floorDecoder(parsedRoom);
+		return _Utils_Tuple2(
+			{
+				canvasGrid: {active: false, items: initialGridItems},
+				canvasSize: {height: 300, width: 400},
+				customInputH: '',
+				customInputW: '',
+				floorType: initialFloor,
+				isOpenMenu: true,
+				isOpenToaster: false,
+				itemsDecor: _List_fromArray(
+					[
+						{
+						allowedOn: _List_fromArray(
+							['Carpet']),
+						height: 160,
+						imgSrc: 'src/img/carpetDecor.png',
+						layer: 0,
+						name: 'Carpet',
+						rotation: 0,
+						width: 230
+					},
+						{
+						allowedOn: _List_fromArray(
+							['Carpet', 'Table', 'Chair']),
+						height: 50,
+						imgSrc: 'src/img/plantDecor.png',
+						layer: 3,
+						name: 'Plant',
+						rotation: 0,
+						width: 50
+					}
+					]),
+				itemsFurniture: _List_fromArray(
+					[
+						{
+						allowedOn: _List_fromArray(
+							['Carpet']),
+						height: 200,
+						imgSrc: 'src/img/bedFurniture.png',
+						layer: 3,
+						name: 'Bed',
+						rotation: 0,
+						width: 140
+					},
+						{
+						allowedOn: _List_fromArray(
+							['Carpet']),
+						height: 50,
+						imgSrc: 'src/img/chairFurniture.png',
+						layer: 2,
+						name: 'Chair',
+						rotation: 0,
+						width: 50
+					},
+						{
+						allowedOn: _List_fromArray(
+							['Carpet']),
+						height: 80,
+						imgSrc: 'src/img/tableFurniture.png',
+						layer: 1,
+						name: 'Table',
+						rotation: 0,
+						width: 140
+					}
+					]),
+				itemsStructure: _List_fromArray(
+					[
+						{
+						allowedOn: _List_fromArray(
+							['Carpet']),
+						height: 140,
+						imgSrc: 'src/img/doorStructure.svg',
+						layer: 0,
+						name: 'Door',
+						rotation: 0,
+						width: 140
+					},
+						{
+						allowedOn: _List_fromArray(
+							['Bed', 'Chair', 'Table', 'Desktop', 'Lamp', 'TV', 'Carpet', 'Plant']),
+						height: 10,
+						imgSrc: 'src/img/windowStructure.svg',
+						layer: 4,
+						name: 'Window',
+						rotation: 0,
+						width: 140
+					}
+					]),
+				itemsUtilities: _List_fromArray(
+					[
+						{
+						allowedOn: _List_fromArray(
+							['Carpet']),
+						height: 80,
+						imgSrc: 'src/img/desktopUtilities.png',
+						layer: 3,
+						name: 'Desktop',
+						rotation: 0,
+						width: 120
+					},
+						{
+						allowedOn: _List_fromArray(
+							['Carpet', 'Table', 'Chair']),
+						height: 40,
+						imgSrc: 'src/img/lampUtilities.png',
+						layer: 3,
+						name: 'Lamp',
+						rotation: 0,
+						width: 40
+					},
+						{
+						allowedOn: _List_fromArray(
+							['Carpet']),
+						height: 50,
+						imgSrc: 'src/img/tvUtilities.png',
+						layer: 3,
+						name: 'TV',
+						rotation: 0,
+						width: 120
+					}
+					]),
+				key: key,
+				mousePosition: _Utils_Tuple2(0, 0),
+				placement: $author$project$Main$Idle,
+				toasterMsg: '',
+				url: url
+			},
+			$elm$core$Platform$Cmd$none);
+	});
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$subscriptions = function (_v0) {
+	return $elm$core$Platform$Sub$none;
+};
+var $author$project$Main$HoldingItem = function (a) {
+	return {$: 'HoldingItem', a: a};
+};
+var $author$project$Main$ModifyingItem = F2(
+	function (a, b) {
+		return {$: 'ModifyingItem', a: a, b: b};
+	});
+var $author$project$Main$OpenToaster = function (a) {
+	return {$: 'OpenToaster', a: a};
+};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$List$all = F2(
+	function (isOkay, list) {
+		return !A2(
+			$elm$core$List$any,
+			A2($elm$core$Basics$composeL, $elm$core$Basics$not, isOkay),
+			list);
+	});
+var $elm$core$Basics$ge = _Utils_ge;
+var $author$project$Main$getRotatedItemDimensions = function (item) {
+	return ((item.rotation === 90) || (item.rotation === 270)) ? _Utils_Tuple2(item.height, item.width) : _Utils_Tuple2(item.width, item.height);
+};
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$Main$checkPlacement = F4(
+	function (model, position, item, oldGrid) {
+		var _v0 = position;
+		var x = _v0.a;
+		var y = _v0.b;
+		var cx = (x * 10) + (item.width / 2.0);
+		var cy = (y * 10) + (item.height / 2.0);
+		var _v1 = $author$project$Main$getRotatedItemDimensions(item);
+		var itemX = _v1.a;
+		var itemY = _v1.b;
+		var nx1 = cx - (itemX / 2.0);
+		var nx2 = cx + (itemX / 2.0);
+		var ny1 = cy - (itemY / 2.0);
+		var ny2 = cy + (itemY / 2.0);
+		var checkCollision = function (_v3) {
+			var _v4 = _v3.a;
+			var oldx = _v4.a;
+			var oldy = _v4.b;
+			var oldItem = _v3.b;
+			var oldCy = (oldy * 10) + (oldItem.height / 2.0);
+			var oldCx = (oldx * 10) + (oldItem.width / 2.0);
+			var _v2 = $author$project$Main$getRotatedItemDimensions(oldItem);
+			var oldItemX = _v2.a;
+			var oldItemY = _v2.b;
+			var ox1 = oldCx - (oldItemX / 2.0);
+			var ox2 = oldCx + (oldItemX / 2.0);
+			var oy1 = oldCy - (oldItemY / 2.0);
+			var oy2 = oldCy + (oldItemY / 2.0);
+			return ((_Utils_cmp(nx2, ox1) < 1) || ((_Utils_cmp(nx1, ox2) > -1) || ((_Utils_cmp(ny2, oy1) < 1) || (_Utils_cmp(ny1, oy2) > -1)))) ? true : (A2($elm$core$List$member, oldItem.name, item.allowedOn) ? true : false);
+		};
+		var checkAllCollisions = A2(
+			$elm$core$List$all,
+			checkCollision,
+			$elm$core$Dict$toList(oldGrid.items));
+		if ((_Utils_cmp(nx2, model.canvasSize.width) > 0) || ((_Utils_cmp(ny2, model.canvasSize.height) > 0) || ((nx1 < 0) || (ny1 < 0)))) {
+			return $elm$core$Result$Err(
+				$author$project$Main$OpenToaster(item.name + ' can\'t be placed there'));
+		} else {
+			if (A2($elm$core$Dict$member, position, oldGrid.items)) {
+				return $elm$core$Result$Err(
+					$author$project$Main$OpenToaster('This tile is already taken by another item'));
+			} else {
+				if (!checkAllCollisions) {
+					return $elm$core$Result$Err(
+						$author$project$Main$OpenToaster('This position is already taken by another item'));
+				} else {
+					var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
+					return $elm$core$Result$Ok(
+						_Utils_update(
+							oldGrid,
+							{active: false, items: newItems}));
+				}
+			}
+		}
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$List$sortBy = _List_sortBy;
+var $author$project$Main$findItemAtPos = F2(
+	function (_v0, items) {
+		var clickX = _v0.a;
+		var clickY = _v0.b;
+		var py = clickY * 10;
+		var px = clickX * 10;
+		var isHit = function (_v2) {
+			var _v3 = _v2.a;
+			var oldx = _v3.a;
+			var oldy = _v3.b;
+			var oldItem = _v2.b;
+			var oy1 = oldy * 10;
+			var ox1 = oldx * 10;
+			var isRotated = (oldItem.rotation === 90) || (oldItem.rotation === 270);
+			var cy = oy1 + (oldItem.height / 2.0);
+			var yMax = isRotated ? (cy + (oldItem.width / 2.0)) : (cy + (oldItem.height / 2.0));
+			var yMin = isRotated ? (cy - (oldItem.width / 2.0)) : (cy - (oldItem.height / 2.0));
+			var cx = ox1 + (oldItem.width / 2.0);
+			var xMax = isRotated ? (cx + (oldItem.height / 2.0)) : (cx + (oldItem.width / 2.0));
+			var xMin = isRotated ? (cx - (oldItem.height / 2.0)) : (cx - (oldItem.width / 2.0));
+			return ((_Utils_cmp(px, xMin) > -1) && (_Utils_cmp(px, xMax) < 0)) && ((_Utils_cmp(py, yMin) > -1) && (_Utils_cmp(py, yMax) < 0));
+		};
+		return $elm$core$List$head(
+			A2(
+				$elm$core$List$sortBy,
+				function (_v1) {
+					var item = _v1.b;
+					return -item.layer;
+				},
+				A2(
+					$elm$core$List$filter,
+					isHit,
+					$elm$core$Dict$toList(items))));
+	});
+var $elm$browser$Browser$Navigation$load = _Browser_load;
+var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $elm$url$Url$addPort = F2(
+	function (maybePort, starter) {
+		if (maybePort.$ === 'Nothing') {
+			return starter;
+		} else {
+			var port_ = maybePort.a;
+			return starter + (':' + $elm$core$String$fromInt(port_));
+		}
+	});
+var $elm$url$Url$addPrefixed = F3(
+	function (prefix, maybeSegment, starter) {
+		if (maybeSegment.$ === 'Nothing') {
+			return starter;
+		} else {
+			var segment = maybeSegment.a;
+			return _Utils_ap(
+				starter,
+				_Utils_ap(prefix, segment));
+		}
+	});
+var $elm$url$Url$toString = function (url) {
+	var http = function () {
+		var _v0 = url.protocol;
+		if (_v0.$ === 'Http') {
+			return 'http://';
+		} else {
+			return 'https://';
+		}
+	}();
+	return A3(
+		$elm$url$Url$addPrefixed,
+		'#',
+		url.fragment,
+		A3(
+			$elm$url$Url$addPrefixed,
+			'?',
+			url.query,
+			_Utils_ap(
+				A2(
+					$elm$url$Url$addPort,
+					url.port_,
+					_Utils_ap(http, url.host)),
+				url.path)));
+};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		update:
 		while (true) {
 			switch (msg.$) {
+				case 'LinkClicked':
+					var urlRequest = msg.a;
+					if (urlRequest.$ === 'Internal') {
+						var url = urlRequest.a;
+						return _Utils_Tuple2(
+							model,
+							A2(
+								$elm$browser$Browser$Navigation$pushUrl,
+								model.key,
+								$elm$url$Url$toString(url)));
+					} else {
+						var href = urlRequest.a;
+						return _Utils_Tuple2(
+							model,
+							$elm$browser$Browser$Navigation$load(href));
+					}
+				case 'UrlChanged':
+					var url = msg.a;
+					var parsedRoom = function () {
+						var _v2 = A2($elm$url$Url$Parser$parse, $author$project$Main$roomParser, url);
+						if ((_v2.$ === 'Just') && (_v2.a.$ === 'Just')) {
+							var roomString = _v2.a.a;
+							return roomString;
+						} else {
+							return '';
+						}
+					}();
+					var oldGrid = model.canvasGrid;
+					var newGrid = _Utils_update(
+						oldGrid,
+						{
+							items: $author$project$Main$roomDecoder(parsedRoom)
+						});
+					var newFloor = (parsedRoom === '') ? 'src/img/laminateFloor.jpg' : $author$project$Main$floorDecoder(parsedRoom);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{canvasGrid: newGrid, floorType: newFloor, url: url}),
+						$elm$core$Platform$Cmd$none);
 				case 'ToggleMenu':
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -9534,14 +10146,14 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'ClickCanvas':
 					var position = msg.a;
-					var _v1 = model.placement;
-					switch (_v1.$) {
+					var _v3 = model.placement;
+					switch (_v3.$) {
 						case 'Idle':
-							var _v2 = A2($author$project$Main$findItemAtPos, position, model.canvasGrid.items);
-							if (_v2.$ === 'Just') {
-								var _v3 = _v2.a;
-								var oldPos = _v3.a;
-								var item = _v3.b;
+							var _v4 = A2($author$project$Main$findItemAtPos, position, model.canvasGrid.items);
+							if (_v4.$ === 'Just') {
+								var _v5 = _v4.a;
+								var oldPos = _v5.a;
+								var item = _v5.b;
 								return _Utils_Tuple2(
 									_Utils_update(
 										model,
@@ -9553,20 +10165,20 @@ var $author$project$Main$update = F2(
 								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 							}
 						case 'HoldingItem':
-							var item = _v1.a;
+							var item = _v3.a;
 							var clearedModel = _Utils_update(
 								model,
 								{isOpenToaster: false, toasterMsg: ''});
-							var _v4 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
-							if (_v4.$ === 'Err') {
-								var toasterMsg = _v4.a;
+							var _v6 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
+							if (_v6.$ === 'Err') {
+								var toasterMsg = _v6.a;
 								var $temp$msg = toasterMsg,
 									$temp$model = model;
 								msg = $temp$msg;
 								model = $temp$model;
 								continue update;
 							} else {
-								var newGrid = _v4.a;
+								var newGrid = _v6.a;
 								return _Utils_Tuple2(
 									_Utils_update(
 										clearedModel,
@@ -9574,8 +10186,8 @@ var $author$project$Main$update = F2(
 									$elm$core$Platform$Cmd$none);
 							}
 						default:
-							var curPosition = _v1.a;
-							var item = _v1.b;
+							var curPosition = _v3.a;
+							var item = _v3.b;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
@@ -9614,9 +10226,9 @@ var $author$project$Main$update = F2(
 					var clearedGrid = _Utils_update(
 						oldGrid,
 						{items: clearedItems});
-					var _v5 = A4($author$project$Main$checkPlacement, model, pos, newItem, clearedGrid);
-					if (_v5.$ === 'Ok') {
-						var newGrid = _v5.a;
+					var _v7 = A4($author$project$Main$checkPlacement, model, pos, newItem, clearedGrid);
+					if (_v7.$ === 'Ok') {
+						var newGrid = _v7.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -9626,7 +10238,7 @@ var $author$project$Main$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 					} else {
-						var toasterMsg = _v5.a;
+						var toasterMsg = _v7.a;
 						var $temp$msg = toasterMsg,
 							$temp$model = model;
 						msg = $temp$msg;
@@ -10210,7 +10822,6 @@ var $author$project$Main$SetCustomInputH = function (a) {
 var $author$project$Main$SetCustomInputW = function (a) {
 	return {$: 'SetCustomInputW', a: a};
 };
-var $elm$html$Html$a = _VirtualDom_node('a');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -10369,28 +10980,28 @@ var $author$project$Main$viewBottomBar = function (model) {
 									]),
 								_List_Nil),
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A3($author$project$Main$sizeBtnAttrs, model, 3, 3),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('3x3')
 									])),
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A3($author$project$Main$sizeBtnAttrs, model, 4, 3),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('4x3')
 									])),
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A3($author$project$Main$sizeBtnAttrs, model, 6, 5),
 								_List_fromArray(
 									[
 										$elm$html$Html$text('6x5')
 									])),
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A3($author$project$Main$sizeBtnAttrs, model, 6, 6),
 								_List_fromArray(
 									[
@@ -10526,7 +11137,7 @@ var $author$project$Main$viewMenu = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$a,
+											$elm$html$Html$div,
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
@@ -10589,7 +11200,7 @@ var $author$project$Main$viewMenu = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$a,
+											$elm$html$Html$div,
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
@@ -10652,7 +11263,7 @@ var $author$project$Main$viewMenu = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$a,
+											$elm$html$Html$div,
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
@@ -10715,7 +11326,7 @@ var $author$project$Main$viewMenu = function (model) {
 									_List_fromArray(
 										[
 											A2(
-											$elm$html$Html$a,
+											$elm$html$Html$div,
 											_List_fromArray(
 												[
 													$elm$html$Html$Attributes$class('is-flex is-justify-content-space-between is-align-items-center'),
@@ -10803,7 +11414,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/graniteFloor.jpg'),
 								_List_fromArray(
 									[
@@ -10833,7 +11444,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/herringboneFloor.jpg'),
 								_List_fromArray(
 									[
@@ -10863,7 +11474,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/laminateFloor.jpg'),
 								_List_fromArray(
 									[
@@ -10893,7 +11504,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/patioFloor.jpg'),
 								_List_fromArray(
 									[
@@ -10923,7 +11534,7 @@ var $author$project$Main$viewRoomSettings = function (model) {
 						_List_fromArray(
 							[
 								A2(
-								$elm$html$Html$a,
+								$elm$html$Html$div,
 								A2($author$project$Main$floorBtnAttrs, model, 'src/img/plankFloor.jpg'),
 								_List_fromArray(
 									[
@@ -10990,75 +11601,81 @@ var $author$project$Main$viewToast = function (message) {
 			]));
 };
 var $author$project$Main$view = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
+	return {
+		body: _List_fromArray(
 			[
-				$elm$html$Html$Attributes$class('hero is-fullheight is-clipped')
-			]),
-		_List_fromArray(
-			[
-				model.isOpenToaster ? $author$project$Main$viewToast(model.toasterMsg) : $elm$html$Html$text(''),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('hero-body p-0 is-relative')
+						$elm$html$Html$Attributes$class('hero is-fullheight is-clipped')
 					]),
 				_List_fromArray(
 					[
+						model.isOpenToaster ? $author$project$Main$viewToast(model.toasterMsg) : $elm$html$Html$text(''),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'z-index', '10'),
-								A2($elm$html$Html$Attributes$style, 'top', '0'),
-								A2($elm$html$Html$Attributes$style, 'left', '0')
+								$elm$html$Html$Attributes$class('hero-body p-0 is-relative')
 							]),
 						_List_fromArray(
 							[
-								$author$project$Main$viewMenu(model)
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+										A2($elm$html$Html$Attributes$style, 'z-index', '10'),
+										A2($elm$html$Html$Attributes$style, 'top', '0'),
+										A2($elm$html$Html$Attributes$style, 'left', '0')
+									]),
+								_List_fromArray(
+									[
+										$author$project$Main$viewMenu(model)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('is-flex is-justify-content-center is-align-items-center'),
+										A2($elm$html$Html$Attributes$style, 'width', '100%'),
+										A2($elm$html$Html$Attributes$style, 'height', '100%')
+									]),
+								_List_fromArray(
+									[
+										$author$project$Main$renderCanvas(model)
+									])),
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+										A2($elm$html$Html$Attributes$style, 'z-index', '10'),
+										A2($elm$html$Html$Attributes$style, 'top', '0'),
+										A2($elm$html$Html$Attributes$style, 'right', '0')
+									]),
+								_List_fromArray(
+									[
+										$author$project$Main$viewRoomSettings(model)
+									]))
 							])),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('is-flex is-justify-content-center is-align-items-center'),
-								A2($elm$html$Html$Attributes$style, 'width', '100%'),
-								A2($elm$html$Html$Attributes$style, 'height', '100%')
+								$elm$html$Html$Attributes$class('hero-foot')
 							]),
 						_List_fromArray(
 							[
-								$author$project$Main$renderCanvas(model)
-							])),
-						A2(
-						$elm$html$Html$div,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'z-index', '10'),
-								A2($elm$html$Html$Attributes$style, 'top', '0'),
-								A2($elm$html$Html$Attributes$style, 'right', '0')
-							]),
-						_List_fromArray(
-							[
-								$author$project$Main$viewRoomSettings(model)
+								$author$project$Main$viewBottomBar(model)
 							]))
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('hero-foot')
-					]),
-				_List_fromArray(
-					[
-						$author$project$Main$viewBottomBar(model)
 					]))
-			]));
+			]),
+		title: 'Room Constructor'
+	};
 };
-var $author$project$Main$main = $elm$browser$Browser$element(
-	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
+var $author$project$Main$main = $elm$browser$Browser$application(
+	{init: $author$project$Main$init, onUrlChange: $author$project$Main$UrlChanged, onUrlRequest: $author$project$Main$LinkClicked, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));

@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Navigation as Nav
 import Dict exposing (Dict)
 import Html exposing (Attribute, Html, a, aside, button, div, form, i, img, input, li, nav, p, span, text, ul)
 import Html.Attributes as Attr exposing (width)
@@ -9,6 +10,9 @@ import Json.Decode as Decode
 import Platform.Cmd as Cmd
 import Svg exposing (Svg, svg)
 import Svg.Attributes as SvgAttr
+import Url
+import Url.Parser as Parser exposing ((<?>), Parser)
+import Url.Parser.Query as Query
 
 
 
@@ -49,7 +53,9 @@ type PlacementState
 
 
 type alias Model =
-    { itemsFurniture : List RoomItem
+    { key : Nav.Key
+    , url : Url.Url
+    , itemsFurniture : List RoomItem
     , itemsUtilities : List RoomItem
     , itemsDecor : List RoomItem
     , itemsStructure : List RoomItem
@@ -66,9 +72,45 @@ type alias Model =
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( { itemsFurniture =
+allAvailableItems : List RoomItem
+allAvailableItems =
+    [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
+    , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50, allowedOn = [ "Carpet" ], layer = 2, rotation = 0 }
+    , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80, allowedOn = [ "Carpet" ], layer = 1, rotation = 0 }
+    , { name = "Desktop", imgSrc = "src/img/desktopUtilities.png", width = 120, height = 80, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
+    , { name = "Lamp", imgSrc = "src/img/lampUtilities.png", width = 40, height = 40, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3, rotation = 0 }
+    , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
+    , { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160, allowedOn = [ "Carpet" ], layer = 0, rotation = 0 }
+    , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3, rotation = 0 }
+    , { name = "Door", imgSrc = "src/img/doorStructure.svg", width = 140, height = 140, allowedOn = [ "Carpet" ], layer = 0, rotation = 0 }
+    , { name = "Window", imgSrc = "src/img/windowStructure.svg", width = 140, height = 10, allowedOn = [ "Bed", "Chair", "Table", "Desktop", "Lamp", "TV", "Carpet", "Plant" ], layer = 4, rotation = 0 }
+    ]
+
+
+init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
+init _ url key =
+    let
+        parsedRoom =
+            case Parser.parse roomParser url of
+                Just (Just roomString) ->
+                    roomString
+
+                _ ->
+                    ""
+
+        initialGridItems =
+            roomDecoder parsedRoom
+
+        initialFloor =
+            if parsedRoom == "" then
+                "src/img/laminateFloor.jpg"
+
+            else
+                floorDecoder parsedRoom
+    in
+    ( { key = key
+      , url = url
+      , itemsFurniture =
             [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
             , { name = "Chair", imgSrc = "src/img/chairFurniture.png", width = 50, height = 50, allowedOn = [ "Carpet" ], layer = 2, rotation = 0 }
             , { name = "Table", imgSrc = "src/img/tableFurniture.png", width = 140, height = 80, allowedOn = [ "Carpet" ], layer = 1, rotation = 0 }
@@ -88,12 +130,12 @@ init _ =
             ]
       , isOpenMenu = True
       , canvasSize = { width = 400, height = 300 }
-      , canvasGrid = { active = False, items = Dict.empty }
+      , canvasGrid = { active = False, items = initialGridItems }
       , customInputW = ""
       , customInputH = ""
       , isOpenToaster = False
       , toasterMsg = ""
-      , floorType = "src/img/laminateFloor.jpg"
+      , floorType = initialFloor
       , mousePosition = ( 0, 0 )
       , placement = Idle
       }
@@ -102,11 +144,139 @@ init _ =
 
 
 
+-- 1,5. URL
+
+
+roomParser : Parser (Maybe String -> a) a
+roomParser =
+    Parser.top <?> Query.string "room"
+
+
+encodingDict : Dict String String
+encodingDict =
+    Dict.fromList
+        [ -- Furniture
+          ( "Bed", "b" )
+        , ( "Chair", "c" )
+        , ( "Table", "t" )
+
+        -- Utilities
+        , ( "Desktop", "d" )
+        , ( "Lamp", "l" )
+        , ( "TV", "v" )
+
+        -- Decor
+        , ( "Carpet", "r" )
+        , ( "Plant", "p" )
+
+        -- Structure
+        , ( "Door", "o" )
+        , ( "Window", "w" )
+
+        -- Floors
+        , ( "src/img/graniteFloor.jpg", "fg" )
+        , ( "src/img/herringboneFloor.jpg", "fh" )
+        , ( "src/img/laminateFloor.jpg", "fl" )
+        , ( "src/img/patioFloor.jpg", "fp" )
+        , ( "src/img/plankFloor.jpg", "fk" )
+        ]
+
+
+decodingDict : Dict String String
+decodingDict =
+    encodingDict
+        |> Dict.toList
+        |> List.map (\( key, value ) -> ( value, key ))
+        |> Dict.fromList
+
+
+roomEncoder : Model -> String
+roomEncoder model =
+    let
+        grid =
+            model.canvasGrid
+
+        items =
+            grid.items
+
+        floor =
+            model.floorType
+
+        itemsCode =
+            items
+                |> Dict.toList
+                |> List.map (\( ( x, y ), item ) -> Maybe.withDefault "" (Dict.get item.name encodingDict) ++ "," ++ String.fromInt x ++ "," ++ String.fromInt y ++ "," ++ String.fromInt item.rotation)
+                |> String.join ";"
+    in
+    Maybe.withDefault "" (Dict.get floor encodingDict) ++ itemsCode
+
+
+roomDecoder : String -> Dict Position RoomItem
+roomDecoder encoded =
+    if String.isEmpty encoded then
+        Dict.empty
+
+    else
+        let
+            parts =
+                String.split ";" encoded
+
+            itemStrings =
+                List.drop 1 parts
+
+            parseItem str =
+                case String.split "," str of
+                    [ code, xStr, yStr, rStr ] ->
+                        let
+                            name =
+                                Maybe.withDefault "" (Dict.get code decodingDict)
+
+                            x =
+                                Maybe.withDefault 0 (String.toInt xStr)
+
+                            y =
+                                Maybe.withDefault 0 (String.toInt yStr)
+
+                            r =
+                                Maybe.withDefault 0 (String.toInt rStr)
+
+                            matchedItem =
+                                List.head (List.filter (\i -> i.name == name) allAvailableItems)
+                        in
+                        case matchedItem of
+                            Just baseItem ->
+                                Just ( ( x, y ), { baseItem | rotation = r } )
+
+                            Nothing ->
+                                Nothing
+
+                    _ ->
+                        Nothing
+        in
+        itemStrings |> List.filterMap parseItem |> Dict.fromList
+
+
+floorDecoder : String -> String
+floorDecoder encoded =
+    if String.isEmpty encoded then
+        "src/img/laminateFloor.jpg"
+
+    else
+        let
+            floorCode =
+                encoded |> String.split ";" |> List.head |> Maybe.withDefault "fl"
+        in
+        Maybe.withDefault "src/img/laminateFloor.jpg" (Dict.get floorCode decodingDict)
+
+
+
 -- 2. UPDATE
 
 
 type Msg
     = ToggleMenu
+    | LinkClicked Browser.UrlRequest
+    | UrlChanged Url.Url
     | ResizeCanvas Float Float
     | SetCustomInputW String
     | SetCustomInputH String
@@ -124,6 +294,45 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        LinkClicked urlRequest ->
+            case urlRequest of
+                Browser.Internal url ->
+                    ( model, Nav.pushUrl model.key (Url.toString url) )
+
+                Browser.External href ->
+                    ( model, Nav.load href )
+
+        UrlChanged url ->
+            let
+                parsedRoom =
+                    case Parser.parse roomParser url of
+                        Just (Just roomString) ->
+                            roomString
+
+                        _ ->
+                            ""
+
+                oldGrid =
+                    model.canvasGrid
+
+                newGrid =
+                    { oldGrid | items = roomDecoder parsedRoom }
+
+                newFloor =
+                    if parsedRoom == "" then
+                        "src/img/laminateFloor.jpg"
+
+                    else
+                        floorDecoder parsedRoom
+            in
+            ( { model
+                | url = url
+                , canvasGrid = newGrid
+                , floorType = newFloor
+              }
+            , Cmd.none
+            )
+
         ToggleMenu ->
             ( { model | isOpenMenu = not model.isOpenMenu }, Cmd.none )
 
@@ -426,27 +635,31 @@ mousePositionDecoder =
 -- 3. VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    div
-        [ Attr.class "hero is-fullheight is-clipped"
-        ]
-        [ if model.isOpenToaster then
-            viewToast model.toasterMsg
-
-          else
-            text ""
-        , div [ Attr.class "hero-body p-0 is-relative" ]
-            [ div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "left" "0" ]
-                [ viewMenu model ]
-            , div [ Attr.class "is-flex is-justify-content-center is-align-items-center", Attr.style "width" "100%", Attr.style "height" "100%" ]
-                [ renderCanvas model ]
-            , div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "right" "0" ]
-                [ viewRoomSettings model ]
+    { title = "Room Constructor"
+    , body =
+        [ div
+            [ Attr.class "hero is-fullheight is-clipped"
             ]
-        , div [ Attr.class "hero-foot" ]
-            [ viewBottomBar model ]
+            [ if model.isOpenToaster then
+                viewToast model.toasterMsg
+
+              else
+                text ""
+            , div [ Attr.class "hero-body p-0 is-relative" ]
+                [ div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "left" "0" ]
+                    [ viewMenu model ]
+                , div [ Attr.class "is-flex is-justify-content-center is-align-items-center", Attr.style "width" "100%", Attr.style "height" "100%" ]
+                    [ renderCanvas model ]
+                , div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "right" "0" ]
+                    [ viewRoomSettings model ]
+                ]
+            , div [ Attr.class "hero-foot" ]
+                [ viewBottomBar model ]
+            ]
         ]
+    }
 
 
 viewMenu : Model -> Html Msg
@@ -478,16 +691,16 @@ viewMenu model =
             [ Attr.class ("menu p-4 animate__animated " ++ animationClass) ]
             [ p [ Attr.class "menu-label" ] [ text "Furniture" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsFurniture)
+                (List.map (\item -> li [] [ div [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsFurniture)
             , p [ Attr.class "menu-label" ] [ text "Utilities" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsUtilities)
+                (List.map (\item -> li [] [ div [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsUtilities)
             , p [ Attr.class "menu-label" ] [ text "Decor" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsDecor)
+                (List.map (\item -> li [] [ div [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsDecor)
             , p [ Attr.class "menu-label" ] [ text "Structure" ]
             , ul [ Attr.class "menu-list" ]
-                (List.map (\item -> li [] [ a [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsStructure)
+                (List.map (\item -> li [] [ div [ Attr.class "is-flex is-justify-content-space-between is-align-items-center", onClick (SelectItem item) ] [ text item.name, span [ Attr.class "is-flex is-align-items-center is-justify-content-center ml-3", Attr.style "width" "35px", Attr.style "height" "35px" ] [ img [ Attr.src item.imgSrc, Attr.style "border" "1.7px solid #363636", Attr.style "border-radius" "4px", Attr.style "box-shadow" "0 2px 4px rgba(0,0,0,1)", Attr.style "width" "100%", Attr.style "height" "100%", Attr.style "object-fit" "contain" ] [] ] ] ]) model.itemsStructure)
             ]
         ]
 
@@ -499,35 +712,35 @@ viewRoomSettings model =
         [ p [ Attr.class "menu-label has-text-centered" ] [ text "Floor" ]
         , ul [ Attr.class "menu-list" ]
             [ li []
-                [ a (floorBtnAttrs model "src/img/graniteFloor.jpg")
+                [ div (floorBtnAttrs model "src/img/graniteFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/graniteFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Granite"
                     ]
                 ]
             , li []
-                [ a (floorBtnAttrs model "src/img/herringboneFloor.jpg")
+                [ div (floorBtnAttrs model "src/img/herringboneFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/herringboneFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Herringbone"
                     ]
                 ]
             , li []
-                [ a (floorBtnAttrs model "src/img/laminateFloor.jpg")
+                [ div (floorBtnAttrs model "src/img/laminateFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/laminateFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Laminate"
                     ]
                 ]
             , li []
-                [ a (floorBtnAttrs model "src/img/patioFloor.jpg")
+                [ div (floorBtnAttrs model "src/img/patioFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/patioFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Patio"
                     ]
                 ]
             , li []
-                [ a (floorBtnAttrs model "src/img/plankFloor.jpg")
+                [ div (floorBtnAttrs model "src/img/plankFloor.jpg")
                     [ span [ Attr.class "icon mr-2" ]
                         [ img [ Attr.src "src/img/plankFloor.jpg", Attr.style "border" "1px solid #dbdbdb" ] [] ]
                     , text "Plank"
@@ -554,10 +767,10 @@ viewBottomBar model =
         [ div [ Attr.class "container is-flex is-justify-content-center" ]
             [ div [ Attr.class "navbar-brand is-flex is-align-items-center" ]
                 [ i [ Attr.class "fa-solid fa-ruler-combined fa-lg mr-3" ] []
-                , a (sizeBtnAttrs model 3 3) [ text "3x3" ]
-                , a (sizeBtnAttrs model 4 3) [ text "4x3" ]
-                , a (sizeBtnAttrs model 6 5) [ text "6x5" ]
-                , a (sizeBtnAttrs model 6 6) [ text "6x6" ]
+                , div (sizeBtnAttrs model 3 3) [ text "3x3" ]
+                , div (sizeBtnAttrs model 4 3) [ text "4x3" ]
+                , div (sizeBtnAttrs model 6 5) [ text "6x5" ]
+                , div (sizeBtnAttrs model 6 6) [ text "6x6" ]
                 , text "Custom size (m)"
                 , form
                     [ Attr.class "is-flex is-align-items-center"
@@ -998,9 +1211,11 @@ subscriptions _ =
 
 main : Program () Model Msg
 main =
-    Browser.element
+    Browser.application
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = LinkClicked
         }
