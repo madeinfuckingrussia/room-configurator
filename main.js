@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1781915075979"
+    "1781998707157"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8666,6 +8666,55 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$Idle = {$: 'Idle'};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$String$toFloat = _String_toFloat;
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$canvasSizeDecoder = function (encoded) {
+	if ($elm$core$String$isEmpty(encoded)) {
+		return {height: 300, width: 400};
+	} else {
+		var header = A2(
+			$elm$core$Maybe$withDefault,
+			'',
+			$elm$core$List$head(
+				A2($elm$core$String$split, ';', encoded)));
+		var parts = A2($elm$core$String$split, ',', header);
+		if (((parts.b && parts.b.b) && parts.b.b.b) && (!parts.b.b.b.b)) {
+			var _v1 = parts.b;
+			var wStr = _v1.a;
+			var _v2 = _v1.b;
+			var hStr = _v2.a;
+			return {
+				height: A2(
+					$elm$core$Maybe$withDefault,
+					300,
+					$elm$core$String$toFloat(hStr)),
+				width: A2(
+					$elm$core$Maybe$withDefault,
+					400,
+					$elm$core$String$toFloat(wStr))
+			};
+		} else {
+			return {height: 300, width: 400};
+		}
+	}
+};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
@@ -8848,33 +8897,20 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $author$project$Main$floorDecoder = function (encoded) {
 	if ($elm$core$String$isEmpty(encoded)) {
 		return 'src/img/laminateFloor.jpg';
 	} else {
-		var floorCode = A2(
+		var header = A2(
 			$elm$core$Maybe$withDefault,
 			'fl',
 			$elm$core$List$head(
 				A2($elm$core$String$split, ';', encoded)));
+		var floorCode = A2(
+			$elm$core$Maybe$withDefault,
+			'fl',
+			$elm$core$List$head(
+				A2($elm$core$String$split, ',', header)));
 		return A2(
 			$elm$core$Maybe$withDefault,
 			'src/img/laminateFloor.jpg',
@@ -9695,10 +9731,11 @@ var $author$project$Main$init = F3(
 		}();
 		var initialGridItems = $author$project$Main$roomDecoder(parsedRoom);
 		var initialFloor = (parsedRoom === '') ? 'src/img/laminateFloor.jpg' : $author$project$Main$floorDecoder(parsedRoom);
+		var initialCanvasSize = (parsedRoom === '') ? {height: 300, width: 400} : $author$project$Main$canvasSizeDecoder(parsedRoom);
 		return _Utils_Tuple2(
 			{
 				canvasGrid: {active: false, items: initialGridItems},
-				canvasSize: {height: 300, width: 400},
+				canvasSize: initialCanvasSize,
 				customInputH: '',
 				customInputW: '',
 				floorType: initialFloor,
@@ -9993,6 +10030,7 @@ var $author$project$Main$findItemAtPos = F2(
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
 var $elm$browser$Browser$Navigation$replaceUrl = _Browser_replaceUrl;
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Main$roomEncoder = function (model) {
 	var grid = model.canvasGrid;
 	var items = grid.items;
@@ -10013,10 +10051,11 @@ var $author$project$Main$roomEncoder = function (model) {
 			},
 			$elm$core$Dict$toList(items)));
 	var floor = model.floorType;
+	var canvasSize = model.canvasSize;
 	return A2(
 		$elm$core$Maybe$withDefault,
 		'',
-		A2($elm$core$Dict$get, floor, $author$project$Main$encodingDict)) + (';' + itemsCode);
+		A2($elm$core$Dict$get, floor, $author$project$Main$encodingDict)) + (',' + ($elm$core$String$fromFloat(canvasSize.width) + (',' + ($elm$core$String$fromFloat(canvasSize.height) + (';' + itemsCode)))));
 };
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
@@ -10101,10 +10140,11 @@ var $author$project$Main$update = F2(
 							items: $author$project$Main$roomDecoder(parsedRoom)
 						});
 					var newFloor = (parsedRoom === '') ? 'src/img/laminateFloor.jpg' : $author$project$Main$floorDecoder(parsedRoom);
+					var newCanvasSize = (parsedRoom === '') ? {height: 300, width: 400} : $author$project$Main$canvasSizeDecoder(parsedRoom);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{canvasGrid: newGrid, floorType: newFloor, url: url}),
+							{canvasGrid: newGrid, canvasSize: newCanvasSize, floorType: newFloor, url: url}),
 						$elm$core$Platform$Cmd$none);
 				case 'ToggleMenu':
 					return _Utils_Tuple2(
@@ -10338,7 +10378,6 @@ var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
@@ -10934,7 +10973,6 @@ var $author$project$Main$sizeBtnAttrs = F3(
 			]);
 	});
 var $elm$html$Html$span = _VirtualDom_node('span');
-var $elm$core$String$toFloat = _String_toFloat;
 var $author$project$Main$submitCustomSize = F2(
 	function (w, h) {
 		var _v0 = _Utils_Tuple2(
@@ -11762,33 +11800,6 @@ var $author$project$Main$viewTopBar = function (model) {
 												_List_fromArray(
 													[
 														$elm$html$Html$Attributes$class('fa-solid fa-floppy-disk')
-													]),
-												_List_Nil)
-											]))
-									])),
-								A2(
-								$elm$html$Html$button,
-								_List_fromArray(
-									[
-										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
-										$elm$html$Html$Attributes$type_('button'),
-										$elm$html$Html$Attributes$title('Link teilen')
-									]),
-								_List_fromArray(
-									[
-										A2(
-										$elm$html$Html$span,
-										_List_fromArray(
-											[
-												$elm$html$Html$Attributes$class('icon is-small has-text-info')
-											]),
-										_List_fromArray(
-											[
-												A2(
-												$elm$html$Html$i,
-												_List_fromArray(
-													[
-														$elm$html$Html$Attributes$class('fa-solid fa-link')
 													]),
 												_List_Nil)
 											]))

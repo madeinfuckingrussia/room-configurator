@@ -104,6 +104,13 @@ init _ url key =
 
             else
                 floorDecoder parsedRoom
+
+        initialCanvasSize =
+            if parsedRoom == "" then
+                { width = 400, height = 300 }
+
+            else
+                canvasSizeDecoder parsedRoom
     in
     ( { key = key
       , url = url
@@ -126,7 +133,7 @@ init _ url key =
             , { name = "Window", imgSrc = "src/img/windowStructure.svg", width = 140, height = 10, allowedOn = [ "Bed", "Chair", "Table", "Desktop", "Lamp", "TV", "Carpet", "Plant" ], layer = 4, rotation = 0 }
             ]
       , isOpenMenu = True
-      , canvasSize = { width = 400, height = 300 }
+      , canvasSize = initialCanvasSize
       , canvasGrid = { active = False, items = initialGridItems }
       , customInputW = ""
       , customInputH = ""
@@ -187,13 +194,16 @@ roomEncoder model =
         floor =
             model.floorType
 
+        canvasSize =
+            model.canvasSize
+
         itemsCode =
             items
                 |> Dict.toList
                 |> List.map (\( ( x, y ), item ) -> Maybe.withDefault "" (Dict.get item.name encodingDict) ++ "," ++ String.fromInt x ++ "," ++ String.fromInt y ++ "," ++ String.fromInt item.rotation)
                 |> String.join ";"
     in
-    Maybe.withDefault "" (Dict.get floor encodingDict) ++ ";" ++ itemsCode
+    Maybe.withDefault "" (Dict.get floor encodingDict) ++ "," ++ String.fromFloat canvasSize.width ++ "," ++ String.fromFloat canvasSize.height ++ ";" ++ itemsCode
 
 
 roomDecoder : String -> Dict Position RoomItem
@@ -248,10 +258,36 @@ floorDecoder encoded =
 
     else
         let
-            floorCode =
+            header =
                 encoded |> String.split ";" |> List.head |> Maybe.withDefault "fl"
+
+            floorCode =
+                header |> String.split "," |> List.head |> Maybe.withDefault "fl"
         in
         Maybe.withDefault "src/img/laminateFloor.jpg" (Dict.get floorCode decodingDict)
+
+
+canvasSizeDecoder : String -> CanvasSize
+canvasSizeDecoder encoded =
+    if String.isEmpty encoded then
+        { width = 400, height = 300 }
+
+    else
+        let
+            header =
+                encoded |> String.split ";" |> List.head |> Maybe.withDefault ""
+
+            parts =
+                String.split "," header
+        in
+        case parts of
+            [ _, wStr, hStr ] ->
+                { width = Maybe.withDefault 400 (String.toFloat wStr)
+                , height = Maybe.withDefault 300 (String.toFloat hStr)
+                }
+
+            _ ->
+                { width = 400, height = 300 }
 
 
 type Msg
@@ -307,11 +343,19 @@ update msg model =
 
                     else
                         floorDecoder parsedRoom
+
+                newCanvasSize =
+                    if parsedRoom == "" then
+                        { width = 400, height = 300 }
+
+                    else
+                        canvasSizeDecoder parsedRoom
             in
             ( { model
                 | url = url
                 , canvasGrid = newGrid
                 , floorType = newFloor
+                , canvasSize = newCanvasSize
               }
             , Cmd.none
             )
@@ -845,14 +889,6 @@ viewTopBar model =
                     ]
                     [ span [ Attr.class "icon is-small has-text-primary" ]
                         [ i [ Attr.class "fa-solid fa-floppy-disk" ] [] ]
-                    ]
-                , button
-                    [ Attr.class "button is-small is-dark mx-1"
-                    , Attr.type_ "button"
-                    , Attr.title "Link teilen"
-                    ]
-                    [ span [ Attr.class "icon is-small has-text-info" ]
-                        [ i [ Attr.class "fa-solid fa-link" ] [] ]
                     ]
                 ]
             ]
