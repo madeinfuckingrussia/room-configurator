@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1781907718712"
+    "1781915075979"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -9819,6 +9819,7 @@ var $author$project$Main$init = F3(
 				key: key,
 				mousePosition: _Utils_Tuple2(0, 0),
 				placement: $author$project$Main$Idle,
+				toasterClass: 'is-danger',
 				toasterMsg: '',
 				url: url
 			},
@@ -9836,9 +9837,10 @@ var $author$project$Main$ModifyingItem = F2(
 	function (a, b) {
 		return {$: 'ModifyingItem', a: a, b: b};
 	});
-var $author$project$Main$OpenToaster = function (a) {
-	return {$: 'OpenToaster', a: a};
-};
+var $author$project$Main$OpenToaster = F2(
+	function (a, b) {
+		return {$: 'OpenToaster', a: a, b: b};
+	});
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -9931,15 +9933,15 @@ var $author$project$Main$checkPlacement = F4(
 			$elm$core$Dict$toList(oldGrid.items));
 		if ((_Utils_cmp(nx2, model.canvasSize.width) > 0) || ((_Utils_cmp(ny2, model.canvasSize.height) > 0) || ((nx1 < 0) || (ny1 < 0)))) {
 			return $elm$core$Result$Err(
-				$author$project$Main$OpenToaster(item.name + ' can\'t be placed there'));
+				A2($author$project$Main$OpenToaster, 'is-danger', item.name + ' can\'t be placed there'));
 		} else {
 			if (A2($elm$core$Dict$member, position, oldGrid.items)) {
 				return $elm$core$Result$Err(
-					$author$project$Main$OpenToaster('This tile is already taken by another item'));
+					A2($author$project$Main$OpenToaster, 'is-danger', 'This tile is already taken by another item'));
 			} else {
 				if (!checkAllCollisions) {
 					return $elm$core$Result$Err(
-						$author$project$Main$OpenToaster('This position is already taken by another item'));
+						A2($author$project$Main$OpenToaster, 'is-danger', 'This position is already taken by another item'));
 				} else {
 					var newItems = A3($elm$core$Dict$insert, position, item, oldGrid.items);
 					return $elm$core$Result$Ok(
@@ -9990,6 +9992,32 @@ var $author$project$Main$findItemAtPos = F2(
 	});
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var $elm$browser$Browser$Navigation$replaceUrl = _Browser_replaceUrl;
+var $author$project$Main$roomEncoder = function (model) {
+	var grid = model.canvasGrid;
+	var items = grid.items;
+	var itemsCode = A2(
+		$elm$core$String$join,
+		';',
+		A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var _v1 = _v0.a;
+				var x = _v1.a;
+				var y = _v1.b;
+				var item = _v0.b;
+				return A2(
+					$elm$core$Maybe$withDefault,
+					'',
+					A2($elm$core$Dict$get, item.name, $author$project$Main$encodingDict)) + (',' + ($elm$core$String$fromInt(x) + (',' + ($elm$core$String$fromInt(y) + (',' + $elm$core$String$fromInt(item.rotation))))));
+			},
+			$elm$core$Dict$toList(items)));
+	var floor = model.floorType;
+	return A2(
+		$elm$core$Maybe$withDefault,
+		'',
+		A2($elm$core$Dict$get, floor, $author$project$Main$encodingDict)) + (';' + itemsCode);
+};
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
 		if (maybePort.$ === 'Nothing') {
@@ -10111,11 +10139,12 @@ var $author$project$Main$update = F2(
 							{customInputH: value, isOpenToaster: false}),
 						$elm$core$Platform$Cmd$none);
 				case 'OpenToaster':
-					var message = msg.a;
+					var toastClass = msg.a;
+					var message = msg.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{isOpenToaster: true, toasterMsg: message}),
+							{isOpenToaster: true, toasterClass: toastClass, toasterMsg: message}),
 						$elm$core$Platform$Cmd$none);
 				case 'HideToaster':
 					return _Utils_Tuple2(
@@ -10168,7 +10197,7 @@ var $author$project$Main$update = F2(
 							var item = _v3.a;
 							var clearedModel = _Utils_update(
 								model,
-								{isOpenToaster: false, toasterMsg: ''});
+								{isOpenToaster: false, toasterClass: 'is-danger', toasterMsg: ''});
 							var _v6 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
 							if (_v6.$ === 'Err') {
 								var toasterMsg = _v6.a;
@@ -10245,7 +10274,7 @@ var $author$project$Main$update = F2(
 						model = $temp$model;
 						continue update;
 					}
-				default:
+				case 'MoveItem':
 					var pos = msg.a;
 					var item = msg.b;
 					var oldGrid = model.canvasGrid;
@@ -10261,6 +10290,31 @@ var $author$project$Main$update = F2(
 								placement: $author$project$Main$HoldingItem(item)
 							}),
 						$elm$core$Platform$Cmd$none);
+				case 'ClearCanvas':
+					var oldGrid = model.canvasGrid;
+					var clearedGrid = _Utils_update(
+						oldGrid,
+						{items: $elm$core$Dict$empty});
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{canvasGrid: clearedGrid}),
+						$elm$core$Platform$Cmd$none);
+				default:
+					var roomCode = $author$project$Main$roomEncoder(model);
+					var currentUrl = model.url;
+					var newUrl = _Utils_update(
+						currentUrl,
+						{
+							query: $elm$core$Maybe$Just('room=' + roomCode)
+						});
+					var fullLink = $elm$url$Url$toString(newUrl);
+					var nextModel = _Utils_update(
+						model,
+						{isOpenToaster: true, toasterClass: 'is-success', toasterMsg: 'Room saved! link: ' + fullLink});
+					return _Utils_Tuple2(
+						nextModel,
+						A2($elm$browser$Browser$Navigation$replaceUrl, model.key, fullLink));
 			}
 		}
 	});
@@ -10889,9 +10943,9 @@ var $author$project$Main$submitCustomSize = F2(
 		if ((_v0.a.$ === 'Just') && (_v0.b.$ === 'Just')) {
 			var width = _v0.a.a;
 			var height = _v0.b.a;
-			return (width > 11) ? $author$project$Main$OpenToaster('Width must be 11m or less') : ((height > 6.5) ? $author$project$Main$OpenToaster('Height must be 6.5m or less') : A2($author$project$Main$ResizeCanvas, width, height));
+			return (width > 11) ? A2($author$project$Main$OpenToaster, 'is-danger', 'Width must be 11m or less') : ((height > 6.5) ? A2($author$project$Main$OpenToaster, 'is-danger', 'Height must be 6.5m or less') : A2($author$project$Main$ResizeCanvas, width, height));
 		} else {
-			return $author$project$Main$OpenToaster('Inputs should be of type number');
+			return A2($author$project$Main$OpenToaster, 'is-danger', 'Inputs should be of type number');
 		}
 	});
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
@@ -11562,44 +11616,47 @@ var $author$project$Main$viewRoomSettings = function (model) {
 			]));
 };
 var $author$project$Main$HideToaster = {$: 'HideToaster'};
-var $author$project$Main$viewToast = function (message) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$class('notification is-danger animate__animated animate__fadeInRight'),
-				A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
-				A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
-				A2($elm$html$Html$Attributes$style, 'right', '20px'),
-				A2($elm$html$Html$Attributes$style, 'z-index', '1000'),
-				A2($elm$html$Html$Attributes$style, 'box-shadow', '0 4px 12px rgba(0,0,0,0.1)'),
-				A2($elm$html$Html$Attributes$style, 'padding-right', '3.5rem'),
-				A2($elm$html$Html$Attributes$style, 'min-width', '200px'),
-				A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-				A2($elm$html$Html$Attributes$style, 'align-items', 'center')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$class('delete'),
-						$elm$html$Html$Events$onClick($author$project$Main$HideToaster),
-						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-						A2($elm$html$Html$Attributes$style, 'right', '0.5rem'),
-						A2($elm$html$Html$Attributes$style, 'top', '0.5rem')
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$span,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(message)
-					]))
-			]));
-};
+var $author$project$Main$viewToast = F2(
+	function (toastClass, message) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$class('notification ' + (toastClass + ' animate__animated animate__fadeInRight')),
+					A2($elm$html$Html$Attributes$style, 'position', 'fixed'),
+					A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
+					A2($elm$html$Html$Attributes$style, 'right', '20px'),
+					A2($elm$html$Html$Attributes$style, 'z-index', '1000'),
+					A2($elm$html$Html$Attributes$style, 'box-shadow', '0 4px 12px rgba(0,0,0,0.1)'),
+					A2($elm$html$Html$Attributes$style, 'padding-right', '3.5rem'),
+					A2($elm$html$Html$Attributes$style, 'min-width', '200px'),
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'align-items', 'center')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$button,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('delete'),
+							$elm$html$Html$Events$onClick($author$project$Main$HideToaster),
+							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+							A2($elm$html$Html$Attributes$style, 'right', '0.5rem'),
+							A2($elm$html$Html$Attributes$style, 'top', '0.5rem')
+						]),
+					_List_Nil),
+					A2(
+					$elm$html$Html$span,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(message)
+						]))
+				]));
+	});
+var $author$project$Main$ClearCanvas = {$: 'ClearCanvas'};
+var $author$project$Main$SaveRoom = {$: 'SaveRoom'};
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $author$project$Main$viewTopBar = function (model) {
 	return A2(
@@ -11632,7 +11689,8 @@ var $author$project$Main$viewTopBar = function (model) {
 									[
 										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
 										$elm$html$Html$Attributes$type_('button'),
-										$elm$html$Html$Attributes$title('Alles löschen')
+										$elm$html$Html$Attributes$title('Alles löschen'),
+										$elm$html$Html$Events$onClick($author$project$Main$ClearCanvas)
 									]),
 								_List_fromArray(
 									[
@@ -11686,7 +11744,8 @@ var $author$project$Main$viewTopBar = function (model) {
 									[
 										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
 										$elm$html$Html$Attributes$type_('button'),
-										$elm$html$Html$Attributes$title('Speichern')
+										$elm$html$Html$Attributes$title('Speichern'),
+										$elm$html$Html$Events$onClick($author$project$Main$SaveRoom)
 									]),
 								_List_fromArray(
 									[
@@ -11750,7 +11809,7 @@ var $author$project$Main$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						model.isOpenToaster ? $author$project$Main$viewToast(model.toasterMsg) : $elm$html$Html$text(''),
+						model.isOpenToaster ? A2($author$project$Main$viewToast, model.toasterClass, model.toasterMsg) : $elm$html$Html$text(''),
 						A2(
 						$elm$html$Html$div,
 						_List_fromArray(

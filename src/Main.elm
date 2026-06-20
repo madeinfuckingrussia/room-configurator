@@ -15,10 +15,6 @@ import Url.Parser as Parser exposing ((<?>), Parser)
 import Url.Parser.Query as Query
 
 
-
--- 1. MODEL
-
-
 type alias CanvasSize =
     { width : Float
     , height : Float
@@ -66,6 +62,7 @@ type alias Model =
     , customInputH : String
     , isOpenToaster : Bool
     , toasterMsg : String
+    , toasterClass : String
     , floorType : String
     , mousePosition : Position
     , placement : PlacementState
@@ -135,16 +132,13 @@ init _ url key =
       , customInputH = ""
       , isOpenToaster = False
       , toasterMsg = ""
+      , toasterClass = "is-danger"
       , floorType = initialFloor
       , mousePosition = ( 0, 0 )
       , placement = Idle
       }
     , Cmd.none
     )
-
-
-
--- 1,5. URL
 
 
 roomParser : Parser (Maybe String -> a) a
@@ -155,25 +149,16 @@ roomParser =
 encodingDict : Dict String String
 encodingDict =
     Dict.fromList
-        [ -- Furniture
-          ( "Bed", "b" )
+        [ ( "Bed", "b" )
         , ( "Chair", "c" )
         , ( "Table", "t" )
-
-        -- Utilities
         , ( "Desktop", "d" )
         , ( "Lamp", "l" )
         , ( "TV", "v" )
-
-        -- Decor
         , ( "Carpet", "r" )
         , ( "Plant", "p" )
-
-        -- Structure
         , ( "Door", "o" )
         , ( "Window", "w" )
-
-        -- Floors
         , ( "src/img/graniteFloor.jpg", "fg" )
         , ( "src/img/herringboneFloor.jpg", "fh" )
         , ( "src/img/laminateFloor.jpg", "fl" )
@@ -208,7 +193,7 @@ roomEncoder model =
                 |> List.map (\( ( x, y ), item ) -> Maybe.withDefault "" (Dict.get item.name encodingDict) ++ "," ++ String.fromInt x ++ "," ++ String.fromInt y ++ "," ++ String.fromInt item.rotation)
                 |> String.join ";"
     in
-    Maybe.withDefault "" (Dict.get floor encodingDict) ++ itemsCode
+    Maybe.withDefault "" (Dict.get floor encodingDict) ++ ";" ++ itemsCode
 
 
 roomDecoder : String -> Dict Position RoomItem
@@ -269,10 +254,6 @@ floorDecoder encoded =
         Maybe.withDefault "src/img/laminateFloor.jpg" (Dict.get floorCode decodingDict)
 
 
-
--- 2. UPDATE
-
-
 type Msg
     = ToggleMenu
     | LinkClicked Browser.UrlRequest
@@ -280,7 +261,7 @@ type Msg
     | ResizeCanvas Float Float
     | SetCustomInputW String
     | SetCustomInputH String
-    | OpenToaster String
+    | OpenToaster String String
     | HideToaster
     | SetFloorType String
     | SelectItem RoomItem
@@ -289,6 +270,8 @@ type Msg
     | Delete Position
     | Rotate Position RoomItem
     | MoveItem Position RoomItem
+    | ClearCanvas
+    | SaveRoom
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -352,8 +335,8 @@ update msg model =
         SetCustomInputH value ->
             ( { model | customInputH = value, isOpenToaster = False }, Cmd.none )
 
-        OpenToaster message ->
-            ( { model | isOpenToaster = True, toasterMsg = message }, Cmd.none )
+        OpenToaster toastClass message ->
+            ( { model | isOpenToaster = True, toasterClass = toastClass, toasterMsg = message }, Cmd.none )
 
         HideToaster ->
             ( { model | isOpenToaster = False }, Cmd.none )
@@ -384,7 +367,7 @@ update msg model =
                 HoldingItem item ->
                     let
                         clearedModel =
-                            { model | isOpenToaster = False, toasterMsg = "" }
+                            { model | isOpenToaster = False, toasterMsg = "", toasterClass = "is-danger" }
                     in
                     case checkPlacement model position item model.canvasGrid of
                         Err toasterMsg ->
@@ -450,6 +433,39 @@ update msg model =
             in
             ( { model | canvasGrid = updatedGrid, placement = HoldingItem item }, Cmd.none )
 
+        ClearCanvas ->
+            let
+                oldGrid =
+                    model.canvasGrid
+
+                clearedGrid =
+                    { oldGrid | items = Dict.empty }
+            in
+            ( { model | canvasGrid = clearedGrid }, Cmd.none )
+
+        SaveRoom ->
+            let
+                roomCode =
+                    roomEncoder model
+
+                currentUrl =
+                    model.url
+
+                newUrl =
+                    { currentUrl | query = Just ("room=" ++ roomCode) }
+
+                fullLink =
+                    Url.toString newUrl
+
+                nextModel =
+                    { model
+                        | isOpenToaster = True
+                        , toasterClass = "is-success"
+                        , toasterMsg = "Room saved! link: " ++ fullLink
+                    }
+            in
+            ( nextModel, Nav.replaceUrl model.key fullLink )
+
 
 onClickStopPropagation : msg -> Svg.Attribute msg
 onClickStopPropagation msg =
@@ -461,16 +477,16 @@ submitCustomSize w h =
     case ( String.toFloat w, String.toFloat h ) of
         ( Just width, Just height ) ->
             if width > 11 then
-                OpenToaster "Width must be 11m or less"
+                OpenToaster "is-danger" "Width must be 11m or less"
 
             else if height > 6.5 then
-                OpenToaster "Height must be 6.5m or less"
+                OpenToaster "is-danger" "Height must be 6.5m or less"
 
             else
                 ResizeCanvas width height
 
         _ ->
-            OpenToaster "Inputs should be of type number"
+            OpenToaster "is-danger" "Inputs should be of type number"
 
 
 getRotatedItemDimensions : RoomItem -> ( Float, Float )
@@ -545,13 +561,13 @@ checkPlacement model position item oldGrid =
             oldGrid.items |> Dict.toList |> List.all checkCollision
     in
     if nx2 > model.canvasSize.width || ny2 > model.canvasSize.height || nx1 < 0 || ny1 < 0 then
-        Err (OpenToaster (item.name ++ " can't be placed there"))
+        Err (OpenToaster "is-danger" (item.name ++ " can't be placed there"))
 
     else if Dict.member position oldGrid.items then
-        Err (OpenToaster "This tile is already taken by another item")
+        Err (OpenToaster "is-danger" "This tile is already taken by another item")
 
     else if not checkAllCollisions then
-        Err (OpenToaster "This position is already taken by another item")
+        Err (OpenToaster "is-danger" "This position is already taken by another item")
 
     else
         let
@@ -631,10 +647,6 @@ mousePositionDecoder =
         (Decode.field "offsetY" Decode.float)
 
 
-
--- 3. VIEW
-
-
 view : Model -> Browser.Document Msg
 view model =
     { title = "Room Constructor"
@@ -643,7 +655,7 @@ view model =
             [ Attr.class "hero is-fullheight is-clipped"
             ]
             [ if model.isOpenToaster then
-                viewToast model.toasterMsg
+                viewToast model.toasterClass model.toasterMsg
 
               else
                 text ""
@@ -812,8 +824,7 @@ viewTopBar model =
                     [ Attr.class "button is-small is-dark mx-1"
                     , Attr.type_ "button"
                     , Attr.title "Alles löschen"
-
-                    -- , onClick ClearCanvasMsg
+                    , onClick ClearCanvas
                     ]
                     [ span [ Attr.class "icon is-small has-text-danger" ]
                         [ i [ Attr.class "fa-solid fa-trash" ] [] ]
@@ -830,19 +841,15 @@ viewTopBar model =
                     [ Attr.class "button is-small is-dark mx-1"
                     , Attr.type_ "button"
                     , Attr.title "Speichern"
-
-                    -- , onClick SaveModelMsg
+                    , onClick SaveRoom
                     ]
                     [ span [ Attr.class "icon is-small has-text-primary" ]
                         [ i [ Attr.class "fa-solid fa-floppy-disk" ] [] ]
                     ]
-                , -- 4. Link kopieren / Teilen
-                  button
+                , button
                     [ Attr.class "button is-small is-dark mx-1"
                     , Attr.type_ "button"
                     , Attr.title "Link teilen"
-
-                    -- , onClick CopyLinkMsg
                     ]
                     [ span [ Attr.class "icon is-small has-text-info" ]
                         [ i [ Attr.class "fa-solid fa-link" ] [] ]
@@ -1193,10 +1200,10 @@ viewSquareInput currentVal toMsg =
         []
 
 
-viewToast : String -> Html Msg
-viewToast message =
+viewToast : String -> String -> Html Msg
+viewToast toastClass message =
     div
-        [ Attr.class "notification is-danger animate__animated animate__fadeInRight"
+        [ Attr.class ("notification " ++ toastClass ++ " animate__animated animate__fadeInRight")
         , Attr.style "position" "fixed"
         , Attr.style "bottom" "10px"
         , Attr.style "right" "20px"
@@ -1253,17 +1260,9 @@ floorBtnAttrs model targetFloor =
     [ Attr.class ("is-flex is-align-items-center " ++ activeClass), onClick (SetFloorType targetFloor) ]
 
 
-
--- 4. SUBSCRIPTIONS
-
-
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.none
-
-
-
--- 5. MAIN
 
 
 main : Program () Model Msg
