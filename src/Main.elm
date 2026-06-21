@@ -66,6 +66,7 @@ type alias Model =
     , floorType : String
     , mousePosition : Position
     , placement : PlacementState
+    , history : List (Dict Position RoomItem)
     }
 
 
@@ -143,6 +144,7 @@ init _ url key =
       , floorType = initialFloor
       , mousePosition = ( 0, 0 )
       , placement = Idle
+      , history = []
       }
     , Cmd.none
     )
@@ -308,6 +310,7 @@ type Msg
     | MoveItem Position RoomItem
     | ClearCanvas
     | SaveRoom
+    | Undo
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -410,8 +413,17 @@ update msg model =
 
                 HoldingItem item ->
                     let
+                        oldGrid =
+                            model.canvasGrid
+
+                        oldItems =
+                            oldGrid.items
+
+                        updatedHistory =
+                            oldItems :: model.history
+
                         clearedModel =
-                            { model | isOpenToaster = False, toasterMsg = "", toasterClass = "is-danger" }
+                            { model | isOpenToaster = False, toasterMsg = "", toasterClass = "is-danger", history = updatedHistory }
                     in
                     case checkPlacement model position item model.canvasGrid of
                         Err toasterMsg ->
@@ -509,6 +521,31 @@ update msg model =
                     }
             in
             ( nextModel, Nav.replaceUrl model.key fullLink )
+
+        Undo ->
+            let
+                oldHistory =
+                    model.history
+
+                lastItems =
+                    List.head oldHistory
+
+                updatedHistory =
+                    Maybe.withDefault [] (List.tail model.history)
+
+                oldGrid =
+                    model.canvasGrid
+            in
+            case lastItems of
+                Just dict ->
+                    let
+                        newGrid =
+                            { oldGrid | items = dict }
+                    in
+                    ( { model | canvasGrid = newGrid, history = updatedHistory }, Cmd.none )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
 
 onClickStopPropagation : msg -> Svg.Attribute msg
@@ -867,7 +904,7 @@ viewTopBar model =
                 [ button
                     [ Attr.class "button is-small is-dark mx-1"
                     , Attr.type_ "button"
-                    , Attr.title "Alles löschen"
+                    , Attr.title "Clear All"
                     , onClick ClearCanvas
                     ]
                     [ span [ Attr.class "icon is-small has-text-danger" ]
@@ -876,7 +913,8 @@ viewTopBar model =
                 , button
                     [ Attr.class "button is-small is-dark mx-1"
                     , Attr.type_ "button"
-                    , Attr.title "Rückgängig"
+                    , Attr.title "Undo"
+                    , onClick Undo
                     ]
                     [ span [ Attr.class "icon is-small has-text-grey-light" ]
                         [ i [ Attr.class "fa-solid fa-rotate-left" ] [] ]
@@ -884,7 +922,7 @@ viewTopBar model =
                 , button
                     [ Attr.class "button is-small is-dark mx-1"
                     , Attr.type_ "button"
-                    , Attr.title "Speichern"
+                    , Attr.title "Save"
                     , onClick SaveRoom
                     ]
                     [ span [ Attr.class "icon is-small has-text-primary" ]

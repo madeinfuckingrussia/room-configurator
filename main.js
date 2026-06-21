@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1781998707157"
+    "1782070639401"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -9739,6 +9739,7 @@ var $author$project$Main$init = F3(
 				customInputH: '',
 				customInputW: '',
 				floorType: initialFloor,
+				history: _List_Nil,
 				isOpenMenu: true,
 				isOpenToaster: false,
 				itemsDecor: _List_fromArray(
@@ -10057,6 +10058,15 @@ var $author$project$Main$roomEncoder = function (model) {
 		'',
 		A2($elm$core$Dict$get, floor, $author$project$Main$encodingDict)) + (',' + ($elm$core$String$fromFloat(canvasSize.width) + (',' + ($elm$core$String$fromFloat(canvasSize.height) + (';' + itemsCode)))));
 };
+var $elm$core$List$tail = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(xs);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$url$Url$addPort = F2(
 	function (maybePort, starter) {
 		if (maybePort.$ === 'Nothing') {
@@ -10235,9 +10245,12 @@ var $author$project$Main$update = F2(
 							}
 						case 'HoldingItem':
 							var item = _v3.a;
+							var oldGrid = model.canvasGrid;
+							var oldItems = oldGrid.items;
+							var updatedHistory = A2($elm$core$List$cons, oldItems, model.history);
 							var clearedModel = _Utils_update(
 								model,
-								{isOpenToaster: false, toasterClass: 'is-danger', toasterMsg: ''});
+								{history: updatedHistory, isOpenToaster: false, toasterClass: 'is-danger', toasterMsg: ''});
 							var _v6 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
 							if (_v6.$ === 'Err') {
 								var toasterMsg = _v6.a;
@@ -10340,7 +10353,7 @@ var $author$project$Main$update = F2(
 							model,
 							{canvasGrid: clearedGrid}),
 						$elm$core$Platform$Cmd$none);
-				default:
+				case 'SaveRoom':
 					var roomCode = $author$project$Main$roomEncoder(model);
 					var currentUrl = model.url;
 					var newUrl = _Utils_update(
@@ -10355,6 +10368,27 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						nextModel,
 						A2($elm$browser$Browser$Navigation$replaceUrl, model.key, fullLink));
+				default:
+					var updatedHistory = A2(
+						$elm$core$Maybe$withDefault,
+						_List_Nil,
+						$elm$core$List$tail(model.history));
+					var oldHistory = model.history;
+					var oldGrid = model.canvasGrid;
+					var lastItems = $elm$core$List$head(oldHistory);
+					if (lastItems.$ === 'Just') {
+						var dict = lastItems.a;
+						var newGrid = _Utils_update(
+							oldGrid,
+							{items: dict});
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{canvasGrid: newGrid, history: updatedHistory}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
 			}
 		}
 	});
@@ -11695,6 +11729,7 @@ var $author$project$Main$viewToast = F2(
 	});
 var $author$project$Main$ClearCanvas = {$: 'ClearCanvas'};
 var $author$project$Main$SaveRoom = {$: 'SaveRoom'};
+var $author$project$Main$Undo = {$: 'Undo'};
 var $elm$html$Html$Attributes$title = $elm$html$Html$Attributes$stringProperty('title');
 var $author$project$Main$viewTopBar = function (model) {
 	return A2(
@@ -11727,7 +11762,7 @@ var $author$project$Main$viewTopBar = function (model) {
 									[
 										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
 										$elm$html$Html$Attributes$type_('button'),
-										$elm$html$Html$Attributes$title('Alles löschen'),
+										$elm$html$Html$Attributes$title('Clear All'),
 										$elm$html$Html$Events$onClick($author$project$Main$ClearCanvas)
 									]),
 								_List_fromArray(
@@ -11755,7 +11790,8 @@ var $author$project$Main$viewTopBar = function (model) {
 									[
 										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
 										$elm$html$Html$Attributes$type_('button'),
-										$elm$html$Html$Attributes$title('Rückgängig')
+										$elm$html$Html$Attributes$title('Undo'),
+										$elm$html$Html$Events$onClick($author$project$Main$Undo)
 									]),
 								_List_fromArray(
 									[
@@ -11782,7 +11818,7 @@ var $author$project$Main$viewTopBar = function (model) {
 									[
 										$elm$html$Html$Attributes$class('button is-small is-dark mx-1'),
 										$elm$html$Html$Attributes$type_('button'),
-										$elm$html$Html$Attributes$title('Speichern'),
+										$elm$html$Html$Attributes$title('Save'),
 										$elm$html$Html$Events$onClick($author$project$Main$SaveRoom)
 									]),
 								_List_fromArray(
