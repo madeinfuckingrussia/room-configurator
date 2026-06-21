@@ -496,8 +496,11 @@ update msg model =
 
                 clearedGrid =
                     { oldGrid | items = Dict.empty }
+
+                updatedHistory =
+                    oldGrid.items :: model.history
             in
-            ( { model | canvasGrid = clearedGrid }, Cmd.none )
+            ( { model | canvasGrid = clearedGrid, history = updatedHistory }, Cmd.none )
 
         SaveRoom ->
             let
@@ -517,7 +520,7 @@ update msg model =
                     { model
                         | isOpenToaster = True
                         , toasterClass = "is-success"
-                        , toasterMsg = "Room saved! link: " ++ fullLink
+                        , toasterMsg = "Room saved! Url: " ++ fullLink
                     }
             in
             ( nextModel, Nav.replaceUrl model.key fullLink )

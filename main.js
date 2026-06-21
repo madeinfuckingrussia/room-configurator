@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1782070639401"
+    "1782071620198"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -10345,13 +10345,14 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'ClearCanvas':
 					var oldGrid = model.canvasGrid;
+					var updatedHistory = A2($elm$core$List$cons, oldGrid.items, model.history);
 					var clearedGrid = _Utils_update(
 						oldGrid,
 						{items: $elm$core$Dict$empty});
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{canvasGrid: clearedGrid}),
+							{canvasGrid: clearedGrid, history: updatedHistory}),
 						$elm$core$Platform$Cmd$none);
 				case 'SaveRoom':
 					var roomCode = $author$project$Main$roomEncoder(model);
@@ -10364,7 +10365,7 @@ var $author$project$Main$update = F2(
 					var fullLink = $elm$url$Url$toString(newUrl);
 					var nextModel = _Utils_update(
 						model,
-						{isOpenToaster: true, toasterClass: 'is-success', toasterMsg: 'Room saved! link: ' + fullLink});
+						{isOpenToaster: true, toasterClass: 'is-success', toasterMsg: 'Room saved! Url: ' + fullLink});
 					return _Utils_Tuple2(
 						nextModel,
 						A2($elm$browser$Browser$Navigation$replaceUrl, model.key, fullLink));
