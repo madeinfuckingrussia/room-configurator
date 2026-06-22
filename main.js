@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1782071620198"
+    "1782162950555"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8917,8 +8917,6 @@ var $author$project$Main$floorDecoder = function (encoded) {
 			A2($elm$core$Dict$get, floorCode, $author$project$Main$decodingDict));
 	}
 };
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$url$Url$Parser$State = F5(
 	function (visited, unvisited, params, frag, value) {
 		return {frag: frag, params: params, unvisited: unvisited, value: value, visited: visited};
@@ -9411,6 +9409,116 @@ var $elm$url$Url$Parser$parse = F2(
 					url.fragment,
 					$elm$core$Basics$identity)));
 	});
+var $elm$url$Url$Parser$Parser = function (a) {
+	return {$: 'Parser', a: a};
+};
+var $elm$url$Url$Parser$query = function (_v0) {
+	var queryParser = _v0.a;
+	return $elm$url$Url$Parser$Parser(
+		function (_v1) {
+			var visited = _v1.visited;
+			var unvisited = _v1.unvisited;
+			var params = _v1.params;
+			var frag = _v1.frag;
+			var value = _v1.value;
+			return _List_fromArray(
+				[
+					A5(
+					$elm$url$Url$Parser$State,
+					visited,
+					unvisited,
+					params,
+					frag,
+					value(
+						queryParser(params)))
+				]);
+		});
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$url$Url$Parser$slash = F2(
+	function (_v0, _v1) {
+		var parseBefore = _v0.a;
+		var parseAfter = _v1.a;
+		return $elm$url$Url$Parser$Parser(
+			function (state) {
+				return A2(
+					$elm$core$List$concatMap,
+					parseAfter,
+					parseBefore(state));
+			});
+	});
+var $elm$url$Url$Parser$questionMark = F2(
+	function (parser, queryParser) {
+		return A2(
+			$elm$url$Url$Parser$slash,
+			parser,
+			$elm$url$Url$Parser$query(queryParser));
+	});
+var $elm$url$Url$Parser$Internal$Parser = function (a) {
+	return {$: 'Parser', a: a};
+};
+var $elm$url$Url$Parser$Query$custom = F2(
+	function (key, func) {
+		return $elm$url$Url$Parser$Internal$Parser(
+			function (dict) {
+				return func(
+					A2(
+						$elm$core$Maybe$withDefault,
+						_List_Nil,
+						A2($elm$core$Dict$get, key, dict)));
+			});
+	});
+var $elm$url$Url$Parser$Query$string = function (key) {
+	return A2(
+		$elm$url$Url$Parser$Query$custom,
+		key,
+		function (stringList) {
+			if (stringList.b && (!stringList.b.b)) {
+				var str = stringList.a;
+				return $elm$core$Maybe$Just(str);
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		});
+};
+var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
+	function (state) {
+		return _List_fromArray(
+			[state]);
+	});
+var $author$project$Main$roomParser = A2(
+	$elm$url$Url$Parser$questionMark,
+	$elm$url$Url$Parser$top,
+	$elm$url$Url$Parser$Query$string('room'));
+var $author$project$Main$getParsedRoom = function (url) {
+	var urlWithRootPath = _Utils_update(
+		url,
+		{path: '/'});
+	var _v0 = A2($elm$url$Url$Parser$parse, $author$project$Main$roomParser, urlWithRootPath);
+	if ((_v0.$ === 'Just') && (_v0.a.$ === 'Just')) {
+		var roomString = _v0.a.a;
+		return roomString;
+	} else {
+		return '';
+	}
+};
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$allAvailableItems = _List_fromArray(
 	[
 		{
@@ -9622,113 +9730,9 @@ var $author$project$Main$roomDecoder = function (encoded) {
 			A2($elm$core$List$filterMap, parseItem, itemStrings));
 	}
 };
-var $elm$url$Url$Parser$Parser = function (a) {
-	return {$: 'Parser', a: a};
-};
-var $elm$url$Url$Parser$query = function (_v0) {
-	var queryParser = _v0.a;
-	return $elm$url$Url$Parser$Parser(
-		function (_v1) {
-			var visited = _v1.visited;
-			var unvisited = _v1.unvisited;
-			var params = _v1.params;
-			var frag = _v1.frag;
-			var value = _v1.value;
-			return _List_fromArray(
-				[
-					A5(
-					$elm$url$Url$Parser$State,
-					visited,
-					unvisited,
-					params,
-					frag,
-					value(
-						queryParser(params)))
-				]);
-		});
-};
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $elm$url$Url$Parser$slash = F2(
-	function (_v0, _v1) {
-		var parseBefore = _v0.a;
-		var parseAfter = _v1.a;
-		return $elm$url$Url$Parser$Parser(
-			function (state) {
-				return A2(
-					$elm$core$List$concatMap,
-					parseAfter,
-					parseBefore(state));
-			});
-	});
-var $elm$url$Url$Parser$questionMark = F2(
-	function (parser, queryParser) {
-		return A2(
-			$elm$url$Url$Parser$slash,
-			parser,
-			$elm$url$Url$Parser$query(queryParser));
-	});
-var $elm$url$Url$Parser$Internal$Parser = function (a) {
-	return {$: 'Parser', a: a};
-};
-var $elm$url$Url$Parser$Query$custom = F2(
-	function (key, func) {
-		return $elm$url$Url$Parser$Internal$Parser(
-			function (dict) {
-				return func(
-					A2(
-						$elm$core$Maybe$withDefault,
-						_List_Nil,
-						A2($elm$core$Dict$get, key, dict)));
-			});
-	});
-var $elm$url$Url$Parser$Query$string = function (key) {
-	return A2(
-		$elm$url$Url$Parser$Query$custom,
-		key,
-		function (stringList) {
-			if (stringList.b && (!stringList.b.b)) {
-				var str = stringList.a;
-				return $elm$core$Maybe$Just(str);
-			} else {
-				return $elm$core$Maybe$Nothing;
-			}
-		});
-};
-var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
-	function (state) {
-		return _List_fromArray(
-			[state]);
-	});
-var $author$project$Main$roomParser = A2(
-	$elm$url$Url$Parser$questionMark,
-	$elm$url$Url$Parser$top,
-	$elm$url$Url$Parser$Query$string('room'));
 var $author$project$Main$init = F3(
 	function (_v0, url, key) {
-		var parsedRoom = function () {
-			var _v1 = A2($elm$url$Url$Parser$parse, $author$project$Main$roomParser, url);
-			if ((_v1.$ === 'Just') && (_v1.a.$ === 'Just')) {
-				var roomString = _v1.a.a;
-				return roomString;
-			} else {
-				return '';
-			}
-		}();
+		var parsedRoom = $author$project$Main$getParsedRoom(url);
 		var initialGridItems = $author$project$Main$roomDecoder(parsedRoom);
 		var initialFloor = (parsedRoom === '') ? 'src/img/laminateFloor.jpg' : $author$project$Main$floorDecoder(parsedRoom);
 		var initialCanvasSize = (parsedRoom === '') ? {height: 300, width: 400} : $author$project$Main$canvasSizeDecoder(parsedRoom);
@@ -10134,15 +10138,7 @@ var $author$project$Main$update = F2(
 					}
 				case 'UrlChanged':
 					var url = msg.a;
-					var parsedRoom = function () {
-						var _v2 = A2($elm$url$Url$Parser$parse, $author$project$Main$roomParser, url);
-						if ((_v2.$ === 'Just') && (_v2.a.$ === 'Just')) {
-							var roomString = _v2.a.a;
-							return roomString;
-						} else {
-							return '';
-						}
-					}();
+					var parsedRoom = $author$project$Main$getParsedRoom(url);
 					var oldGrid = model.canvasGrid;
 					var newGrid = _Utils_update(
 						oldGrid,
@@ -10225,14 +10221,14 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'ClickCanvas':
 					var position = msg.a;
-					var _v3 = model.placement;
-					switch (_v3.$) {
+					var _v2 = model.placement;
+					switch (_v2.$) {
 						case 'Idle':
-							var _v4 = A2($author$project$Main$findItemAtPos, position, model.canvasGrid.items);
-							if (_v4.$ === 'Just') {
-								var _v5 = _v4.a;
-								var oldPos = _v5.a;
-								var item = _v5.b;
+							var _v3 = A2($author$project$Main$findItemAtPos, position, model.canvasGrid.items);
+							if (_v3.$ === 'Just') {
+								var _v4 = _v3.a;
+								var oldPos = _v4.a;
+								var item = _v4.b;
 								return _Utils_Tuple2(
 									_Utils_update(
 										model,
@@ -10244,23 +10240,23 @@ var $author$project$Main$update = F2(
 								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 							}
 						case 'HoldingItem':
-							var item = _v3.a;
+							var item = _v2.a;
 							var oldGrid = model.canvasGrid;
 							var oldItems = oldGrid.items;
 							var updatedHistory = A2($elm$core$List$cons, oldItems, model.history);
 							var clearedModel = _Utils_update(
 								model,
 								{history: updatedHistory, isOpenToaster: false, toasterClass: 'is-danger', toasterMsg: ''});
-							var _v6 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
-							if (_v6.$ === 'Err') {
-								var toasterMsg = _v6.a;
+							var _v5 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
+							if (_v5.$ === 'Err') {
+								var toasterMsg = _v5.a;
 								var $temp$msg = toasterMsg,
 									$temp$model = model;
 								msg = $temp$msg;
 								model = $temp$model;
 								continue update;
 							} else {
-								var newGrid = _v6.a;
+								var newGrid = _v5.a;
 								return _Utils_Tuple2(
 									_Utils_update(
 										clearedModel,
@@ -10268,8 +10264,8 @@ var $author$project$Main$update = F2(
 									$elm$core$Platform$Cmd$none);
 							}
 						default:
-							var curPosition = _v3.a;
-							var item = _v3.b;
+							var curPosition = _v2.a;
+							var item = _v2.b;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
@@ -10308,9 +10304,9 @@ var $author$project$Main$update = F2(
 					var clearedGrid = _Utils_update(
 						oldGrid,
 						{items: clearedItems});
-					var _v7 = A4($author$project$Main$checkPlacement, model, pos, newItem, clearedGrid);
-					if (_v7.$ === 'Ok') {
-						var newGrid = _v7.a;
+					var _v6 = A4($author$project$Main$checkPlacement, model, pos, newItem, clearedGrid);
+					if (_v6.$ === 'Ok') {
+						var newGrid = _v6.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -10320,7 +10316,7 @@ var $author$project$Main$update = F2(
 								}),
 							$elm$core$Platform$Cmd$none);
 					} else {
-						var toasterMsg = _v7.a;
+						var toasterMsg = _v6.a;
 						var $temp$msg = toasterMsg,
 							$temp$model = model;
 						msg = $temp$msg;

@@ -89,12 +89,7 @@ init : () -> Url.Url -> Nav.Key -> ( Model, Cmd Msg )
 init _ url key =
     let
         parsedRoom =
-            case Parser.parse roomParser url of
-                Just (Just roomString) ->
-                    roomString
-
-                _ ->
-                    ""
+            getParsedRoom url
 
         initialGridItems =
             roomDecoder parsedRoom
@@ -182,6 +177,20 @@ decodingDict =
         |> Dict.toList
         |> List.map (\( key, value ) -> ( value, key ))
         |> Dict.fromList
+
+
+getParsedRoom : Url.Url -> String
+getParsedRoom url =
+    let
+        urlWithRootPath =
+            { url | path = "/" }
+    in
+    case Parser.parse roomParser urlWithRootPath of
+        Just (Just roomString) ->
+            roomString
+
+        _ ->
+            ""
 
 
 roomEncoder : Model -> String
@@ -327,12 +336,7 @@ update msg model =
         UrlChanged url ->
             let
                 parsedRoom =
-                    case Parser.parse roomParser url of
-                        Just (Just roomString) ->
-                            roomString
-
-                        _ ->
-                            ""
+                    getParsedRoom url
 
                 oldGrid =
                     model.canvasGrid
