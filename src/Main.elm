@@ -402,8 +402,16 @@ update msg model =
 
                 newGrid =
                     { oldGrid | active = True }
+
+                updatedHistory =
+                    case model.placement of
+                        HoldingItem _ ->
+                            model.history
+
+                        _ ->
+                            model.canvasGrid.items :: model.history
             in
-            ( { model | canvasGrid = newGrid, placement = HoldingItem item }, Cmd.none )
+            ( { model | canvasGrid = newGrid, placement = HoldingItem item, history = updatedHistory }, Cmd.none )
 
         ClickCanvas position ->
             case model.placement of
@@ -417,17 +425,8 @@ update msg model =
 
                 HoldingItem item ->
                     let
-                        oldGrid =
-                            model.canvasGrid
-
-                        oldItems =
-                            oldGrid.items
-
-                        updatedHistory =
-                            oldItems :: model.history
-
                         clearedModel =
-                            { model | isOpenToaster = False, toasterMsg = "", toasterClass = "is-danger", history = updatedHistory }
+                            { model | isOpenToaster = False, toasterMsg = "", toasterClass = "is-danger" }
                     in
                     case checkPlacement model position item model.canvasGrid of
                         Err toasterMsg ->
@@ -447,10 +446,16 @@ update msg model =
                 oldGrid =
                     model.canvasGrid
 
+                oldItems =
+                    oldGrid.items
+
                 newGrid =
                     { oldGrid | items = Dict.remove pos oldGrid.items }
+
+                updatedHistory =
+                    oldItems :: model.history
             in
-            ( { model | canvasGrid = newGrid }, Cmd.none )
+            ( { model | canvasGrid = newGrid, history = updatedHistory }, Cmd.none )
 
         Rotate pos item ->
             let
@@ -462,6 +467,9 @@ update msg model =
 
                 clearedGrid =
                     { oldGrid | items = clearedItems }
+
+                updatedHistory =
+                    oldGrid.items :: model.history
 
                 newRotation =
                     if item.rotation >= 270 then
@@ -475,7 +483,7 @@ update msg model =
             in
             case checkPlacement model pos newItem clearedGrid of
                 Ok newGrid ->
-                    ( { model | canvasGrid = newGrid, placement = ModifyingItem pos newItem }, Cmd.none )
+                    ( { model | canvasGrid = newGrid, placement = ModifyingItem pos newItem, history = updatedHistory }, Cmd.none )
 
                 Err toasterMsg ->
                     update toasterMsg model
@@ -488,10 +496,13 @@ update msg model =
                 clearedItems =
                     Dict.remove pos oldGrid.items
 
+                updatedHistory =
+                    oldGrid.items :: model.history
+
                 updatedGrid =
                     { oldGrid | items = clearedItems, active = True }
             in
-            ( { model | canvasGrid = updatedGrid, placement = HoldingItem item }, Cmd.none )
+            ( { model | canvasGrid = updatedGrid, placement = HoldingItem item, history = updatedHistory }, Cmd.none )
 
         ClearCanvas ->
             let

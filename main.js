@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1782162950555"
+    "1782387510271"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -10207,6 +10207,14 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'SelectItem':
 					var item = msg.a;
+					var updatedHistory = function () {
+						var _v2 = model.placement;
+						if (_v2.$ === 'HoldingItem') {
+							return model.history;
+						} else {
+							return A2($elm$core$List$cons, model.canvasGrid.items, model.history);
+						}
+					}();
 					var oldGrid = model.canvasGrid;
 					var newGrid = _Utils_update(
 						oldGrid,
@@ -10216,19 +10224,20 @@ var $author$project$Main$update = F2(
 							model,
 							{
 								canvasGrid: newGrid,
+								history: updatedHistory,
 								placement: $author$project$Main$HoldingItem(item)
 							}),
 						$elm$core$Platform$Cmd$none);
 				case 'ClickCanvas':
 					var position = msg.a;
-					var _v2 = model.placement;
-					switch (_v2.$) {
+					var _v3 = model.placement;
+					switch (_v3.$) {
 						case 'Idle':
-							var _v3 = A2($author$project$Main$findItemAtPos, position, model.canvasGrid.items);
-							if (_v3.$ === 'Just') {
-								var _v4 = _v3.a;
-								var oldPos = _v4.a;
-								var item = _v4.b;
+							var _v4 = A2($author$project$Main$findItemAtPos, position, model.canvasGrid.items);
+							if (_v4.$ === 'Just') {
+								var _v5 = _v4.a;
+								var oldPos = _v5.a;
+								var item = _v5.b;
 								return _Utils_Tuple2(
 									_Utils_update(
 										model,
@@ -10240,23 +10249,20 @@ var $author$project$Main$update = F2(
 								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 							}
 						case 'HoldingItem':
-							var item = _v2.a;
-							var oldGrid = model.canvasGrid;
-							var oldItems = oldGrid.items;
-							var updatedHistory = A2($elm$core$List$cons, oldItems, model.history);
+							var item = _v3.a;
 							var clearedModel = _Utils_update(
 								model,
-								{history: updatedHistory, isOpenToaster: false, toasterClass: 'is-danger', toasterMsg: ''});
-							var _v5 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
-							if (_v5.$ === 'Err') {
-								var toasterMsg = _v5.a;
+								{isOpenToaster: false, toasterClass: 'is-danger', toasterMsg: ''});
+							var _v6 = A4($author$project$Main$checkPlacement, model, position, item, model.canvasGrid);
+							if (_v6.$ === 'Err') {
+								var toasterMsg = _v6.a;
 								var $temp$msg = toasterMsg,
 									$temp$model = model;
 								msg = $temp$msg;
 								model = $temp$model;
 								continue update;
 							} else {
-								var newGrid = _v5.a;
+								var newGrid = _v6.a;
 								return _Utils_Tuple2(
 									_Utils_update(
 										clearedModel,
@@ -10264,8 +10270,8 @@ var $author$project$Main$update = F2(
 									$elm$core$Platform$Cmd$none);
 							}
 						default:
-							var curPosition = _v2.a;
-							var item = _v2.b;
+							var curPosition = _v3.a;
+							var item = _v3.b;
 							return _Utils_Tuple2(
 								_Utils_update(
 									model,
@@ -10282,6 +10288,8 @@ var $author$project$Main$update = F2(
 				case 'Delete':
 					var pos = msg.a;
 					var oldGrid = model.canvasGrid;
+					var oldItems = oldGrid.items;
+					var updatedHistory = A2($elm$core$List$cons, oldItems, model.history);
 					var newGrid = _Utils_update(
 						oldGrid,
 						{
@@ -10290,12 +10298,13 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{canvasGrid: newGrid}),
+							{canvasGrid: newGrid, history: updatedHistory}),
 						$elm$core$Platform$Cmd$none);
 				case 'Rotate':
 					var pos = msg.a;
 					var item = msg.b;
 					var oldGrid = model.canvasGrid;
+					var updatedHistory = A2($elm$core$List$cons, oldGrid.items, model.history);
 					var newRotation = (item.rotation >= 270) ? 0 : (item.rotation + 90);
 					var newItem = _Utils_update(
 						item,
@@ -10304,19 +10313,20 @@ var $author$project$Main$update = F2(
 					var clearedGrid = _Utils_update(
 						oldGrid,
 						{items: clearedItems});
-					var _v6 = A4($author$project$Main$checkPlacement, model, pos, newItem, clearedGrid);
-					if (_v6.$ === 'Ok') {
-						var newGrid = _v6.a;
+					var _v7 = A4($author$project$Main$checkPlacement, model, pos, newItem, clearedGrid);
+					if (_v7.$ === 'Ok') {
+						var newGrid = _v7.a;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									canvasGrid: newGrid,
+									history: updatedHistory,
 									placement: A2($author$project$Main$ModifyingItem, pos, newItem)
 								}),
 							$elm$core$Platform$Cmd$none);
 					} else {
-						var toasterMsg = _v6.a;
+						var toasterMsg = _v7.a;
 						var $temp$msg = toasterMsg,
 							$temp$model = model;
 						msg = $temp$msg;
@@ -10327,6 +10337,7 @@ var $author$project$Main$update = F2(
 					var pos = msg.a;
 					var item = msg.b;
 					var oldGrid = model.canvasGrid;
+					var updatedHistory = A2($elm$core$List$cons, oldGrid.items, model.history);
 					var clearedItems = A2($elm$core$Dict$remove, pos, oldGrid.items);
 					var updatedGrid = _Utils_update(
 						oldGrid,
@@ -10336,6 +10347,7 @@ var $author$project$Main$update = F2(
 							model,
 							{
 								canvasGrid: updatedGrid,
+								history: updatedHistory,
 								placement: $author$project$Main$HoldingItem(item)
 							}),
 						$elm$core$Platform$Cmd$none);
