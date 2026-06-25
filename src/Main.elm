@@ -6,6 +6,7 @@ import Dict exposing (Dict)
 import Html exposing (Attribute, Html, a, aside, button, div, form, i, img, input, li, nav, p, span, text, ul)
 import Html.Attributes as Attr exposing (width)
 import Html.Events exposing (on, onClick, onSubmit)
+import Http
 import Json.Decode as Decode
 import Platform.Cmd as Cmd
 import Svg exposing (Svg, svg)
@@ -42,6 +43,10 @@ type alias Grid =
     }
 
 
+type alias Template =
+    { name : String, code : String }
+
+
 type PlacementState
     = Idle
     | HoldingItem RoomItem
@@ -67,6 +72,7 @@ type alias Model =
     , mousePosition : Position
     , placement : PlacementState
     , history : List (Dict Position RoomItem)
+    , inspirations : List Template
     }
 
 
@@ -140,6 +146,7 @@ init _ url key =
       , mousePosition = ( 0, 0 )
       , placement = Idle
       , history = []
+      , inspirations = []
       }
     , Cmd.none
     )
@@ -320,6 +327,9 @@ type Msg
     | ClearCanvas
     | SaveRoom
     | Undo
+    | FetchInspirations
+    | GotInspirations (Result Http.Error (List Template))
+    | LoadTemplate String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -565,6 +575,41 @@ update msg model =
                 Nothing ->
                     ( model, Cmd.none )
 
+        FetchInspirations ->
+            ( model, getInspirations )
+
+        GotInspirations (Ok templates) ->
+            ( { model | inspirations = templates }, Cmd.none )
+
+        GotInspirations (Err _) ->
+            ( { model | isOpenToaster = True, toasterClass = "is-danger", toasterMsg = "Fehler beim Laden der Vorlagen" }, Cmd.none )
+
+        LoadTemplate code ->
+            let
+                newItems =
+                    roomDecoder code
+
+                newFloor =
+                    floorDecoder code
+
+                newCanvasSize =
+                    canvasSizeDecoder code
+
+                oldGrid =
+                    model.canvasGrid
+
+                updatedHistory =
+                    oldGrid.items :: model.history
+            in
+            ( { model
+                | canvasGrid = { active = False, items = newItems }
+                , floorType = newFloor
+                , canvasSize = newCanvasSize
+                , history = updatedHistory
+              }
+            , Cmd.none
+            )
+
 
 onClickStopPropagation : msg -> Svg.Attribute msg
 onClickStopPropagation msg =
@@ -739,6 +784,23 @@ findItemAtPos ( clickX, clickY ) items =
         |> List.head
 
 
+templatesDecoder : Decode.Decoder (List Template)
+templatesDecoder =
+    Decode.list
+        (Decode.map2 Template
+            (Decode.field "name" Decode.string)
+            (Decode.field "code" Decode.string)
+        )
+
+
+getInspirations : Cmd Msg
+getInspirations =
+    Http.get
+        { url = "inspirations.json"
+        , expect = Http.expectJson GotInspirations templatesDecoder
+        }
+
+
 mousePositionDecoder : Decode.Decoder Position
 mousePositionDecoder =
     Decode.map2 (\x y -> ( floor (x / 10), floor (y / 10) ))
@@ -759,7 +821,7 @@ view model =
               else
                 text ""
             , div [ Attr.class "hero-body p-0 is-relative" ]
-                [ div [ Attr.style "position" "absolute", Attr.style "z-index" "10", Attr.style "top" "0", Attr.style "left" "0" ]
+                [ div [ Attr.style "position" "absolute", Attr.style "z-index" "20", Attr.style "top" "0", Attr.style "left" "0" ]
                     [ viewMenu model ]
                 , div
                     [ Attr.style "position" "absolute"
@@ -866,6 +928,35 @@ viewRoomSettings model =
                     ]
                 ]
             ]
+        , div [ Attr.class "mt-6 is-flex is-justify-content-center" ]
+            [ button
+                [ Attr.class "button is-primary has-text-weight-bold"
+                , onClick FetchInspirations
+                ]
+                [ span [ Attr.class "icon" ]
+                    [ i [ Attr.class "fa-solid fa-wand-magic-sparkles" ] [] ]
+                , span [] [ text "Inspirations" ]
+                ]
+            ]
+        , if List.isEmpty model.inspirations then
+            text ""
+
+          else
+            div [ Attr.class "mt-4" ]
+                [ ul [ Attr.class "menu-list" ]
+                    (List.map
+                        (\template ->
+                            li []
+                                [ button
+                                    [ onClick (LoadTemplate template.code)
+                                    , Attr.style "cursor" "pointer"
+                                    ]
+                                    [ text template.name ]
+                                ]
+                        )
+                        model.inspirations
+                    )
+                ]
         ]
 
 
