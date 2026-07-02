@@ -86,7 +86,7 @@ allAvailableItems =
     , { name = "TV", imgSrc = "src/img/tvUtilities.png", width = 120, height = 50, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
     , { name = "Carpet", imgSrc = "src/img/carpetDecor.png", width = 230, height = 160, allowedOn = [ "Carpet" ], layer = 0, rotation = 0 }
     , { name = "Plant", imgSrc = "src/img/plantDecor.png", width = 50, height = 50, allowedOn = [ "Carpet", "Table", "Chair" ], layer = 3, rotation = 0 }
-    , { name = "Door", imgSrc = "src/img/doorStructure.svg", width = 140, height = 140, allowedOn = [ "Carpet" ], layer = 0, rotation = 0 }
+    , { name = "Door", imgSrc = "src/img/doorStructure.svg", width = 140, height = 140, allowedOn = [ "Carpet" ], layer = 1, rotation = 0 }
     , { name = "Window", imgSrc = "src/img/windowStructure.svg", width = 140, height = 10, allowedOn = [ "Bed", "Chair", "Table", "Desktop", "Lamp", "TV", "Carpet", "Plant" ], layer = 4, rotation = 0 }
     ]
 

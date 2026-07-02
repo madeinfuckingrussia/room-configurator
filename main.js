@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1782394570606"
+    "1782989155877"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -9781,7 +9781,7 @@ var $author$project$Main$allAvailableItems = _List_fromArray(
 			['Carpet']),
 		height: 140,
 		imgSrc: 'src/img/doorStructure.svg',
-		layer: 0,
+		layer: 1,
 		name: 'Door',
 		rotation: 0,
 		width: 140
