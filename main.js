@@ -762,7 +762,7 @@ ${indent.repeat(level)}}`;
   var WEBSOCKET_TOKEN = "b08f3545-8129-494a-9091-d28de5566a7c";
   var TARGET_NAME = "Raumplaner";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1782989155877"
+    "1782990838237"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -10094,6 +10094,15 @@ var $elm$core$List$all = F2(
 			list);
 	});
 var $elm$core$Basics$ge = _Utils_ge;
+var $author$project$Main$getItemVisualPos = F3(
+	function (gridX, gridY, item) {
+		var isRotated = (item.rotation === 90) || (item.rotation === 270);
+		var xOffset = isRotated ? ((item.height - item.width) / 2.0) : 0;
+		var yOffset = isRotated ? ((item.width - item.height) / 2.0) : 0;
+		var baseY = (gridY * 10.0) + yOffset;
+		var baseX = (gridX * 10.0) + xOffset;
+		return {cx: baseX + (item.width / 2.0), cy: baseY + (item.height / 2.0), x: baseX, y: baseY};
+	});
 var $author$project$Main$getRotatedItemDimensions = function (item) {
 	return ((item.rotation === 90) || (item.rotation === 270)) ? _Utils_Tuple2(item.height, item.width) : _Utils_Tuple2(item.width, item.height);
 };
@@ -10120,29 +10129,27 @@ var $author$project$Main$checkPlacement = F4(
 		var _v0 = position;
 		var x = _v0.a;
 		var y = _v0.b;
-		var cx = (x * 10) + (item.width / 2.0);
-		var cy = (y * 10) + (item.height / 2.0);
+		var vItem = A3($author$project$Main$getItemVisualPos, x, y, item);
 		var _v1 = $author$project$Main$getRotatedItemDimensions(item);
 		var itemX = _v1.a;
 		var itemY = _v1.b;
-		var nx1 = cx - (itemX / 2.0);
-		var nx2 = cx + (itemX / 2.0);
-		var ny1 = cy - (itemY / 2.0);
-		var ny2 = cy + (itemY / 2.0);
+		var nx1 = vItem.cx - (itemX / 2.0);
+		var nx2 = vItem.cx + (itemX / 2.0);
+		var ny1 = vItem.cy - (itemY / 2.0);
+		var ny2 = vItem.cy + (itemY / 2.0);
 		var checkCollision = function (_v3) {
 			var _v4 = _v3.a;
 			var oldx = _v4.a;
 			var oldy = _v4.b;
 			var oldItem = _v3.b;
-			var oldCy = (oldy * 10) + (oldItem.height / 2.0);
-			var oldCx = (oldx * 10) + (oldItem.width / 2.0);
+			var vOld = A3($author$project$Main$getItemVisualPos, oldx, oldy, oldItem);
 			var _v2 = $author$project$Main$getRotatedItemDimensions(oldItem);
 			var oldItemX = _v2.a;
 			var oldItemY = _v2.b;
-			var ox1 = oldCx - (oldItemX / 2.0);
-			var ox2 = oldCx + (oldItemX / 2.0);
-			var oy1 = oldCy - (oldItemY / 2.0);
-			var oy2 = oldCy + (oldItemY / 2.0);
+			var ox1 = vOld.cx - (oldItemX / 2.0);
+			var ox2 = vOld.cx + (oldItemX / 2.0);
+			var oy1 = vOld.cy - (oldItemY / 2.0);
+			var oy2 = vOld.cy + (oldItemY / 2.0);
 			return ((_Utils_cmp(nx2, ox1) < 1) || ((_Utils_cmp(nx1, ox2) > -1) || ((_Utils_cmp(ny2, oy1) < 1) || (_Utils_cmp(ny1, oy2) > -1)))) ? true : (A2($elm$core$List$member, oldItem.name, item.allowedOn) ? true : false);
 		};
 		var checkAllCollisions = A2(
@@ -10185,15 +10192,12 @@ var $author$project$Main$findItemAtPos = F2(
 			var oldx = _v3.a;
 			var oldy = _v3.b;
 			var oldItem = _v2.b;
-			var oy1 = oldy * 10;
-			var ox1 = oldx * 10;
+			var vOld = A3($author$project$Main$getItemVisualPos, oldx, oldy, oldItem);
 			var isRotated = (oldItem.rotation === 90) || (oldItem.rotation === 270);
-			var cy = oy1 + (oldItem.height / 2.0);
-			var yMax = isRotated ? (cy + (oldItem.width / 2.0)) : (cy + (oldItem.height / 2.0));
-			var yMin = isRotated ? (cy - (oldItem.width / 2.0)) : (cy - (oldItem.height / 2.0));
-			var cx = ox1 + (oldItem.width / 2.0);
-			var xMax = isRotated ? (cx + (oldItem.height / 2.0)) : (cx + (oldItem.width / 2.0));
-			var xMin = isRotated ? (cx - (oldItem.height / 2.0)) : (cx - (oldItem.width / 2.0));
+			var xMax = isRotated ? (vOld.cx + (oldItem.height / 2.0)) : (vOld.cx + (oldItem.width / 2.0));
+			var xMin = isRotated ? (vOld.cx - (oldItem.height / 2.0)) : (vOld.cx - (oldItem.width / 2.0));
+			var yMax = isRotated ? (vOld.cy + (oldItem.width / 2.0)) : (vOld.cy + (oldItem.height / 2.0));
+			var yMin = isRotated ? (vOld.cy - (oldItem.width / 2.0)) : (vOld.cy - (oldItem.height / 2.0));
 			return ((_Utils_cmp(px, xMin) > -1) && (_Utils_cmp(px, xMax) < 0)) && ((_Utils_cmp(py, yMin) > -1) && (_Utils_cmp(py, yMax) < 0));
 		};
 		return $elm$core$List$head(
@@ -10989,17 +10993,14 @@ var $author$project$Main$renderModifyingOverlay = F2(
 	function (_v0, item) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var posY = y * 10;
-		var posX = x * 10;
-		var cy = (y * 10.0) + (item.height / 2.0);
-		var cx = (x * 10.0) + (item.width / 2.0);
+		var vItem = A3($author$project$Main$getItemVisualPos, x, y, item);
 		var btnSpacing = 8;
 		var btnSize = 24;
 		var totalWidth = (btnSize * 3) + (btnSpacing * 2);
-		var barY = posY + ((item.height - btnSize) / 2.0);
-		var barX = posX + ((item.width - totalWidth) / 2.0);
+		var barY = vItem.y + ((item.height - btnSize) / 2.0);
+		var barX = vItem.x + ((item.width - totalWidth) / 2.0);
 		var angle = $elm$core$String$fromInt(item.rotation);
-		var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(cx) + (', ' + ($elm$core$String$fromFloat(cy) + ')')))));
+		var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(vItem.cx) + (', ' + ($elm$core$String$fromFloat(vItem.cy) + ')')))));
 		return A2(
 			$elm$svg$Svg$g,
 			_List_Nil,
@@ -11010,9 +11011,9 @@ var $author$project$Main$renderModifyingOverlay = F2(
 					_List_fromArray(
 						[
 							$elm$svg$Svg$Attributes$x(
-							$elm$core$String$fromFloat(posX)),
+							$elm$core$String$fromFloat(vItem.x)),
 							$elm$svg$Svg$Attributes$y(
-							$elm$core$String$fromFloat(posY)),
+							$elm$core$String$fromFloat(vItem.y)),
 							$elm$svg$Svg$Attributes$width(
 							$elm$core$String$fromFloat(item.width)),
 							$elm$svg$Svg$Attributes$height(
@@ -11187,9 +11188,8 @@ var $author$project$Main$renderCanvas = function (model) {
 				var _v8 = model.mousePosition;
 				var mx = _v8.a;
 				var my = _v8.b;
-				var cx = (mx * 10.0) + (item.width / 2.0);
-				var cy = (my * 10.0) + (item.height / 2.0);
-				var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(cx) + (', ' + ($elm$core$String$fromFloat(cy) + ')')))));
+				var vItem = A3($author$project$Main$getItemVisualPos, mx, my, item);
+				var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(vItem.cx) + (', ' + ($elm$core$String$fromFloat(vItem.cy) + ')')))));
 				return _List_fromArray(
 					[
 						A2(
@@ -11206,9 +11206,9 @@ var $author$project$Main$renderCanvas = function (model) {
 									[
 										$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
 										$elm$svg$Svg$Attributes$x(
-										$elm$core$String$fromInt(mx * 10)),
+										$elm$core$String$fromFloat(vItem.x)),
 										$elm$svg$Svg$Attributes$y(
-										$elm$core$String$fromInt(my * 10)),
+										$elm$core$String$fromFloat(vItem.y)),
 										$elm$svg$Svg$Attributes$width(
 										$elm$core$String$fromFloat(item.width)),
 										$elm$svg$Svg$Attributes$height(
@@ -11222,9 +11222,9 @@ var $author$project$Main$renderCanvas = function (model) {
 								_List_fromArray(
 									[
 										$elm$svg$Svg$Attributes$x(
-										$elm$core$String$fromInt(mx * 10)),
+										$elm$core$String$fromFloat(vItem.x)),
 										$elm$svg$Svg$Attributes$y(
-										$elm$core$String$fromInt(my * 10)),
+										$elm$core$String$fromFloat(vItem.y)),
 										$elm$svg$Svg$Attributes$width(
 										$elm$core$String$fromFloat(item.width)),
 										$elm$svg$Svg$Attributes$height(
@@ -11261,6 +11261,7 @@ var $author$project$Main$renderCanvas = function (model) {
 			var x = _v2.a;
 			var y = _v2.b;
 			var item = _v1.b;
+			var vItem = A3($author$project$Main$getItemVisualPos, x, y, item);
 			var isModifying = function () {
 				if (modifyingData.$ === 'Just') {
 					var _v4 = modifyingData.a;
@@ -11272,10 +11273,8 @@ var $author$project$Main$renderCanvas = function (model) {
 					return false;
 				}
 			}();
-			var cy = (y * 10.0) + (item.height / 2.0);
-			var cx = (x * 10.0) + (item.width / 2.0);
 			var angle = $elm$core$String$fromInt(item.rotation);
-			var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(cx) + (', ' + ($elm$core$String$fromFloat(cy) + ')')))));
+			var groupTransform = 'rotate(' + (angle + (', ' + ($elm$core$String$fromFloat(vItem.cx) + (', ' + ($elm$core$String$fromFloat(vItem.cy) + ')')))));
 			return A2(
 				$elm$svg$Svg$g,
 				_List_Nil,
@@ -11295,9 +11294,9 @@ var $author$project$Main$renderCanvas = function (model) {
 									[
 										$elm$svg$Svg$Attributes$xlinkHref(item.imgSrc),
 										$elm$svg$Svg$Attributes$x(
-										$elm$core$String$fromInt(x * 10)),
+										$elm$core$String$fromFloat(vItem.x)),
 										$elm$svg$Svg$Attributes$y(
-										$elm$core$String$fromInt(y * 10)),
+										$elm$core$String$fromFloat(vItem.y)),
 										$elm$svg$Svg$Attributes$width(
 										$elm$core$String$fromFloat(item.width)),
 										$elm$svg$Svg$Attributes$height(

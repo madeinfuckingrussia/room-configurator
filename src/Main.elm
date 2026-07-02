@@ -76,6 +76,14 @@ type alias Model =
     }
 
 
+type alias VisualPos =
+    { x : Float
+    , y : Float
+    , cx : Float
+    , cy : Float
+    }
+
+
 allAvailableItems : List RoomItem
 allAvailableItems =
     [ { name = "Bed", imgSrc = "src/img/bedFurniture.png", width = 140, height = 200, allowedOn = [ "Carpet" ], layer = 3, rotation = 0 }
@@ -642,6 +650,39 @@ getRotatedItemDimensions item =
         ( item.width, item.height )
 
 
+getItemVisualPos : Int -> Int -> RoomItem -> VisualPos
+getItemVisualPos gridX gridY item =
+    let
+        isRotated =
+            item.rotation == 90 || item.rotation == 270
+
+        xOffset =
+            if isRotated then
+                (item.height - item.width) / 2.0
+
+            else
+                0
+
+        yOffset =
+            if isRotated then
+                (item.width - item.height) / 2.0
+
+            else
+                0
+
+        baseX =
+            (toFloat gridX * 10.0) + xOffset
+
+        baseY =
+            (toFloat gridY * 10.0) + yOffset
+    in
+    { x = baseX
+    , y = baseY
+    , cx = baseX + (item.width / 2.0)
+    , cy = baseY + (item.height / 2.0)
+    }
+
+
 checkPlacement : Model -> Position -> RoomItem -> Grid -> Result Msg Grid
 checkPlacement model position item oldGrid =
     let
@@ -651,46 +692,40 @@ checkPlacement model position item oldGrid =
         ( itemX, itemY ) =
             getRotatedItemDimensions item
 
-        cx =
-            (toFloat x * 10) + (item.width / 2.0)
-
-        cy =
-            (toFloat y * 10) + (item.height / 2.0)
+        vItem =
+            getItemVisualPos x y item
 
         nx1 =
-            cx - (itemX / 2.0)
+            vItem.cx - (itemX / 2.0)
 
         nx2 =
-            cx + (itemX / 2.0)
+            vItem.cx + (itemX / 2.0)
 
         ny1 =
-            cy - (itemY / 2.0)
+            vItem.cy - (itemY / 2.0)
 
         ny2 =
-            cy + (itemY / 2.0)
+            vItem.cy + (itemY / 2.0)
 
         checkCollision ( ( oldx, oldy ), oldItem ) =
             let
                 ( oldItemX, oldItemY ) =
                     getRotatedItemDimensions oldItem
 
-                oldCx =
-                    (toFloat oldx * 10) + (oldItem.width / 2.0)
-
-                oldCy =
-                    (toFloat oldy * 10) + (oldItem.height / 2.0)
+                vOld =
+                    getItemVisualPos oldx oldy oldItem
 
                 ox1 =
-                    oldCx - (oldItemX / 2.0)
+                    vOld.cx - (oldItemX / 2.0)
 
                 ox2 =
-                    oldCx + (oldItemX / 2.0)
+                    vOld.cx + (oldItemX / 2.0)
 
                 oy1 =
-                    oldCy - (oldItemY / 2.0)
+                    vOld.cy - (oldItemY / 2.0)
 
                 oy2 =
-                    oldCy + (oldItemY / 2.0)
+                    vOld.cy + (oldItemY / 2.0)
             in
             if (nx2 <= ox1) || (nx1 >= ox2) || (ny2 <= oy1) || (ny1 >= oy2) then
                 True
@@ -732,48 +767,39 @@ findItemAtPos ( clickX, clickY ) items =
 
         isHit ( ( oldx, oldy ), oldItem ) =
             let
-                ox1 =
-                    toFloat oldx * 10
-
-                oy1 =
-                    toFloat oldy * 10
-
-                cx =
-                    ox1 + (oldItem.width / 2.0)
-
-                cy =
-                    oy1 + (oldItem.height / 2.0)
+                vOld =
+                    getItemVisualPos oldx oldy oldItem
 
                 isRotated =
                     oldItem.rotation == 90 || oldItem.rotation == 270
 
                 xMin =
                     if isRotated then
-                        cx - (oldItem.height / 2.0)
+                        vOld.cx - (oldItem.height / 2.0)
 
                     else
-                        cx - (oldItem.width / 2.0)
+                        vOld.cx - (oldItem.width / 2.0)
 
                 xMax =
                     if isRotated then
-                        cx + (oldItem.height / 2.0)
+                        vOld.cx + (oldItem.height / 2.0)
 
                     else
-                        cx + (oldItem.width / 2.0)
+                        vOld.cx + (oldItem.width / 2.0)
 
                 yMin =
                     if isRotated then
-                        cy - (oldItem.width / 2.0)
+                        vOld.cy - (oldItem.width / 2.0)
 
                     else
-                        cy - (oldItem.height / 2.0)
+                        vOld.cy - (oldItem.height / 2.0)
 
                 yMax =
                     if isRotated then
-                        cy + (oldItem.width / 2.0)
+                        vOld.cy + (oldItem.width / 2.0)
 
                     else
-                        cy + (oldItem.height / 2.0)
+                        vOld.cy + (oldItem.height / 2.0)
             in
             (px >= xMin && px < xMax) && (py >= yMin && py < yMax)
     in
@@ -1077,24 +1103,21 @@ renderCanvas model =
                                     Nothing ->
                                         False
 
-                            cx =
-                                (toFloat x * 10.0) + (item.width / 2.0)
-
-                            cy =
-                                (toFloat y * 10.0) + (item.height / 2.0)
+                            vItem =
+                                getItemVisualPos x y item
 
                             angle =
                                 String.fromInt item.rotation
 
                             groupTransform =
-                                "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
+                                "rotate(" ++ angle ++ ", " ++ String.fromFloat vItem.cx ++ ", " ++ String.fromFloat vItem.cy ++ ")"
                         in
                         Svg.g []
                             [ Svg.g [ SvgAttr.transform groupTransform ]
                                 [ Svg.image
                                     [ SvgAttr.xlinkHref item.imgSrc
-                                    , SvgAttr.x (String.fromInt (x * 10))
-                                    , SvgAttr.y (String.fromInt (y * 10))
+                                    , SvgAttr.x (String.fromFloat vItem.x)
+                                    , SvgAttr.y (String.fromFloat vItem.y)
                                     , SvgAttr.width (String.fromFloat item.width)
                                     , SvgAttr.height (String.fromFloat item.height)
                                     , SvgAttr.preserveAspectRatio "none"
@@ -1126,24 +1149,21 @@ renderCanvas model =
                         ( mx, my ) =
                             model.mousePosition
 
-                        cx =
-                            (toFloat mx * 10.0) + (item.width / 2.0)
-
-                        cy =
-                            (toFloat my * 10.0) + (item.height / 2.0)
+                        vItem =
+                            getItemVisualPos mx my item
 
                         angle =
                             String.fromInt item.rotation
 
                         groupTransform =
-                            "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
+                            "rotate(" ++ angle ++ ", " ++ String.fromFloat vItem.cx ++ ", " ++ String.fromFloat vItem.cy ++ ")"
                     in
                     [ Svg.g
                         [ SvgAttr.transform groupTransform ]
                         [ Svg.image
                             [ SvgAttr.xlinkHref item.imgSrc
-                            , SvgAttr.x (String.fromInt (mx * 10))
-                            , SvgAttr.y (String.fromInt (my * 10))
+                            , SvgAttr.x (String.fromFloat vItem.x)
+                            , SvgAttr.y (String.fromFloat vItem.y)
                             , SvgAttr.width (String.fromFloat item.width)
                             , SvgAttr.height (String.fromFloat item.height)
                             , SvgAttr.preserveAspectRatio "none"
@@ -1151,8 +1171,8 @@ renderCanvas model =
                             ]
                             []
                         , Svg.rect
-                            [ SvgAttr.x (String.fromInt (mx * 10))
-                            , SvgAttr.y (String.fromInt (my * 10))
+                            [ SvgAttr.x (String.fromFloat vItem.x)
+                            , SvgAttr.y (String.fromFloat vItem.y)
                             , SvgAttr.width (String.fromFloat item.width)
                             , SvgAttr.height (String.fromFloat item.height)
                             , SvgAttr.fill "none"
@@ -1244,11 +1264,8 @@ renderCanvas model =
 renderModifyingOverlay : Position -> RoomItem -> Svg Msg
 renderModifyingOverlay ( x, y ) item =
     let
-        posX =
-            toFloat x * 10
-
-        posY =
-            toFloat y * 10
+        vItem =
+            getItemVisualPos x y item
 
         btnSize =
             24
@@ -1260,27 +1277,21 @@ renderModifyingOverlay ( x, y ) item =
             (btnSize * 3) + (btnSpacing * 2)
 
         barX =
-            posX + ((item.width - totalWidth) / 2.0)
+            vItem.x + ((item.width - totalWidth) / 2.0)
 
         barY =
-            posY + ((item.height - btnSize) / 2.0)
-
-        cx =
-            (toFloat x * 10.0) + (item.width / 2.0)
-
-        cy =
-            (toFloat y * 10.0) + (item.height / 2.0)
+            vItem.y + ((item.height - btnSize) / 2.0)
 
         angle =
             String.fromInt item.rotation
 
         groupTransform =
-            "rotate(" ++ angle ++ ", " ++ String.fromFloat cx ++ ", " ++ String.fromFloat cy ++ ")"
+            "rotate(" ++ angle ++ ", " ++ String.fromFloat vItem.cx ++ ", " ++ String.fromFloat vItem.cy ++ ")"
     in
     Svg.g []
         [ Svg.rect
-            [ SvgAttr.x (String.fromFloat posX)
-            , SvgAttr.y (String.fromFloat posY)
+            [ SvgAttr.x (String.fromFloat vItem.x)
+            , SvgAttr.y (String.fromFloat vItem.y)
             , SvgAttr.width (String.fromFloat item.width)
             , SvgAttr.height (String.fromFloat item.height)
             , SvgAttr.fill "none"
